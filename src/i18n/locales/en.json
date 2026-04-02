@@ -506,5 +506,8 @@
   "passwordMustContainAtLeastOneSpecialCharacter": "Must contain at least one special character",
   "passwordsDoNotMatch": "Passwords do not match",
   "error": "Error",
-  "registrationFailed": "Registration failed. Please try again."
+  "registrationFailed": "Registration failed. Please try again.",
+  "tryAgain": "Please try again.",
+  "loginSuccessful": "Login successful.",
+  "success": "Success."
 }

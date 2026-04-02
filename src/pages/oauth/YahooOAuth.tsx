@@ -1,0 +1,264 @@
+/* eslint-disable camelcase */
+import React, { useState, useEffect } from 'react';
+import { Button, Stack, Alert, Text } from '@mantine/core';
+import { IconBrandYahoo, IconAlertCircle } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { notifications } from '@mantine/notifications';
+import { UAParser } from 'ua-parser-js';
+// import { USER_ROLES, UserRole } from '@/types/auth';
+// import { useStoreActions } from '@/store';
+import { createPortal } from 'react-dom';
+import { get, post } from '../../utils/api.utils';
+import Spinner from '../../components/spinner/Spinner';
+
+enum DeviceType {
+  Mobile = 1,
+  Tablet = 2,
+  Desktop = 3
+}
+
+interface DeviceInfo {
+  deviceType: DeviceType;
+  userAgent: string;
+  operatingSystem: string;
+  browser: string;
+  lastIPAddress: string;
+}
+
+interface SimpleYahooOAuthProps {
+  isMobile?: boolean;
+  clientId?: string;
+}
+
+const YahooOAuth: React.FC<SimpleYahooOAuthProps> = ({
+  isMobile = false,
+  clientId = import.meta.env.VITE_YAHOO_CLIENT_ID
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
+    deviceType: DeviceType.Desktop,
+    userAgent: '',
+    operatingSystem: '',
+    browser: '',
+    lastIPAddress: ''
+  });
+
+  const [capturedParams] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+      code: urlParams.get('code'),
+      state: urlParams.get('state'),
+      error: urlParams.get('error'),
+      errorDescription: urlParams.get('error_description'),
+    };
+  });
+
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  // const {
+  //   authModel: { setAuthToken },
+  //   userModel: { setAuthUser, setRole }
+  // } = useStoreActions((actions) => actions);
+
+  useEffect(() => { initDeviceInfo(); }, []);
+
+  useEffect(() => {
+    if (!capturedParams.state?.startsWith('yahoo_')) return;
+    if (!deviceInfo.lastIPAddress) return;
+
+    const { code, state, error: errorParam, errorDescription } = capturedParams;
+
+    if (errorParam) {
+      setError(`Authentication failed: ${errorDescription || errorParam}`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
+    if (code && state) {
+      const storedState = sessionStorage.getItem('yahoo_oauth_state');
+      const codeVerifier = sessionStorage.getItem('yahoo_code_verifier');
+
+      if (!storedState || !codeVerifier || storedState !== state) {
+        setError('Invalid state parameter. Please try again.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      sessionStorage.removeItem('yahoo_oauth_state');
+      sessionStorage.removeItem('yahoo_code_verifier');
+      sessionStorage.removeItem('yahoo_redirect_uri');
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+      exchangeCodeForUserData(code, codeVerifier);
+    }
+  }, [deviceInfo.lastIPAddress]);
+
+  const getIPAddress = async () => {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      return data.ip;
+    } catch {
+      return '';
+    }
+  };
+
+  const initDeviceInfo = async () => {
+    const parser = new UAParser(navigator.userAgent);
+    const result = parser.getResult();
+    let deviceType = DeviceType.Desktop;
+    if (result.device.type === 'mobile') deviceType = DeviceType.Mobile;
+    else if (result.device.type === 'tablet') deviceType = DeviceType.Tablet;
+    const ip = await getIPAddress();
+    setDeviceInfo({
+      deviceType,
+      userAgent: navigator.userAgent,
+      operatingSystem: `${result.os.name} ${result.os.version}`,
+      browser: `${result.browser.name} ${result.browser.version}`,
+      lastIPAddress: ip
+    });
+  };
+
+  const generateRandomString = (length = 32): string => {
+    const array = new Uint8Array(length);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode(...array))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  };
+
+  const generateCodeChallenge = async (verifier: string): Promise<string> => {
+    const data = new TextEncoder().encode(verifier);
+    const hashed = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(hashed)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  };
+
+  const exchangeCodeForUserData = async (code: string, codeVerifier: string) => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const redirectUri = sessionStorage.getItem('yahoo_redirect_uri') ||
+        `${window.location.origin}${window.location.pathname}`;
+
+      const savedUserType = sessionStorage.getItem('ms_user_type');
+      sessionStorage.removeItem('ms_user_type');
+
+      const response = await post('Authentication/yahoo-verify', {
+        code,
+        codeVerifier,
+        redirectUri,
+        ...deviceInfo,
+        ...(savedUserType && {
+          userType: savedUserType[0].toUpperCase() + savedUserType.slice(1)
+        }),
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to verify Yahoo authentication');
+      }
+
+      const authData = response.data;
+      const res = await get(`Users/user/${authData.userId}`);
+      if (!res.success) throw new Error('Failed to get user data');
+
+      // setAuthToken(authData.token);
+      // setAuthUser(res.data);
+      // setRole((authData.role));
+      if (authData.token) localStorage.setItem('authToken', authData.token);
+
+      notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
+      navigate('/profile');
+
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Authentication failed';
+      setError(msg);
+      notifications.show({ color: 'red', title: t('error'), message: msg });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startYahooOAuth = async () => {
+    setError('');
+
+    sessionStorage.removeItem('google_oauth_state');
+    sessionStorage.removeItem('facebook_oauth_state');
+    sessionStorage.removeItem('ms_state');
+    sessionStorage.removeItem('ms_verifier');
+
+    const state = 'yahoo_' + generateRandomString(16);
+    const codeVerifier = generateRandomString(32);
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    const redirectUri = `${window.location.origin}${window.location.pathname}`;
+
+    sessionStorage.setItem('yahoo_oauth_state', state);
+    sessionStorage.setItem('yahoo_code_verifier', codeVerifier);
+    sessionStorage.setItem('yahoo_redirect_uri', redirectUri);
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'openid email profile',
+      state,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256',
+    });
+
+    window.location.href = `https://api.login.yahoo.com/oauth2/request_auth?${params.toString()}`;
+  };
+
+  if (error) {
+    return (
+      <Stack gap="xs">
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          color="red"
+          variant="light"
+          radius="md"
+          styles={{
+            root: { padding: '12px 14px' },
+            message: { fontSize: '13px' },
+          }}
+        >
+          <Text size="sm">{error}</Text>
+        </Alert>
+        <Button
+          variant="outline"
+          color="red"
+          size="sm"
+          onClick={() => setError('')}
+          fullWidth
+          radius="md"
+        >
+          {t('tryAgain')}
+        </Button>
+      </Stack>
+    );
+  }
+
+  return (
+    <>
+      {isLoading && createPortal(<Spinner visible={isLoading} />, document.body)}
+      <Button
+        variant="outline"
+        color="teal"
+        onClick={startYahooOAuth}
+        fullWidth
+        size={isMobile ? 'xs' : 'sm'}
+        radius="md"
+        leftSection={<IconBrandYahoo size={18} />}
+      >
+        {t('login.yahoo')}
+      </Button>
+    </>
+  );
+};
+
+export default YahooOAuth;

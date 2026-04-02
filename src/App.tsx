@@ -9,7 +9,7 @@ import VehicleDetailPage from './pages/VehicleDetailPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+import RegisterPage from './pages/register/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProfilePage from './pages/account/ProfilePage';
 import SavedCarsPage from './pages/account/SavedCarsPage';

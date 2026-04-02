@@ -506,5 +506,8 @@
     "uppercase": "Una lettera maiuscola",
     "number": "Un numero",
     "special": "Un carattere speciale"
-  }
+  },
+  "tryAgain": "Per favore riprova.",
+  "loginSuccessful": "Accesso effettuato con successo.",
+  "success": "Successo."
 }
