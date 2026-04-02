@@ -15,6 +15,8 @@ import {
   Divider,
   Select,
   Popover,
+  Tooltip,
+  ActionIcon,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -29,6 +31,7 @@ import {
   IconBrandYahoo,
   IconCalendar,
   IconId,
+  IconTrash,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
@@ -87,8 +90,8 @@ export default function RegisterPage() {
     const fetchPrefixes = async () => {
       try {
         const response = await get('StatePrefix/getAll');
-        console.log("response.data",response)
-        if (response.success   ) {
+        console.log("response.data", response)
+        if (response.success) {
           setPhonePrefixes(response.data as PhonePrefix[]);
           if (response.data.length > 0) {
             setPhonePrefix(response.data[0].phonePrefix ?? '+355');
@@ -142,6 +145,15 @@ export default function RegisterPage() {
       },
       confirmPassword: (v, values) =>
         v !== values.password ? t('passwordsDoNotMatch') : null,
+      dateOfBirth: (value) => {
+        if (!value) return null;
+        const date = new Date(value);
+        if (date > new Date()) return t('dateOfBirthCannotBeInFuture');
+        const minAge = new Date();
+        minAge.setFullYear(minAge.getFullYear() - 18);
+        if (date > minAge) return t('youMustBeAtLeast18YearsOld');
+        return null;
+      },
     },
   });
 
@@ -174,6 +186,7 @@ export default function RegisterPage() {
       if (response.success) {
         notifications.show({
           color: 'teal',
+          title: t('success'),
           message: t('register.success'),
         });
         navigate('/login');
@@ -288,7 +301,7 @@ export default function RegisterPage() {
                           cursor: 'pointer',
                           overflow: 'hidden',
                           flexShrink: 0,
-                          background: imagePreview ? 'transparent' : 'var(--mantine-color-dark-4)',
+                          background: imagePreview ? 'transparent' : 'var(--mantine-color-body)',
                         }}
                       >
                         {imagePreview ? (
@@ -317,17 +330,21 @@ export default function RegisterPage() {
                           </Text>
                         )}
                         {imagePreview && (
-                          <Anchor
-                            size="xs"
-                            c="red"
-                            onClick={() => {
-                              form.setFieldValue('image', { name: '', data: '' });
-                              setImagePreview(null);
-                              if (fileInputRef.current) fileInputRef.current.value = '';
-                            }}
-                          >
-                            {t('register.removePhoto')}
-                          </Anchor>
+                          <Tooltip label={t('register.removePhoto')} withArrow position="right">
+                            <ActionIcon
+                              variant="light"
+                              color="red"
+                              size="sm"
+                              radius="xl"
+                              onClick={() => {
+                                form.setFieldValue('image', { name: '', data: '' });
+                                setImagePreview(null);
+                                if (fileInputRef.current) fileInputRef.current.value = '';
+                              }}
+                            >
+                              <IconTrash size={14} />
+                            </ActionIcon>
+                          </Tooltip>
                         )}
                       </Stack>
                       <input
@@ -344,7 +361,6 @@ export default function RegisterPage() {
                   <TextInput
                     label={t('register.email')}
                     placeholder="email@example.com"
-                    type="email"
                     leftSection={<IconMail size={16} />}
                     withAsterisk
                     {...form.getInputProps('email')}
@@ -369,7 +385,6 @@ export default function RegisterPage() {
                       />
                       <TextInput
                         placeholder="6X XXX XXXX"
-                        type="tel"
                         leftSection={<IconPhone size={16} />}
                         style={{ flex: 1 }}
                         {...form.getInputProps('phone')}
@@ -378,15 +393,18 @@ export default function RegisterPage() {
                   </Box>
 
                   {/* Date of birth */}
-                  <DateInput
-                    label={t('register.dateOfBirth')}
-                    placeholder="DD/MM/YYYY"
-                    leftSection={<IconCalendar size={16} />}
-                    maxDate={new Date()}
-                    valueFormat="DD/MM/YYYY"
-                    clearable
-                    {...form.getInputProps('dateOfBirth')}
-                  />
+                  <Box>
+                    <DateInput
+                      label={t('register.dateOfBirth')}
+                      placeholder="DD/MM/YYYY"
+                      leftSection={<IconCalendar size={16} />}
+                      maxDate={new Date()}
+                      valueFormat="DD/MM/YYYY"
+                      clearable
+                      {...form.getInputProps('dateOfBirth')}
+                    />
+                  </Box>
+
 
                   {/* Password with popover rules */}
                   <Popover
@@ -464,14 +482,14 @@ export default function RegisterPage() {
               <Divider label={t('register.orSocial')} labelPosition="center" my="lg" />
 
               <StaggerContainer stagger={0.06}>
-                 <Box mb="lg">
-              <Stack gap="sm">
-                <GoogleOAuth />
-                <FacebookOAuth />
-                <MicrosoftOAuth />
-                <YahooOAuth />
-              </Stack>
-            </Box>
+                <Box mb="lg">
+                  <Stack gap="sm">
+                    <GoogleOAuth />
+                    <FacebookOAuth />
+                    <MicrosoftOAuth />
+                    <YahooOAuth />
+                  </Stack>
+                </Box>
               </StaggerContainer>
             </Paper>
           </AnimatedSection>

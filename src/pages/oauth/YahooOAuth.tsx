@@ -160,12 +160,12 @@ const YahooOAuth: React.FC<SimpleYahooOAuthProps> = ({
       });
 
       if (!response.success) {
-        throw new Error(response.message || 'Failed to verify Yahoo authentication');
+        throw new Error(response.message?.toString());
       }
 
       const authData = response.data;
-      const res = await get(`Users/user/${authData.userId}`);
-      if (!res.success) throw new Error('Failed to get user data');
+      // const res = await get(`Users/user/${authData.userId}`);
+      // if (!res.success) throw new Error('Failed to get user data');
 
       // setAuthToken(authData.token);
       // setAuthUser(res.data);

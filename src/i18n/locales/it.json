@@ -509,5 +509,7 @@
   },
   "tryAgain": "Per favore riprova.",
   "loginSuccessful": "Accesso effettuato con successo.",
-  "success": "Successo."
+  "success": "Successo.",
+  "dateOfBirthCannotBeInFuture": "La data di nascita non può essere nel futuro",
+  "youMustBeAtLeast18YearsOld": "Devi avere almeno 18 anni"
 }

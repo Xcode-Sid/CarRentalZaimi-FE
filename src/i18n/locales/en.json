@@ -509,5 +509,7 @@
   "registrationFailed": "Registration failed. Please try again.",
   "tryAgain": "Please try again.",
   "loginSuccessful": "Login successful.",
-  "success": "Success."
+  "success": "Success.",
+  "dateOfBirthCannotBeInFuture": "Date of birth cannot be in the future",
+  "youMustBeAtLeast18YearsOld": "You must be at least 18 years old"
 }

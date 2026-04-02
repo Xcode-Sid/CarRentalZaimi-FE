@@ -507,5 +507,7 @@
   },
   "tryAgain": "Ju lutemi provoni përsëri.",
   "loginSuccessful": "Hyrja u krye me sukses.",
-  "success": "Sukses."
+  "success": "Sukses.",
+  "dateOfBirthCannotBeInFuture": "Data e lindjes nuk mund të jetë në të ardhmen",
+  "youMustBeAtLeast18YearsOld": "Duhet të kesh të paktën 18 vjeç"
 }
