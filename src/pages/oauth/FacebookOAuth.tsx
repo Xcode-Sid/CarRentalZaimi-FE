@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import { get, post } from '../../utils/api.utils';
 import Spinner from '../../components/spinner/Spinner';
+import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
 
 enum DeviceType {
   Mobile = 1,
@@ -30,18 +31,11 @@ interface SimpleFacebookOAuthProps {
   appId?: string;
 }
 
-const FacebookIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708V30.938h-6.094V24h6.094v-5.288c0-6.015 3.583-9.337 9.065-9.337 2.625 0 5.372.469 5.372.469v5.906h-3.026c-2.981 0-3.911 1.85-3.911 3.75V24h6.656l-1.064 6.938H27.75v16.77C39.224 45.908 48 35.979 48 24z"
-      fill="#1877F2"
-    />
-    <path
-      d="M33.342 30.938L34.406 24H27.75v-4.5c0-1.9.93-3.75 3.911-3.75h3.026V9.844s-2.747-.469-5.372-.469c-5.482 0-9.065 3.322-9.065 9.337V24h-6.094v6.938h6.094v16.77a24.18 24.18 0 0 0 7.5 0V30.938h5.592z"
-      fill="#fff"
-    />
-  </svg>
-);
+interface PendingAuthData {
+  token: string;
+  user: Record<string, unknown>;
+  role: { name: string } | string;
+}
 
 const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
   isMobile = false,
@@ -49,6 +43,9 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [pendingAuthData, setPendingAuthData] = useState<PendingAuthData | null>(null);
+
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
     deviceType: DeviceType.Desktop,
     userAgent: '',
@@ -146,6 +143,17 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
     }
   };
 
+
+  const getRoleName = (role: PendingAuthData['role']): string =>
+    typeof role === 'string' ? role : role?.name ?? '';
+
+  const completeLogin = (authData: PendingAuthData) => {
+    const roleName = getRoleName(authData.role);
+    notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
+    navigate(roleName === 'admin' ? '/admin' : '/account', { replace: true });
+  };
+
+
   const exchangeCodeForUserData = async (code: string) => {
     setIsLoading(true);
     setError('');
@@ -239,6 +247,17 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
       >
         {t('login.facebook')}
       </Button>
+      {pendingAuthData && (
+        <PhoneNumberModal
+          opened={phoneModalOpen}
+          userId={(pendingAuthData.user as Record<string, unknown>).id as string}
+          onClose={() => setPhoneModalOpen(false)}
+          onSuccess={() => {
+            setPhoneModalOpen(false);
+            completeLogin(pendingAuthData);
+          }}
+        />
+      )}
     </>
   );
 };

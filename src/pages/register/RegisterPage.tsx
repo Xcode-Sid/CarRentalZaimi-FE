@@ -220,15 +220,6 @@ export default function RegisterPage() {
     reader.readAsDataURL(file);
   };
 
-  // ── Social (unchanged — no real auth yet) ──────────────────────────────────
-  const handleSocialRegister = (provider: string) => {
-    notifications.show({
-      message: `${t('register.success')} (${provider})`,
-      color: 'teal',
-    });
-    navigate('/login');
-  };
-
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <>

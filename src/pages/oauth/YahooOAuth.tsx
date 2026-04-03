@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import { get, post } from '../../utils/api.utils';
 import Spinner from '../../components/spinner/Spinner';
+import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
 
 enum DeviceType {
   Mobile = 1,
@@ -30,12 +31,23 @@ interface SimpleYahooOAuthProps {
   clientId?: string;
 }
 
+
+interface PendingAuthData {
+  token: string;
+  user: Record<string, unknown>;
+  role: { name: string } | string;
+}
+
+
 const YahooOAuth: React.FC<SimpleYahooOAuthProps> = ({
   isMobile = false,
   clientId = import.meta.env.VITE_YAHOO_CLIENT_ID
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [pendingAuthData, setPendingAuthData] = useState<PendingAuthData | null>(null);
+
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
     deviceType: DeviceType.Desktop,
     userAgent: '',
@@ -175,6 +187,17 @@ const YahooOAuth: React.FC<SimpleYahooOAuthProps> = ({
     }
   };
 
+
+  const getRoleName = (role: PendingAuthData['role']): string =>
+    typeof role === 'string' ? role : role?.name ?? '';
+
+  const completeLogin = (authData: PendingAuthData) => {
+    const roleName = getRoleName(authData.role);
+    notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
+    navigate(roleName === 'admin' ? '/admin' : '/account', { replace: true });
+  };
+
+
   const startYahooOAuth = async () => {
     setError('');
 
@@ -248,6 +271,17 @@ const YahooOAuth: React.FC<SimpleYahooOAuthProps> = ({
       >
         {t('login.yahoo')}
       </Button>
+      {pendingAuthData && (
+        <PhoneNumberModal
+          opened={phoneModalOpen}
+          userId={(pendingAuthData.user as Record<string, unknown>).id as string}
+          onClose={() => setPhoneModalOpen(false)}
+          onSuccess={() => {
+            setPhoneModalOpen(false);
+            completeLogin(pendingAuthData);
+          }}
+        />
+      )}
     </>
   );
 };

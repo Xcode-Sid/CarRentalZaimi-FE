@@ -511,5 +511,12 @@
   "loginSuccessful": "Accesso effettuato con successo.",
   "success": "Successo.",
   "dateOfBirthCannotBeInFuture": "La data di nascita non può essere nel futuro",
-  "youMustBeAtLeast18YearsOld": "Devi avere almeno 18 anni"
+  "youMustBeAtLeast18YearsOld": "Devi avere almeno 18 anni",
+  "addPhoneNumber": "Aggiungi Numero di Telefono",
+  "phoneModalDescription": "Si prega di aggiungere il proprio numero di telefono per completare il profilo. Questo passaggio è necessario prima di continuare.",
+  "register.phone": "Telefono",
+  "register.phonePlaceholder": "6X XXX XXXX",
+  "phoneAdded": "Numero di telefono salvato con successo.",
+  "phoneAddFailed": "Salvataggio del numero di telefono non riuscito.",
+  "saveAndContinue": "Salva & Continua"
 }

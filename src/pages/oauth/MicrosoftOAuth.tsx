@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import { get, post } from '../../utils/api.utils';
 import Spinner from '../../components/spinner/Spinner';
+import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
 
 enum DeviceType {
   Mobile = 1,
@@ -31,6 +32,12 @@ interface SimpleMicrosoftOAuthProps {
   isMobile?: boolean;
 }
 
+interface PendingAuthData {
+  token: string;
+  user: Record<string, unknown>;
+  role: { name: string } | string;
+}
+
 const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
   clientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID,
   tenantId = import.meta.env.VITE_MICROSOFT_TENANT_ID,
@@ -38,6 +45,9 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [pendingAuthData, setPendingAuthData] = useState<PendingAuthData | null>(null);
+
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
     deviceType: DeviceType.Desktop,
     userAgent: '',
@@ -183,6 +193,17 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
     }
   };
 
+
+  const getRoleName = (role: PendingAuthData['role']): string =>
+    typeof role === 'string' ? role : role?.name ?? '';
+
+  const completeLogin = (authData: PendingAuthData) => {
+    const roleName = getRoleName(authData.role);
+    notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
+    navigate(roleName === 'admin' ? '/admin' : '/account', { replace: true });
+  };
+
+
   const startOAuth = async () => {
     setError('');
 
@@ -258,6 +279,17 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
       >
         {t('login.microsoft')}
       </Button>
+      {pendingAuthData && (
+        <PhoneNumberModal
+          opened={phoneModalOpen}
+          userId={(pendingAuthData.user as Record<string, unknown>).id as string}
+          onClose={() => setPhoneModalOpen(false)}
+          onSuccess={() => {
+            setPhoneModalOpen(false);
+            completeLogin(pendingAuthData);
+          }}
+        />
+      )}
     </>
   );
 };

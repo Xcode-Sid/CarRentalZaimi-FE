@@ -509,5 +509,12 @@
   "loginSuccessful": "Hyrja u krye me sukses.",
   "success": "Sukses.",
   "dateOfBirthCannotBeInFuture": "Data e lindjes nuk mund të jetë në të ardhmen",
-  "youMustBeAtLeast18YearsOld": "Duhet të kesh të paktën 18 vjeç"
+  "youMustBeAtLeast18YearsOld": "Duhet të kesh të paktën 18 vjeç",
+  "addPhoneNumber": "Shto Numrin e Telefonit",
+  "phoneModalDescription": "Ju lutem shtoni numrin tuaj të telefonit për të përfunduar profilin tuaj. Ky hap është i nevojshëm para se të vazhdoni.",
+  "register.phone": "Telefon",
+  "register.phonePlaceholder": "6X XXX XXXX",
+  "phoneAdded": "Numri i telefonit u ruajt me sukses.",
+  "phoneAddFailed": "Dështoi ruajtja e numrit të telefonit.",
+  "saveAndContinue": "Ruaj & Vazhdo"
 }

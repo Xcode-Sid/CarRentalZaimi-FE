@@ -3,7 +3,7 @@ import i18next from "i18next";
 import type { ApiResponse, LoginTokens } from "../types/backendAuth";
 import { showApiError } from "./notifications";
 import { STORAGE_KEYS, DEFAULT_LANGUAGE } from "../data/storageKeys";
-import { API_REQUEST_FAILED, MUTATION_END, SESSION_EXPIRED  } from "../constants/events";
+import { API_REQUEST_FAILED, MUTATION_END, SESSION_EXPIRED } from "../constants/events";
 import { AUTH_REFRESH } from "../constants/apiPaths";
 
 
@@ -202,7 +202,10 @@ export const post = async (
       response = await doPost();
     }
 
-    const res = await response.json<ApiResponse<any>>();
+    const text = await response.text();
+    const res: ApiResponse<any> = text
+      ? JSON.parse(text)
+      : { success: true, data: null, message: null, errors: [] };
 
     if (!res.success) {
       const msg =
