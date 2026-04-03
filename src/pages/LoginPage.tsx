@@ -27,6 +27,10 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Logo } from '../components/common/Logo';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../components/common/AnimatedSection';
+import GoogleOAuth from './oauth/GoogleOAuth';
+import FacebookOAuth from './oauth/FacebookOAuth';
+import MicrosoftOAuth from './oauth/MicrosoftOAuth';
+import YahooOAuth from './oauth/YahooOAuth';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -37,29 +41,19 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      const loggedInUser = login(email, password);
-      if (loggedInUser) {
-        notifications.show({ message: t('login.success'), color: 'teal' });
-        navigate(loggedInUser.role === 'admin' ? '/admin' : '/account', { replace: true });
-      } else {
-        setError(t('login.error'));
-      }
-      setLoading(false);
-    }, 600);
-  };
-
-  const handleSocialLogin = (provider: string) => {
-    const u = login('user@autozaimi.al', 'user123');
-    if (u) {
-      notifications.show({ message: `${t('login.success')} (${provider})`, color: 'teal' });
-      navigate(u.role === 'admin' ? '/admin' : '/account', { replace: true });
+    const loggedInUser = await login(email, password);
+    if (loggedInUser) {
+      notifications.show({ message: t('login.success'), color: 'teal' });
+      navigate(loggedInUser.role === 'admin' ? '/admin' : '/account', { replace: true });
+    } else {
+      setError(t('login.error'));
     }
+    setLoading(false);
   };
 
   return (
@@ -127,26 +121,14 @@ export default function LoginPage() {
             <Divider label={t('login.orSocial')} labelPosition="center" my="lg" />
 
             <StaggerContainer stagger={0.06}>
-              <Stack gap="sm">
-                {[
-                  { color: 'red', icon: IconBrandGoogle, label: t('login.google'), provider: 'Google' },
-                  { color: 'blue', icon: IconBrandFacebook, label: t('login.facebook'), provider: 'Facebook' },
-                  { color: 'indigo', icon: IconBrandWindows, label: t('login.microsoft'), provider: 'Microsoft' },
-                  { color: 'teal', icon: IconBrandYahoo, label: t('login.yahoo'), provider: 'Yahoo' },
-                ].map((btn) => (
-                  <StaggerItem key={btn.provider}>
-                    <Button
-                      fullWidth
-                      variant="outline"
-                      color={btn.color}
-                      leftSection={<btn.icon size={18} />}
-                      onClick={() => handleSocialLogin(btn.provider)}
-                    >
-                      {btn.label}
-                    </Button>
-                  </StaggerItem>
-                ))}
-              </Stack>
+              <Box mb="lg">
+                <Stack gap="sm">
+                  <GoogleOAuth />
+                  <FacebookOAuth />
+                  <MicrosoftOAuth />
+                  <YahooOAuth />
+                </Stack>
+              </Box>
             </StaggerContainer>
           </Paper>
         </AnimatedSection>

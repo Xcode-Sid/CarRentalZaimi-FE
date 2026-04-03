@@ -90,7 +90,6 @@ export default function RegisterPage() {
     const fetchPrefixes = async () => {
       try {
         const response = await get('StatePrefix/getAll');
-        console.log("response.data", response)
         if (response.success) {
           setPhonePrefixes(response.data as PhonePrefix[]);
           if (response.data.length > 0) {

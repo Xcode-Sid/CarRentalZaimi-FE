@@ -6,9 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { UAParser } from 'ua-parser-js';
-
-// import { USER_ROLES, UserRole } from '@/types/auth';
-// import { useStoreActions } from '@/store';
+import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import { get, post } from '../../utils/api.utils';
 import Spinner from '../../components/spinner/Spinner';
@@ -67,10 +65,7 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
 
   const { t } = useTranslation();
   const navigate = useNavigate();
-  // const {
-  //   authModel: { setAuthToken },
-  //   userModel: { setAuthUser, setRole }
-  // } = useStoreActions((actions) => actions);
+  const { updateProfile } = useAuth();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -167,18 +162,15 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
         }),
       });
       if (!response.success) throw new Error(response.message?.toString());
-
       const authData = response.data;
-      // const res = await get(`Users/user/${authData.userId}`);
-      // if (!res.success) throw new Error('Failed to get user data');
+      localStorage.setItem('az-token', authData.token);
+      const userData = { ...authData.user, role: authData.role?.name, token: authData.token };
+      localStorage.setItem('az-user', JSON.stringify(userData));
+      updateProfile(userData);
 
-      // setAuthToken(authData.token);
-      // setAuthUser(res.data);
-      // setRole((authData.role));
       if (authData.token) localStorage.setItem('authToken', authData.token);
-
       notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
-      navigate('/profile');
+      navigate(authData.role === 'admin' ? '/admin' : '/account', { replace: true });
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';

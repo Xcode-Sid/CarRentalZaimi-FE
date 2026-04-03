@@ -6,12 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { UAParser } from 'ua-parser-js';
-
-// import { USER_ROLES, UserRole } from '@/types/auth';
-// import { useStoreActions } from '@/store';
+import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import Spinner from '../../components/spinner/Spinner';
 import { get, post } from '../../utils/api.utils';
+
 
 enum DeviceType {
   Mobile = 1,
@@ -43,7 +42,7 @@ const GoogleIcon = () => (
 
 const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
   isMobile = false,
-  clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID 
+  clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -56,19 +55,18 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
   });
   const { t } = useTranslation();
   const navigate = useNavigate();
-  // const {
-  //   authModel: { setAuthToken },
-  //   userModel: { setAuthUser, setRole }
-  // } = useStoreActions((actions) => actions);
-
+  const { updateProfile } = useAuth();
   useEffect(() => { initDeviceInfo(); }, []);
   useEffect(() => { checkForOAuthCallback(); }, [deviceInfo]);
 
   const getIPAddress = async () => {
     try {
       const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip;
+      if (!response.ok) return '';
+      const text = await response.text();
+      if (!text) return '';
+      const data = JSON.parse(text);
+      return data.ip ?? '';
     } catch {
       return '';
     }
@@ -136,19 +134,15 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
         }),
       });
       if (!response.success) throw new Error(response.message?.toString());
-
       const authData = response.data;
-      // const res = await get(`Users/user/${authData.userId}`);
-      // if (!res.isSuccessful) throw new Error('Failed to get user data');
+      localStorage.setItem('az-token', authData.token);
+      const userData = { ...authData.user, role: authData.role?.name, token: authData.token };
+      localStorage.setItem('az-user', JSON.stringify(userData));
+      updateProfile(userData);
 
-      // setAuthToken(authData.token);
-      // setAuthUser(res.data);
-      // setRole((authData.role));//check first letter
       if (authData.token) localStorage.setItem('authToken', authData.token);
-
       notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
-
-      navigate('/dashboard');
+      navigate(authData.role === 'admin' ? '/admin' : '/account', { replace: true });
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';
@@ -205,22 +199,22 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
     );
   }
 
-return (
-  <>
-    {isLoading && createPortal(<Spinner visible={isLoading} />, document.body)}
-    <Button
-      variant="outline"
-      color="red"
-      onClick={startGoogleOAuth}
-      fullWidth
-      size={isMobile ? 'xs' : 'sm'}
-      radius="md"
-      leftSection={<IconBrandGoogle size={18} />}
-    >
-      {t('login.google')} 
-    </Button>
-  </>
-);
+  return (
+    <>
+      {isLoading && createPortal(<Spinner visible={isLoading} />, document.body)}
+      <Button
+        variant="outline"
+        color="red"
+        onClick={startGoogleOAuth}
+        fullWidth
+        size={isMobile ? 'xs' : 'sm'}
+        radius="md"
+        leftSection={<IconBrandGoogle size={18} />}
+      >
+        {t('login.google')}
+      </Button>
+    </>
+  );
 };
 
 export default GoogleOAuth;

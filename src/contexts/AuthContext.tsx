@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import { users, type User } from '../data/users';
+import { type User } from '../data/users';
+import { post } from '../utils/api.utils';
 
 interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   isLoggedIn: boolean;
-  login: (email: string, password: string) => User | null;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
 }
@@ -25,14 +26,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   });
 
-  const login = useCallback((email: string, password: string) => {
-    const found = users.find((u) => u.email === email && u.password === password);
-    if (found) {
-      setUser(found);
-      localStorage.setItem('az-user', JSON.stringify(found));
-      return found;
+const login = useCallback(async (email: string, password: string) => {
+    try {
+    const response = await post('Authentication/login', {
+      login: email,
+      password: password,
+    });
+
+    if (response.success) {
+      const loggedInUser: User = response.data;
+      setUser(loggedInUser);
+      localStorage.setItem('az-user', JSON.stringify(loggedInUser));
+      return loggedInUser;
     }
     return null;
+  } catch {
+    return null;
+  }
   }, []);
 
   const logout = useCallback(() => {
@@ -55,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAdmin: user?.role === 'admin',
         isLoggedIn: !!user,
-        login,
+          login,
         logout,
         updateProfile,
       }}
