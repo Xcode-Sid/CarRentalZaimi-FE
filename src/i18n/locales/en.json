@@ -530,5 +530,10 @@
   "resetPasswordSubtitle": "Enter your new password below",
   "passwordResetSuccess": "Password reset successfully",
   "passwordResetFailed": "Failed to reset password, link may be expired",
-  "invalidOrExpiredResetLink": "Invalid or expired reset link"
+  "invalidOrExpiredResetLink": "Invalid or expired reset link",
+  "register.location": "Location",
+  "typeToSearchAddress": "Type to search address...",
+  "useMyCurrentLocation": "Use my current location",
+  "locationSet": "Location set",
+  "givePermissionToLocation": "Please allow location access in your browser settings."
 }

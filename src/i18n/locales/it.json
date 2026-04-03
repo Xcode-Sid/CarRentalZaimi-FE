@@ -530,5 +530,10 @@
   "resetPasswordSubtitle": "Inserisci la tua nuova password qui sotto",
   "passwordResetSuccess": "Password reimpostata con successo",
   "passwordResetFailed": "Reimpostazione password fallita, il link potrebbe essere scaduto",
-  "invalidOrExpiredResetLink": "Link di reimpostazione non valido o scaduto"
+  "invalidOrExpiredResetLink": "Link di reimpostazione non valido o scaduto",
+  "register.location": "Posizione",
+  "typeToSearchAddress": "Scrivi per cercare un indirizzo...",
+  "useMyCurrentLocation": "Usa la mia posizione attuale",
+  "locationSet": "Posizione impostata",
+  "givePermissionToLocation": "Per favore consenti l'accesso alla posizione nelle impostazioni del browser."
 }

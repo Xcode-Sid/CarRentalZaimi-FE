@@ -530,5 +530,10 @@
   "resetPasswordSubtitle": "Vendosni fjalëkalimin tuaj të ri më poshtë",
   "passwordResetSuccess": "Fjalëkalimi u rivendos me sukses",
   "passwordResetFailed": "Rivendosja e fjalëkalimit dështoi, linku mund të ketë skaduar",
-  "invalidOrExpiredResetLink": "Linku i rivendosjes është i pavlefshëm ose ka skaduar"
+  "invalidOrExpiredResetLink": "Linku i rivendosjes është i pavlefshëm ose ka skaduar",
+  "register.location": "Vendndodhja",
+  "typeToSearchAddress": "Shkruaj për të kërkuar adresën...",
+  "useMyCurrentLocation": "Përdor vendndodhjen time aktuale",
+  "locationSet": "Vendndodhja u caktua",
+  "givePermissionToLocation": "Ju lutemi lejoni aksesin e vendndodhjes në cilësimet e shfletuesit tuaj."
 }

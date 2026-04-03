@@ -26,28 +26,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   });
 
-const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
-    const response = await post('Authentication/login', {
-      login: email,
-      password: password,
-    });
+      const response = await post('Authentication/login', {
+        login: email,
+        password: password,
+      });
 
-    if (response.success) {
-      const loggedInUser: User = response.data;
-      setUser(loggedInUser);
-      localStorage.setItem('az-user', JSON.stringify(loggedInUser));
-      return loggedInUser;
+      if (response.success) {
+        const loggedInUser: User = response.data.user;
+        setUser(loggedInUser);
+        localStorage.setItem('az-user', JSON.stringify(loggedInUser));
+        return loggedInUser;
+      }
+      return null;
+    } catch {
+      return null;
     }
-    return null;
-  } catch {
-    return null;
-  }
   }, []);
 
-  const logout = useCallback(() => {
-    setUser(null);
-    localStorage.removeItem('az-user');
+  const logout = useCallback(async () => {
+    try {
+      console.log("entered")
+      await post('Authentication/logout', {});
+    } catch {
+      // proceed with local logout regardless
+    } finally {
+      setUser(null);
+      localStorage.removeItem('az-user');
+    }
   }, []);
 
   const updateProfile = useCallback((data: Partial<User>) => {
@@ -65,7 +72,7 @@ const login = useCallback(async (email: string, password: string) => {
         user,
         isAdmin: user?.role === 'admin',
         isLoggedIn: !!user,
-          login,
+        login,
         logout,
         updateProfile,
       }}
