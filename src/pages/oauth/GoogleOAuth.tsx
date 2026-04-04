@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { UAParser } from 'ua-parser-js';
-
-// import { USER_ROLES, UserRole } from '@/types/auth';
-// import { useStoreActions } from '@/store';
+import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import Spinner from '../../components/spinner/Spinner';
 import { get, post } from '../../utils/api.utils';
+import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
+
 
 enum DeviceType {
   Mobile = 1,
@@ -32,21 +32,21 @@ interface SimpleGoogleOAuthProps {
   clientId?: string;
 }
 
-const GoogleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M47.532 24.552c0-1.636-.142-3.21-.406-4.733H24.48v9.057h13.01c-.562 2.99-2.248 5.527-4.782 7.23v6.01h7.745c4.53-4.172 7.14-10.318 7.14-17.564z" fill="#4285F4" />
-    <path d="M24.48 48c6.524 0 11.996-2.163 15.994-5.883l-7.745-6.01c-2.163 1.449-4.933 2.307-8.249 2.307-6.344 0-11.715-4.283-13.634-10.045H2.876v6.198C6.856 42.48 15.067 48 24.48 48z" fill="#34A853" />
-    <path d="M10.846 28.369A14.334 14.334 0 0 1 10.1 24a14.334 14.334 0 0 1 .746-4.369v-6.198H2.876A23.949 23.949 0 0 0 .48 24c0 3.864.925 7.522 2.396 10.567l7.97-6.198z" fill="#FBBC05" />
-    <path d="M24.48 9.582c3.572 0 6.776 1.228 9.297 3.641l6.973-6.973C36.47 2.382 30.998 0 24.48 0 15.067 0 6.856 5.52 2.876 13.433l7.97 6.198C12.765 13.865 18.136 9.582 24.48 9.582z" fill="#EA4335" />
-  </svg>
-);
+interface PendingAuthData {
+  token: string;
+  user: Record<string, unknown>;
+  role: { name: string } | string;
+}
 
 const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
   isMobile = false,
-  clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID 
+  clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [pendingAuthData, setPendingAuthData] = useState<PendingAuthData | null>(null);
+
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
     deviceType: DeviceType.Desktop,
     userAgent: '',
@@ -56,10 +56,7 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
   });
   const { t } = useTranslation();
   const navigate = useNavigate();
-  // const {
-  //   authModel: { setAuthToken },
-  //   userModel: { setAuthUser, setRole }
-  // } = useStoreActions((actions) => actions);
+  const { updateProfile } = useAuth();
 
   useEffect(() => { initDeviceInfo(); }, []);
   useEffect(() => { checkForOAuthCallback(); }, [deviceInfo]);
@@ -67,8 +64,11 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
   const getIPAddress = async () => {
     try {
       const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip;
+      if (!response.ok) return '';
+      const text = await response.text();
+      if (!text) return '';
+      const data = JSON.parse(text);
+      return data.ip ?? '';
     } catch {
       return '';
     }
@@ -136,19 +136,20 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
         }),
       });
       if (!response.success) throw new Error(response.message?.toString());
-
       const authData = response.data;
-      // const res = await get(`Users/user/${authData.userId}`);
-      // if (!res.isSuccessful) throw new Error('Failed to get user data');
+      localStorage.setItem('az-token', authData.token);
+      const userData = { ...authData.user, role: authData.role?.name, token: authData.token };
+      localStorage.setItem('az-user', JSON.stringify(userData));
+      updateProfile(userData);
 
-      // setAuthToken(authData.token);
-      // setAuthUser(res.data);
-      // setRole((authData.role));//check first letter
       if (authData.token) localStorage.setItem('authToken', authData.token);
-
-      notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
-
-      navigate('/dashboard');
+      const phone = (authData.user as Record<string, unknown>).phone as string | undefined;
+      if (!phone) {
+        setPendingAuthData(authData);
+        setPhoneModalOpen(true);
+      } else {
+        completeLogin(authData);
+      }
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';
@@ -158,6 +159,16 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
       setIsLoading(false);
     }
   };
+
+  const getRoleName = (role: PendingAuthData['role']): string =>
+    typeof role === 'string' ? role : role?.name ?? '';
+
+  const completeLogin = (authData: PendingAuthData) => {
+    const roleName = getRoleName(authData.role);
+    notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
+    navigate(roleName === 'admin' ? '/admin' : '/account', { replace: true });
+  };
+
 
   const startGoogleOAuth = () => {
     setError('');
@@ -205,22 +216,33 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
     );
   }
 
-return (
-  <>
-    {isLoading && createPortal(<Spinner visible={isLoading} />, document.body)}
-    <Button
-      variant="outline"
-      color="red"
-      onClick={startGoogleOAuth}
-      fullWidth
-      size={isMobile ? 'xs' : 'sm'}
-      radius="md"
-      leftSection={<IconBrandGoogle size={18} />}
-    >
-      {t('login.google')} 
-    </Button>
-  </>
-);
+  return (
+    <>
+      {isLoading && createPortal(<Spinner visible={isLoading} />, document.body)}
+      <Button
+        variant="outline"
+        color="red"
+        onClick={startGoogleOAuth}
+        fullWidth
+        size={isMobile ? 'xs' : 'sm'}
+        radius="md"
+        leftSection={<IconBrandGoogle size={18} />}
+      >
+        {t('login.google')}
+      </Button>
+      {pendingAuthData && (
+        <PhoneNumberModal
+          opened={phoneModalOpen}
+          userId={(pendingAuthData.user as Record<string, unknown>).id as string}
+          onClose={() => setPhoneModalOpen(false)}
+          onSuccess={() => {
+            setPhoneModalOpen(false);
+            completeLogin(pendingAuthData);
+          }}
+        />
+      )}
+    </>
+  );
 };
 
 export default GoogleOAuth;

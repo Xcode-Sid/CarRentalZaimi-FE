@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Container,
@@ -17,6 +17,8 @@ import {
   Popover,
   Tooltip,
   ActionIcon,
+  Autocomplete,
+  Alert,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -25,19 +27,19 @@ import {
   IconLock,
   IconUser,
   IconPhone,
-  IconBrandGoogle,
-  IconBrandFacebook,
-  IconBrandWindows,
-  IconBrandYahoo,
   IconCalendar,
   IconId,
   IconTrash,
+  IconMapPin,
+  IconSearch,
+  IconX,
+  IconCircleCheck,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { Logo } from '../../components/common/Logo';
-import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
+import { AnimatedSection, StaggerContainer } from '../../components/common/AnimatedSection';
 import { get, post } from '../../utils/api.utils';
 import GoogleOAuth from '../oauth/GoogleOAuth';
 import Spinner from '../../components/spinner/Spinner';
@@ -50,7 +52,7 @@ import YahooOAuth from '../oauth/YahooOAuth';
 
 interface UserImage {
   name: string;
-  data: string; // base64
+  data: string;
 }
 
 interface FormValues {
@@ -72,6 +74,61 @@ interface PhonePrefix {
   phoneRegex: string | null;
 }
 
+interface LocationDetails {
+  lat: number;
+  lng: number;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  zipCode: string | null;
+}
+
+// ─── Location helpers ─────────────────────────────────────────────────────────
+
+async function reverseGeocode(lat: number, lng: number): Promise<LocationDetails> {
+  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const json = await res.json();
+    const a = json.address ?? {};
+    return {
+      lat,
+      lng,
+      address: json.display_name ?? null,
+      city: a.city ?? a.town ?? a.village ?? null,
+      state: a.state ?? null,
+      country: a.country ?? null,
+      zipCode: a.postcode ?? null,
+    };
+  } catch {
+    return { lat, lng, address: null, city: null, state: null, country: null, zipCode: null };
+  }
+}
+
+async function searchAddress(query: string): Promise<LocationDetails[]> {
+  if (!query || query.length < 3) return [];
+  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=6`;
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const json: any[] = await res.json();
+    return json.map((item) => {
+      const a = item.address ?? {};
+      return {
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        address: item.display_name ?? null,
+        city: a.city ?? a.town ?? a.village ?? null,
+        state: a.state ?? null,
+        country: a.country ?? null,
+        zipCode: a.postcode ?? null,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
@@ -85,12 +142,19 @@ export default function RegisterPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // ── Location state ─────────────────────────────────────────────────────────
+  const [location, setLocation] = useState<LocationDetails | null>(null);
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+  const [locationSuggestions, setLocationSuggestions] = useState<LocationDetails[]>([]);
+  const [locationSearchLoading, setLocationSearchLoading] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const searchIdRef = useRef(0);
+
   // ── Fetch phone prefixes on mount ──────────────────────────────────────────
   useEffect(() => {
     const fetchPrefixes = async () => {
       try {
         const response = await get('StatePrefix/getAll');
-        console.log("response.data", response)
         if (response.success) {
           setPhonePrefixes(response.data as PhonePrefix[]);
           if (response.data.length > 0) {
@@ -102,6 +166,70 @@ export default function RegisterPage() {
       }
     };
     fetchPrefixes();
+  }, []);
+
+  // ── Location handlers ──────────────────────────────────────────────────────
+  const handleLocationSearchChange = useCallback(async (value: string) => {
+    setLocationSearchQuery(value);
+    if (value.length < 3) {
+      searchIdRef.current++;
+      setLocationSuggestions([]);
+      setLocationSearchLoading(false);
+      return;
+    }
+    const requestId = ++searchIdRef.current;
+    setLocationSearchLoading(true);
+    const results = await searchAddress(value);
+    if (requestId !== searchIdRef.current) return;
+    const unique = results.filter(
+      (r, i, arr) => r.address && arr.findIndex((x) => x.address === r.address) === i
+    );
+    setLocationSuggestions(unique);
+    setLocationSearchLoading(false);
+  }, []);
+
+  const handleLocationSelect = useCallback(
+    (value: string) => {
+      const found = locationSuggestions.find((s) => s.address === value);
+      if (found) {
+        setLocation(found);
+        form.setFieldValue('location', found);
+        setLocationSearchQuery(found.address ?? '');
+        setLocationSuggestions([]);
+      }
+    },
+    [locationSuggestions]
+  );
+
+  const handleGPS = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const details = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+        setLocation(details);
+        form.setFieldValue('location', details);
+        setLocationSearchQuery(details.address ?? '');
+        setGpsLoading(false);
+      },
+      () => {
+        setGpsLoading(false);
+        notifications.show({
+          color: 'red',
+          title: t('error'),
+          message: t('givePermissionToLocation'),
+        });
+      }
+    );
+  }, [t]);
+
+  const handleClearLocation = useCallback(() => {
+    searchIdRef.current++;
+    setLocation(null);
+    form.setFieldValue('location', null);
+    setLocationSearchQuery('');
+    setLocationSuggestions([]);
+    setLocationSearchLoading(false);
   }, []);
 
   // ── Form ───────────────────────────────────────────────────────────────────
@@ -177,11 +305,12 @@ export default function RegisterPage() {
         email: values.email,
         phone: fullPhone,
         dateOfBirth: values.dateOfBirth?.toISOString() ?? null,
-        name: values.image.name || null,   // maps BE "Name" to image filename
-        data: values.image.data || null,   // maps BE "Data" to base64 image
+        name: values.image.name || null,
+        data: values.image.data || null,
         password: values.password,
         confirmPassword: values.confirmPassword,
-        role: "User",
+        role: 'User',
+        location: location ? JSON.stringify(location) : null
       });
       if (response.success) {
         notifications.show({
@@ -214,20 +343,11 @@ export default function RegisterPage() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const base64 = (reader.result as string).split(',')[1]; // strip data:...;base64,
+      const base64 = (reader.result as string).split(',')[1];
       form.setFieldValue('image', { name: file.name, data: base64 });
       setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
-  };
-
-  // ── Social (unchanged — no real auth yet) ──────────────────────────────────
-  const handleSocialRegister = (provider: string) => {
-    notifications.show({
-      message: `${t('register.success')} (${provider})`,
-      color: 'teal',
-    });
-    navigate('/login');
   };
 
   // ─── Render ────────────────────────────────────────────────────────────────
@@ -393,18 +513,86 @@ export default function RegisterPage() {
                   </Box>
 
                   {/* Date of birth */}
-                  <Box>
-                    <DateInput
-                      label={t('register.dateOfBirth')}
-                      placeholder="DD/MM/YYYY"
-                      leftSection={<IconCalendar size={16} />}
-                      maxDate={new Date()}
-                      valueFormat="DD/MM/YYYY"
-                      clearable
-                      {...form.getInputProps('dateOfBirth')}
-                    />
-                  </Box>
+                  <DateInput
+                    label={t('register.dateOfBirth')}
+                    placeholder="DD/MM/YYYY"
+                    leftSection={<IconCalendar size={16} />}
+                    maxDate={new Date()}
+                    valueFormat="DD/MM/YYYY"
+                    clearable
+                    {...form.getInputProps('dateOfBirth')}
+                  />
 
+                  {/* ── Location ──────────────────────────────────────────── */}
+                  <Stack gap="xs">
+                    <Autocomplete
+                      label={t('register.location')}
+                      placeholder={t('typeToSearchAddress')}
+                      value={locationSearchQuery}
+                      onChange={handleLocationSearchChange}
+                      onOptionSubmit={handleLocationSelect}
+                      data={locationSuggestions.map((s) => s.address ?? '').filter(Boolean)}
+                      radius="md"
+                      leftSection={<IconSearch size={16} style={{ opacity: locationSearchLoading ? 0.4 : 1 }} />}
+                      rightSection={
+                        locationSearchQuery ? (
+                          <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            size="sm"
+                            radius="xl"
+                            onClick={handleClearLocation}
+                          >
+                            <IconX size={13} />
+                          </ActionIcon>
+                        ) : null
+                      }
+                    />
+
+                    <Button
+                      variant="outline"
+                      color="teal"
+                      fullWidth
+                      radius="md"
+                      loading={gpsLoading}
+                      leftSection={<IconMapPin size={16} />}
+                      styles={{
+                        root: {
+                          borderStyle: 'dashed',
+                          borderColor: 'var(--mantine-color-teal-4)',
+                        },
+                      }}
+                      onClick={handleGPS}
+                    >
+                      {t('useMyCurrentLocation')}
+                    </Button>
+
+                    {location && (
+                      <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
+                        <Alert
+                          color="teal"
+                          variant="light"
+                          radius="md"
+                          icon={<IconCircleCheck size={14} />}
+                          withCloseButton
+                          onClose={handleClearLocation}
+                          styles={{ message: { fontSize: '0.75rem' } }}
+                        >
+                          <Stack gap={2}>
+                            <Text size="xs" fw={600}>{t('locationSet')}</Text>
+                            {location.address && (
+                              <Text size="xs" c="dimmed">{location.address}</Text>
+                            )}
+                            <Text size="xs" c="dimmed">
+                              {[location.city, location.state, location.country]
+                                .filter(Boolean)
+                                .join(', ')}
+                            </Text>
+                          </Stack>
+                        </Alert>
+                      </motion.div>
+                    )}
+                  </Stack>
 
                   {/* Password with popover rules */}
                   <Popover

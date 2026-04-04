@@ -64,7 +64,7 @@ export default function CustomersPage() {
       firstName: u.firstName,
       lastName: u.lastName,
       email: u.email,
-      phone: u.phone,
+      phone: u.phoneNumber,
       customerStatus: u.customerStatus ?? 'active',
     });
     setEditUser(u);
@@ -80,7 +80,7 @@ export default function CustomersPage() {
   const filteredUsers = customerUsers.filter((u) => {
     const q = search.trim().toLowerCase();
     if (q) {
-      const hay = `${u.firstName} ${u.lastName} ${u.email} ${u.phone ?? ''}`.toLowerCase();
+      const hay = `${u.firstName} ${u.lastName} ${u.email} ${u.phoneNumber ?? ''}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     if (statusFilter) {
@@ -161,7 +161,7 @@ export default function CustomersPage() {
                     <Text size="sm">{c.email}</Text>
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm">{c.phone}</Text>
+                    <Text size="sm">{c.phoneNumber}</Text>
                   </Table.Td>
                   <Table.Td>
                     <Badge circle variant="light" color="teal">

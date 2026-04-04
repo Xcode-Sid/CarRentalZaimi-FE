@@ -27,6 +27,7 @@ import { LanguageSwitcher } from './components/common/LanguageSwitcher';
 import { ThemeToggle } from './components/common/ThemeToggle';
 import { Box } from '@mantine/core';
 import { AdPageShell, AdsVerticalLayout } from './layouts/AdPageShell';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 export default function App() {
   return (
@@ -56,7 +57,8 @@ export default function App() {
       </Route>
 
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />      
+              <Route path="reset-password" element={<ResetPasswordPage />} />
 
         <Route element={<UserAccountRoute />}>
           <Route element={<AccountLayout />}>

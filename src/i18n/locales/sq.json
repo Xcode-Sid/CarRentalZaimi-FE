@@ -112,7 +112,7 @@
     "cityFilter": "Qyteti",
     "activeFilters": "filtra aktive",
     "rentalLength": "Mënyra e qirasë",
-    "rentalLengthDesc": "Thekso çmimin për ditë ose për orë; renditja e rekomanduar ndjek zgjedhjen tënde."
+    "rentalLengthDesc": "Thekso çmimin për ditë ose për orë"
   },
   "vehicle": {
     "overview": "Përmbledhje",
@@ -147,7 +147,9 @@
     "notHelpful": "Jo e dobishme",
     "linkCopied": "Linku u kopjua!",
     "reviewSuccess": "Vlerësimi u dërgua me sukses!",
-    "similarCars": "Makina të Ngjashme"
+    "similarCars": "Makina të Ngjashme",
+    "saveVehicle": "Ruaj te makina me qira të ruajtura",
+    "removeSavedVehicle": "Hiq nga të ruajturat"
   },
   "rental": {
     "title": "Rezervo Makinën",
@@ -184,7 +186,7 @@
     "savedCars": "Makina me qira të ruajtura",
     "myBookings": "Rezervimet e mia",
     "rentalCarsSubtitle": "Rezervimet dhe historia e qirasë në një vend.",
-    "carsSubtitle": "Makinat që keni ruajtur nga flota për t’i rezervuar më vonë lehtë.",
+    "carsSubtitle": "Makinat që keni ruajtur nga flota për t'i rezervuar më vonë lehtë.",
     "savedCarsPaymentNote": "Kur rezervoni, mund të paguani me para ose kartë në marrje.",
     "settings": "Cilësimet",
     "firstName": "Emri",
@@ -388,7 +390,9 @@
     "google": "Vazhdo me Google",
     "facebook": "Vazhdo me Facebook",
     "microsoft": "Vazhdo me Microsoft",
-    "yahoo": "Vazhdo me Yahoo"
+    "yahoo": "Vazhdo me Yahoo",
+    "emailRequired": "Email-i është i detyrueshëm",
+    "forgotError": "Dërgimi i email-it të rivendosjes dështoi"
   },
   "register": {
     "title": "Krijoni Llogarinë",
@@ -410,7 +414,8 @@
     "hasAccount": "Keni llogari?",
     "login": "Hyni",
     "success": "Llogaria u krijua me sukses!",
-    "orSocial": "ose regjistrohu me"
+    "orSocial": "ose regjistrohu me",
+    "passwordRules": "Fjalëkalimi duhet të përmbajë:"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -458,7 +463,7 @@
     "reason3Title": "Mbështetje 24/7",
     "reason3Desc": "Ekipi ynë është gjithmonë i gatshëm t'ju ndihmojë — ditë e natë.",
     "reason4Title": "Rezervim i Lehtë",
-    "reason4Desc": "Reservoni online në vetëm disa minuta me platformën tonë intuitive."
+    "reason4Desc": "Rezervoni online në vetëm disa minuta me platformën tonë intuitive."
   },
   "contact": {
     "title": "Na Kontaktoni",
@@ -484,6 +489,13 @@
     "hoursTitle": "Orari",
     "hoursValue": "E Hënë - E Shtunë: 08:00 - 20:00"
   },
+  "passwordRules": {
+    "minLength": "Të paktën 8 karaktere",
+    "lowercase": "Një shkronjë e vogël",
+    "uppercase": "Një shkronjë e madhe",
+    "number": "Një numër",
+    "special": "Një karakter special"
+  },
   "username": "Emri i përdoruesit",
   "usernamePlaceholder": "Zgjidhni një emër përdoruesi",
   "usernameMustBeAtLeastTwoCharacters": "Emri i përdoruesit duhet të ketë të paktën 2 karaktere",
@@ -498,16 +510,30 @@
   "passwordsDoNotMatch": "Fjalëkalimet nuk përputhen",
   "error": "Gabim",
   "registrationFailed": "Regjistrimi dështoi. Ju lutemi provoni përsëri.",
-  "passwordRules": {
-    "minLength": "Të paktën 8 karaktere",
-    "lowercase": "Një shkronjë e vogël",
-    "uppercase": "Një shkronjë e madhe",
-    "number": "Një numër",
-    "special": "Një karakter special"
-  },
   "tryAgain": "Ju lutemi provoni përsëri.",
   "loginSuccessful": "Hyrja u krye me sukses.",
   "success": "Sukses.",
   "dateOfBirthCannotBeInFuture": "Data e lindjes nuk mund të jetë në të ardhmen",
-  "youMustBeAtLeast18YearsOld": "Duhet të kesh të paktën 18 vjeç"
+  "youMustBeAtLeast18YearsOld": "Duhet të kesh të paktën 18 vjeç",
+  "addPhoneNumber": "Shto Numrin e Telefonit",
+  "phoneModalDescription": "Ju lutem shtoni numrin tuaj të telefonit për të përfunduar profilin tuaj. Ky hap është i nevojshëm para se të vazhdoni.",
+  "register.phone": "Telefon",
+  "register.phonePlaceholder": "6X XXX XXXX",
+  "phoneAdded": "Numri i telefonit u ruajt me sukses.",
+  "phoneAddFailed": "Dështoi ruajtja e numrit të telefonit.",
+  "saveAndContinue": "Ruaj & Vazhdo",
+  "forgotPassword": "Keni harruar fjalëkalimin?",
+  "checkYourEmail": "Kontrolloni email-in tuaj",
+  "passwordSentToEmail": "Kemi dërguar një link për rivendosjen e fjalëkalimit në adresën tuaj email.",
+  "gotIt": "Kuptova",
+  "resetPassword": "Rivendos Fjalëkalimin",
+  "resetPasswordSubtitle": "Vendosni fjalëkalimin tuaj të ri më poshtë",
+  "passwordResetSuccess": "Fjalëkalimi u rivendos me sukses",
+  "passwordResetFailed": "Rivendosja e fjalëkalimit dështoi, linku mund të ketë skaduar",
+  "invalidOrExpiredResetLink": "Linku i rivendosjes është i pavlefshëm ose ka skaduar",
+  "register.location": "Vendndodhja",
+  "typeToSearchAddress": "Shkruaj për të kërkuar adresën...",
+  "useMyCurrentLocation": "Përdor vendndodhjen time aktuale",
+  "locationSet": "Vendndodhja u caktua",
+  "givePermissionToLocation": "Ju lutemi lejoni aksesin e vendndodhjes në cilësimet e shfletuesit tuaj."
 }

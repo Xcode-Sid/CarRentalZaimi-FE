@@ -390,7 +390,9 @@
     "google": "Continue with Google",
     "facebook": "Continue with Facebook",
     "microsoft": "Continue with Microsoft",
-    "yahoo": "Continue with Yahoo"
+    "yahoo": "Continue with Yahoo",
+    "emailRequired": "Email is required",
+    "forgotError": "Failed to send reset email"
   },
   "register": {
     "title": "Create Account",
@@ -412,7 +414,8 @@
     "hasAccount": "Already have an account?",
     "login": "Log In",
     "success": "Account created successfully!",
-    "orSocial": "or register with"
+    "orSocial": "or register with",
+    "passwordRules": "Password must contain:"
   },
   "notFound": {
     "title": "Page Not Found",
@@ -511,5 +514,26 @@
   "loginSuccessful": "Login successful.",
   "success": "Success.",
   "dateOfBirthCannotBeInFuture": "Date of birth cannot be in the future",
-  "youMustBeAtLeast18YearsOld": "You must be at least 18 years old"
+  "youMustBeAtLeast18YearsOld": "You must be at least 18 years old",
+  "addPhoneNumber": "Add Phone Number",
+  "phoneModalDescription": "Please add your phone number to complete your profile. This step is required before continuing.",
+  "register.phone": "Phone",
+  "register.phonePlaceholder": "6X XXX XXXX",
+  "phoneAdded": "Phone number saved successfully.",
+  "phoneAddFailed": "Failed to save phone number.",
+  "saveAndContinue": "Save & Continue",
+  "forgotPassword": "Forgot password?",
+  "checkYourEmail": "Check your email",
+  "passwordSentToEmail": "We've sent a password reset link to your email address.",
+  "gotIt": "Got it",
+  "resetPassword": "Reset Password",
+  "resetPasswordSubtitle": "Enter your new password below",
+  "passwordResetSuccess": "Password reset successfully",
+  "passwordResetFailed": "Failed to reset password, link may be expired",
+  "invalidOrExpiredResetLink": "Invalid or expired reset link",
+  "register.location": "Location",
+  "typeToSearchAddress": "Type to search address...",
+  "useMyCurrentLocation": "Use my current location",
+  "locationSet": "Location set",
+  "givePermissionToLocation": "Please allow location access in your browser settings."
 }

@@ -252,7 +252,7 @@ export function Navbar() {
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
-                  {user?.avatar}
+                  {/* {user?.avatar} */}
                 </Avatar>
               </Menu.Target>
               <Menu.Dropdown className="animate-scale-in">
