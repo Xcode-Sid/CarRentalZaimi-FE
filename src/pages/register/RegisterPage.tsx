@@ -182,7 +182,7 @@ export default function RegisterPage() {
 
       if (response.success) {
         notifications.show({ color: 'teal', title: t('success'), message: t('register.success') });
-        navigate('/login');
+        await sendVerificationCode(values.email);
       } else {
         notifications.show({ color: 'red', title: t('error'), message: response.message ?? t('registrationFailed') });
       }
@@ -190,6 +190,50 @@ export default function RegisterPage() {
       notifications.show({ color: 'red', title: t('error'), message: error?.message ?? t('registrationFailed') });
     } finally {
       setTimeout(() => setLoading(false), 400);
+    }
+  };
+
+  const sendVerificationCode = async (email: string) => {
+    try {
+      const userRes = await get(`User/user/email/${email}`);
+      const id = userRes.data.id;
+
+      if (userRes.success && id) {
+        const smsResponse = await post('Phone/send-verification-code', {
+          userId: id,
+        });
+
+        if (smsResponse.success) {
+          notifications.show({
+            color: 'green',
+            title: t('success'),
+            message: t('verificationCodeSent'),
+          });
+          navigate("/verify-phone", {
+            state: { userId: id },
+          });
+        } else {
+          notifications.show({
+            color: 'red',
+            title: t('error'),
+            message: smsResponse.message ?? t('resendFailed'),
+          });
+        }
+      } else {
+        notifications.show({
+          color: 'red',
+          title: t('error'),
+          message: t('emailDoesNotExist'),
+        });
+        return;
+      }
+    } catch (err) {
+      console.error('Something went wrong:', err);
+      notifications.show({
+        color: 'red',
+        title: t('error'),
+        message: t('somethingWentWrong'),
+      });
     }
   };
 

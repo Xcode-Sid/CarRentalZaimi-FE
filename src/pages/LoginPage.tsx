@@ -29,9 +29,10 @@ import GoogleOAuth from './oauth/GoogleOAuth';
 import FacebookOAuth from './oauth/FacebookOAuth';
 import MicrosoftOAuth from './oauth/MicrosoftOAuth';
 import YahooOAuth from './oauth/YahooOAuth';
-import { post } from '../utils/api.utils';
+import { get, post } from '../utils/api.utils';
 import { Loader } from 'lucide-react';
 import { useForm } from '@mantine/form';
+import Spinner from '../components/spinner/Spinner';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -61,20 +62,20 @@ export default function LoginPage() {
   });
 
   const handleSubmit = async (values: { email: string; password: string }) => {
-  setLoading(true);
-  const loggedInUser = await login(values.email, values.password);
-  if (loggedInUser) {
-    notifications.show({ message: t('login.success'), color: 'teal' });
-    // ✅ Read from role object instead of comparing role directly to a string
-    navigate(
-      loggedInUser.role?.normalizedName?.toLowerCase() === 'admin' ? '/admin' : '/account',
-      { replace: true }
-    );
-  } else {
-    form.setErrors({ password: t('login.error') });
-  }
-  setLoading(false);
-};
+    setLoading(true);
+    const loggedInUser = await login(values.email, values.password);
+    if (loggedInUser) {
+      notifications.show({ message: t('login.success'), color: 'teal' });
+      // ✅ Read from role object instead of comparing role directly to a string
+      navigate(
+        loggedInUser.role?.normalizedName?.toLowerCase() === 'admin' ? '/admin' : '/account',
+        { replace: true }
+      );
+    } else {
+      form.setErrors({ password: t('login.error') });
+    }
+    setLoading(false);
+  };
 
   const handleForgotPassword = async () => {
     const emailError = /^\S+@\S+\.\S+$/.test(form.values.email)
@@ -97,8 +98,85 @@ export default function LoginPage() {
     setForgotLoading(false);
   };
 
+  const handleConfirmPhone = async () => {
+    // Reuse the email from the form (same as forgotPassword does)
+    const emailError = /^\S+@\S+\.\S+$/.test(form.values.email)
+      ? null
+      : t('enterAValidEmail');
+
+    if (!form.values.email || emailError) {
+      form.setFieldError('email', emailError ?? t('login.emailRequired'));
+      return;
+    }
+
+    const email = form.values.email;
+
+    try {
+      // 1. Get userId by email
+      const res = await get(`User/user/email/${email}`);
+
+      if (!res.success || !res.data) {
+        notifications.show({
+          color: 'red',
+          title: t('error'),
+          message: t('somethingWentWrong'),
+        });
+        return;
+      }
+      if (res.data.status == 'Active') {
+        notifications.show({
+          color: 'orange',
+          title: t('error'),
+          message: t('thisAccountIsConfirmed'), 
+        });
+        return;
+      }
+
+      const id = res.data.id;
+
+      if (!id) {
+        notifications.show({
+          color: 'red',
+          title: t('error'),
+          message: t('emailDoesNotExist'),
+        });
+        return;
+      }
+      // 2. Send SMS verification code
+      const smsResponse = await post('Phone/send-verification-code', {
+        userId: id,
+      });
+
+      if (smsResponse.success) {
+        notifications.show({
+          color: 'green',
+          title: t('success'),
+          message: t('verificationCodeSent'),
+        });
+        navigate("/verify-phone", {
+          state: { userId: id },
+        });
+      } else {
+        notifications.show({
+          color: 'red',
+          title: t('error'),
+          message: smsResponse.message ?? t('resendFailed'),
+        });
+      }
+    } catch (err) {
+      console.error('Something went wrong:', err);
+      notifications.show({
+        color: 'red',
+        title: t('error'),
+        message: t('somethingWentWrong'),
+      });
+    }
+  };
+
+
   return (
     <>
+     <Spinner visible={loading} />
       <Box w="100%" py={{ base: 'md', sm: 'xl' }}>
         <Container size={440} w="100%">
           <AnimatedSection>
@@ -183,6 +261,16 @@ export default function LoginPage() {
                 onClick={handleForgotPassword}
               >
                 {forgotLoading ? <Loader size={12} /> : t('forgotPassword')}
+              </Anchor>
+            </Text>
+            <Text ta="center" mt="md" size="sm">
+              <Anchor
+                component="button"
+                type="button"
+                fw={600}
+                onClick={handleConfirmPhone}
+              >
+                {forgotLoading ? <Loader size={12} /> : t('confirmPhoneNumber')}
               </Anchor>
             </Text>
           </AnimatedSection>

@@ -535,5 +535,23 @@
   "typeToSearchAddress": "Shkruaj për të kërkuar adresën...",
   "useMyCurrentLocation": "Përdor vendndodhjen time aktuale",
   "locationSet": "Vendndodhja u caktua",
-  "givePermissionToLocation": "Ju lutemi lejoni aksesin e vendndodhjes në cilësimet e shfletuesit tuaj."
+  "givePermissionToLocation": "Ju lutemi lejoni aksesin e vendndodhjes në cilësimet e shfletuesit tuaj.",
+  "verifyPhone": {
+    "title": "Verifiko telefonin tënd",
+    "subtitle": "Shkruaj kodin 6-shifror të dërguar në numrin tënd të telefonit",
+    "enterCode": "Shkruaj kodin e verifikimit",
+    "verify": "Verifiko telefonin",
+    "didntReceive": "Nuk e more kodin?",
+    "resend": "Dërgo përsëri",
+    "resendIn": "Dërgo përsëri pas"
+  },
+  "phoneVerifiedSuccessfully": "Numri i telefonit u verifikua me sukses!",
+  "enterFullCode": "Ju lutemi shkruani kodin e plotë 6-shifror",
+  "invalidOrExpiredCode": "Kodi është i pavlefshëm ose ka skaduar",
+  "sending": "Duke dërguar...",
+  "backToLogin": "Kthehu te hyrja",
+  "confirmPhoneNumber": "Konfirmo numrin e telefonit",
+  "emailDoesNotExist": "Email-i nuk ekziston",
+  "thisAccountIsConfirmed": "Kjo llogari është tashmë e konfirmuar",
+  "somethingWentWrong": "Diçka shkoi keq"
 }
