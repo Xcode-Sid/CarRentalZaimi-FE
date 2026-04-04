@@ -17,10 +17,6 @@ import {
 import {
   IconMail,
   IconLock,
-  IconBrandGoogle,
-  IconBrandFacebook,
-  IconBrandWindows,
-  IconBrandYahoo,
   IconMailCheck,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -65,16 +61,20 @@ export default function LoginPage() {
   });
 
   const handleSubmit = async (values: { email: string; password: string }) => {
-    setLoading(true);
-    const loggedInUser = await login(values.email, values.password);
-    if (loggedInUser) {
-      notifications.show({ message: t('login.success'), color: 'teal' });
-      navigate(loggedInUser.role === 'admin' ? '/admin' : '/account', { replace: true });
-    } else {
-      form.setErrors({ password: t('login.error') });
-    }
-    setLoading(false);
-  };
+  setLoading(true);
+  const loggedInUser = await login(values.email, values.password);
+  if (loggedInUser) {
+    notifications.show({ message: t('login.success'), color: 'teal' });
+    // ✅ Read from role object instead of comparing role directly to a string
+    navigate(
+      loggedInUser.role?.normalizedName?.toLowerCase() === 'admin' ? '/admin' : '/account',
+      { replace: true }
+    );
+  } else {
+    form.setErrors({ password: t('login.error') });
+  }
+  setLoading(false);
+};
 
   const handleForgotPassword = async () => {
     const emailError = /^\S+@\S+\.\S+$/.test(form.values.email)

@@ -17,8 +17,6 @@ import {
   Popover,
   Tooltip,
   ActionIcon,
-  Autocomplete,
-  Alert,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -30,10 +28,6 @@ import {
   IconCalendar,
   IconId,
   IconTrash,
-  IconMapPin,
-  IconSearch,
-  IconX,
-  IconCircleCheck,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
@@ -46,14 +40,9 @@ import Spinner from '../../components/spinner/Spinner';
 import MicrosoftOAuth from '../oauth/MicrosoftOAuth';
 import FacebookOAuth from '../oauth/FacebookOAuth';
 import YahooOAuth from '../oauth/YahooOAuth';
+import { LocationField, useLocation } from '../../components/location/Location';
 
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface UserImage {
-  name: string;
-  data: string;
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface FormValues {
   firstname: string;
@@ -64,7 +53,7 @@ interface FormValues {
   dateOfBirth: Date | null;
   password: string;
   confirmPassword: string;
-  image: UserImage;
+  image: { name: string; data: string };
 }
 
 interface PhonePrefix {
@@ -72,61 +61,6 @@ interface PhonePrefix {
   phonePrefix: string | null;
   flag: string | null;
   phoneRegex: string | null;
-}
-
-interface LocationDetails {
-  lat: number;
-  lng: number;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  country: string | null;
-  zipCode: string | null;
-}
-
-// ─── Location helpers ─────────────────────────────────────────────────────────
-
-async function reverseGeocode(lat: number, lng: number): Promise<LocationDetails> {
-  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-  try {
-    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
-    const json = await res.json();
-    const a = json.address ?? {};
-    return {
-      lat,
-      lng,
-      address: json.display_name ?? null,
-      city: a.city ?? a.town ?? a.village ?? null,
-      state: a.state ?? null,
-      country: a.country ?? null,
-      zipCode: a.postcode ?? null,
-    };
-  } catch {
-    return { lat, lng, address: null, city: null, state: null, country: null, zipCode: null };
-  }
-}
-
-async function searchAddress(query: string): Promise<LocationDetails[]> {
-  if (!query || query.length < 3) return [];
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=6`;
-  try {
-    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
-    const json: any[] = await res.json();
-    return json.map((item) => {
-      const a = item.address ?? {};
-      return {
-        lat: parseFloat(item.lat),
-        lng: parseFloat(item.lon),
-        address: item.display_name ?? null,
-        city: a.city ?? a.town ?? a.village ?? null,
-        state: a.state ?? null,
-        country: a.country ?? null,
-        zipCode: a.postcode ?? null,
-      };
-    });
-  } catch {
-    return [];
-  }
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -142,94 +76,22 @@ export default function RegisterPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Location state ─────────────────────────────────────────────────────────
-  const [location, setLocation] = useState<LocationDetails | null>(null);
-  const [locationSearchQuery, setLocationSearchQuery] = useState('');
-  const [locationSuggestions, setLocationSuggestions] = useState<LocationDetails[]>([]);
-  const [locationSearchLoading, setLocationSearchLoading] = useState(false);
-  const [gpsLoading, setGpsLoading] = useState(false);
-  const searchIdRef = useRef(0);
+  const loc = useLocation();
 
-  // ── Fetch phone prefixes on mount ──────────────────────────────────────────
+  // ── Fetch phone prefixes ───────────────────────────────────────────────────
   useEffect(() => {
     const fetchPrefixes = async () => {
       try {
         const response = await get('StatePrefix/getAll');
         if (response.success) {
           setPhonePrefixes(response.data as PhonePrefix[]);
-          if (response.data.length > 0) {
-            setPhonePrefix(response.data[0].phonePrefix ?? '+355');
-          }
+          if (response.data.length > 0) setPhonePrefix(response.data[0].phonePrefix ?? '+355');
         }
       } catch (error) {
         console.error('Failed to fetch phone prefixes:', error);
       }
     };
     fetchPrefixes();
-  }, []);
-
-  // ── Location handlers ──────────────────────────────────────────────────────
-  const handleLocationSearchChange = useCallback(async (value: string) => {
-    setLocationSearchQuery(value);
-    if (value.length < 3) {
-      searchIdRef.current++;
-      setLocationSuggestions([]);
-      setLocationSearchLoading(false);
-      return;
-    }
-    const requestId = ++searchIdRef.current;
-    setLocationSearchLoading(true);
-    const results = await searchAddress(value);
-    if (requestId !== searchIdRef.current) return;
-    const unique = results.filter(
-      (r, i, arr) => r.address && arr.findIndex((x) => x.address === r.address) === i
-    );
-    setLocationSuggestions(unique);
-    setLocationSearchLoading(false);
-  }, []);
-
-  const handleLocationSelect = useCallback(
-    (value: string) => {
-      const found = locationSuggestions.find((s) => s.address === value);
-      if (found) {
-        setLocation(found);
-        form.setFieldValue('location', found);
-        setLocationSearchQuery(found.address ?? '');
-        setLocationSuggestions([]);
-      }
-    },
-    [locationSuggestions]
-  );
-
-  const handleGPS = useCallback(() => {
-    if (!navigator.geolocation) return;
-    setGpsLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const details = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-        setLocation(details);
-        form.setFieldValue('location', details);
-        setLocationSearchQuery(details.address ?? '');
-        setGpsLoading(false);
-      },
-      () => {
-        setGpsLoading(false);
-        notifications.show({
-          color: 'red',
-          title: t('error'),
-          message: t('givePermissionToLocation'),
-        });
-      }
-    );
-  }, [t]);
-
-  const handleClearLocation = useCallback(() => {
-    searchIdRef.current++;
-    setLocation(null);
-    form.setFieldValue('location', null);
-    setLocationSearchQuery('');
-    setLocationSuggestions([]);
-    setLocationSearchLoading(false);
   }, []);
 
   // ── Form ───────────────────────────────────────────────────────────────────
@@ -246,20 +108,15 @@ export default function RegisterPage() {
       image: { name: '', data: '' },
     },
     validate: {
-      firstname: (v) =>
-        v.trim().length < 2 ? t('register.firstNameMin') : null,
-      lastname: (v) =>
-        v.trim().length < 2 ? t('register.lastNameMin') : null,
-      username: (v) =>
-        v.trim().length < 2 ? t('usernameMustBeAtLeastTwoCharacters') : null,
-      email: (v) =>
-        /^\S+@\S+\.\S+$/.test(v) ? null : t('enterAValidEmail'),
+      firstname: (v) => v.trim().length < 2 ? t('register.firstNameMin') : null,
+      lastname: (v) => v.trim().length < 2 ? t('register.lastNameMin') : null,
+      username: (v) => v.trim().length < 2 ? t('usernameMustBeAtLeastTwoCharacters') : null,
+      email: (v) => /^\S+@\S+\.\S+$/.test(v) ? null : t('enterAValidEmail'),
       phone: (value) => {
         if (!value || value.trim() === '') return t('phoneIsRequired');
         const selected = phonePrefixes.find((p) => p.phonePrefix === phonePrefix);
         if (!selected?.phoneRegex) return null;
-        const fullPhone = `${phonePrefix}${value}`;
-        return new RegExp(selected.phoneRegex).test(fullPhone)
+        return new RegExp(selected.phoneRegex).test(`${phonePrefix}${value}`)
           ? null
           : t('enterAValidPhoneNumber');
       },
@@ -271,8 +128,7 @@ export default function RegisterPage() {
         if (!/[^a-zA-Z0-9]/.test(v)) return t('passwordMustContainAtLeastOneSpecialCharacter');
         return null;
       },
-      confirmPassword: (v, values) =>
-        v !== values.password ? t('passwordsDoNotMatch') : null,
+      confirmPassword: (v, values) => v !== values.password ? t('passwordsDoNotMatch') : null,
       dateOfBirth: (value) => {
         if (!value) return null;
         const date = new Date(value);
@@ -292,51 +148,6 @@ export default function RegisterPage() {
     /\d/.test(form.values.password) &&
     /[^a-zA-Z0-9]/.test(form.values.password);
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
-  const handleSubmit = async (values: FormValues) => {
-    setLoading(true);
-    const fullPhone = values.phone ? `${phonePrefix}${values.phone}` : undefined;
-
-    try {
-      const response = await post('Authentication/register', {
-        firstname: values.firstname,
-        lastname: values.lastname,
-        username: values.username,
-        email: values.email,
-        phone: fullPhone,
-        dateOfBirth: values.dateOfBirth?.toISOString() ?? null,
-        name: values.image.name || null,
-        data: values.image.data || null,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-        role: 'User',
-        location: location ? JSON.stringify(location) : null
-      });
-      if (response.success) {
-        notifications.show({
-          color: 'teal',
-          title: t('success'),
-          message: t('register.success'),
-        });
-        navigate('/login');
-      } else {
-        notifications.show({
-          color: 'red',
-          title: t('error'),
-          message: response.message ?? t('registrationFailed'),
-        });
-      }
-    } catch (error: any) {
-      notifications.show({
-        color: 'red',
-        title: t('error'),
-        message: error?.message ?? t('registrationFailed'),
-      });
-    } finally {
-      setTimeout(() => setLoading(false), 400);
-    }
-  };
-
   // ── Image upload ───────────────────────────────────────────────────────────
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -350,20 +161,49 @@ export default function RegisterPage() {
     reader.readAsDataURL(file);
   };
 
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  const handleSubmit = async (values: FormValues) => {
+    setLoading(true);
+    try {
+      const response = await post('Authentication/register', {
+        firstname: values.firstname,
+        lastname: values.lastname,
+        username: values.username,
+        email: values.email,
+        phone: values.phone ? `${phonePrefix}${values.phone}` : undefined,
+        dateOfBirth: values.dateOfBirth?.toISOString() ?? null,
+        name: values.image.name || null,
+        data: values.image.data || null,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+        role: 'User',
+        location: loc.location ? JSON.stringify(loc.location) : null,
+      });
+
+      if (response.success) {
+        notifications.show({ color: 'teal', title: t('success'), message: t('register.success') });
+        navigate('/login');
+      } else {
+        notifications.show({ color: 'red', title: t('error'), message: response.message ?? t('registrationFailed') });
+      }
+    } catch (error: any) {
+      notifications.show({ color: 'red', title: t('error'), message: error?.message ?? t('registrationFailed') });
+    } finally {
+      setTimeout(() => setLoading(false), 400);
+    }
+  };
+
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <>
       {loading && <Spinner visible={loading} />}
       <Box w="100%" py={{ base: 'md', sm: 'xl' }}>
         <Container size={560} w="100%">
+
           {/* Header */}
           <AnimatedSection>
             <Stack align="center" mb="xl">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                style={{ cursor: 'pointer' }}
-                onClick={() => navigate('/')}
-              >
+              <motion.div whileHover={{ scale: 1.05 }} style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
                 <Logo height={44} />
               </motion.div>
               <Text size="xl" fw={700}>{t('register.title')}</Text>
@@ -377,85 +217,42 @@ export default function RegisterPage() {
               <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
 
-                  {/* First & Last name */}
+                  {/* Name */}
                   <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                    <TextInput
-                      label={t('register.firstName')}
-                      placeholder={t('register.firstName')}
-                      leftSection={<IconUser size={16} />}
-                      withAsterisk
-                      {...form.getInputProps('firstname')}
-                    />
-                    <TextInput
-                      label={t('register.lastName')}
-                      placeholder={t('register.lastName')}
-                      leftSection={<IconUser size={16} />}
-                      withAsterisk
-                      {...form.getInputProps('lastname')}
-                    />
+                    <TextInput label={t('register.firstName')} placeholder={t('register.firstName')} leftSection={<IconUser size={16} />} withAsterisk {...form.getInputProps('firstname')} />
+                    <TextInput label={t('register.lastName')} placeholder={t('register.lastName')} leftSection={<IconUser size={16} />} withAsterisk {...form.getInputProps('lastname')} />
                   </SimpleGrid>
 
                   {/* Username */}
-                  <TextInput
-                    label={t('username')}
-                    placeholder={t('usernamePlaceholder')}
-                    leftSection={<IconId size={16} />}
-                    withAsterisk
-                    {...form.getInputProps('username')}
-                  />
+                  <TextInput label={t('username')} placeholder={t('usernamePlaceholder')} leftSection={<IconId size={16} />} withAsterisk {...form.getInputProps('username')} />
 
-                  {/* Avatar upload */}
+                  {/* Avatar */}
                   <Box>
                     <Text size="xs" mb={6} fw={500}>{t('register.profilePhoto')}</Text>
                     <Group gap="md" align="center">
                       <Box
                         onClick={() => fileInputRef.current?.click()}
                         style={{
-                          width: 72,
-                          height: 72,
-                          borderRadius: '50%',
+                          width: 72, height: 72, borderRadius: '50%',
                           border: '2px dashed var(--mantine-color-teal-5)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          overflow: 'hidden',
-                          flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', overflow: 'hidden', flexShrink: 0,
                           background: imagePreview ? 'transparent' : 'var(--mantine-color-body)',
                         }}
                       >
-                        {imagePreview ? (
-                          <img
-                            src={imagePreview}
-                            alt="avatar"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          <IconUser size={28} style={{ opacity: 0.4 }} />
-                        )}
+                        {imagePreview
+                          ? <img src={imagePreview} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : <IconUser size={28} style={{ opacity: 0.4 }} />
+                        }
                       </Box>
                       <Stack gap={4} style={{ flex: 1 }}>
-                        <Button
-                          variant="light"
-                          color="teal"
-                          size="xs"
-                          leftSection={<IconUser size={14} />}
-                          onClick={() => fileInputRef.current?.click()}
-                        >
+                        <Button variant="light" color="teal" size="xs" leftSection={<IconUser size={14} />} onClick={() => fileInputRef.current?.click()}>
                           {imagePreview ? t('register.changePhoto') : t('register.uploadPhoto')}
                         </Button>
-                        {form.values.image.name && (
-                          <Text size="xs" c="dimmed" truncate>
-                            {form.values.image.name}
-                          </Text>
-                        )}
+                        {form.values.image.name && <Text size="xs" c="dimmed" truncate>{form.values.image.name}</Text>}
                         {imagePreview && (
                           <Tooltip label={t('register.removePhoto')} withArrow position="right">
-                            <ActionIcon
-                              variant="light"
-                              color="red"
-                              size="sm"
-                              radius="xl"
+                            <ActionIcon variant="light" color="red" size="sm" radius="xl"
                               onClick={() => {
                                 form.setFieldValue('image', { name: '', data: '' });
                                 setImagePreview(null);
@@ -467,142 +264,51 @@ export default function RegisterPage() {
                           </Tooltip>
                         )}
                       </Stack>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={handleImageChange}
-                      />
+                      <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageChange} />
                     </Group>
                   </Box>
 
                   {/* Email */}
-                  <TextInput
-                    label={t('register.email')}
-                    placeholder="email@example.com"
-                    leftSection={<IconMail size={16} />}
-                    withAsterisk
-                    {...form.getInputProps('email')}
-                  />
+                  <TextInput label={t('register.email')} placeholder="email@example.com" leftSection={<IconMail size={16} />} withAsterisk {...form.getInputProps('email')} />
 
-                  {/* Phone with prefix */}
+                  {/* Phone */}
                   <Box>
-                    <Text size="xs" mb={4}>
-                      {t('register.phone')} <span style={{ color: 'red' }}>*</span>
-                    </Text>
+                    <Text size="xs" mb={4}>{t('register.phone')} <span style={{ color: 'red' }}>*</span></Text>
                     <Group gap="xs" align="flex-start">
                       <Select
-                        data={phonePrefixes.map((p) => ({
-                          value: p.phonePrefix ?? '',
-                          label: `${p.flag ?? ''} ${p.phonePrefix ?? ''}`.trim(),
-                        }))}
+                        data={phonePrefixes.map((p) => ({ value: p.phonePrefix ?? '', label: `${p.flag ?? ''} ${p.phonePrefix ?? ''}`.trim() }))}
                         value={phonePrefix}
                         onChange={(v) => setPhonePrefix(v ?? '+355')}
                         radius="md"
                         w={130}
                         comboboxProps={{ withinPortal: true }}
                       />
-                      <TextInput
-                        placeholder="6X XXX XXXX"
-                        leftSection={<IconPhone size={16} />}
-                        style={{ flex: 1 }}
-                        {...form.getInputProps('phone')}
-                      />
+                      <TextInput placeholder="6X XXX XXXX" leftSection={<IconPhone size={16} />} style={{ flex: 1 }} {...form.getInputProps('phone')} />
                     </Group>
                   </Box>
 
                   {/* Date of birth */}
-                  <DateInput
-                    label={t('register.dateOfBirth')}
-                    placeholder="DD/MM/YYYY"
-                    leftSection={<IconCalendar size={16} />}
-                    maxDate={new Date()}
-                    valueFormat="DD/MM/YYYY"
-                    clearable
-                    {...form.getInputProps('dateOfBirth')}
+                  <DateInput label={t('register.dateOfBirth')} placeholder="DD/MM/YYYY" leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
+
+                  {/* Location */}
+                  <LocationField
+                    location={loc.location}
+                    locationSearchQuery={loc.locationSearchQuery}
+                    locationSuggestions={loc.locationSuggestions}
+                    locationSearchLoading={loc.locationSearchLoading}
+                    gpsLoading={loc.gpsLoading}
+                    onSearchChange={loc.handleLocationSearchChange}
+                    onSelect={loc.handleLocationSelect}
+                    onGPS={loc.handleGPS}
+                    onClear={loc.handleClearLocation}
                   />
 
-                  {/* ── Location ──────────────────────────────────────────── */}
-                  <Stack gap="xs">
-                    <Autocomplete
-                      label={t('register.location')}
-                      placeholder={t('typeToSearchAddress')}
-                      value={locationSearchQuery}
-                      onChange={handleLocationSearchChange}
-                      onOptionSubmit={handleLocationSelect}
-                      data={locationSuggestions.map((s) => s.address ?? '').filter(Boolean)}
-                      radius="md"
-                      leftSection={<IconSearch size={16} style={{ opacity: locationSearchLoading ? 0.4 : 1 }} />}
-                      rightSection={
-                        locationSearchQuery ? (
-                          <ActionIcon
-                            variant="subtle"
-                            color="gray"
-                            size="sm"
-                            radius="xl"
-                            onClick={handleClearLocation}
-                          >
-                            <IconX size={13} />
-                          </ActionIcon>
-                        ) : null
-                      }
-                    />
-
-                    <Button
-                      variant="outline"
-                      color="teal"
-                      fullWidth
-                      radius="md"
-                      loading={gpsLoading}
-                      leftSection={<IconMapPin size={16} />}
-                      styles={{
-                        root: {
-                          borderStyle: 'dashed',
-                          borderColor: 'var(--mantine-color-teal-4)',
-                        },
-                      }}
-                      onClick={handleGPS}
-                    >
-                      {t('useMyCurrentLocation')}
-                    </Button>
-
-                    {location && (
-                      <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
-                        <Alert
-                          color="teal"
-                          variant="light"
-                          radius="md"
-                          icon={<IconCircleCheck size={14} />}
-                          withCloseButton
-                          onClose={handleClearLocation}
-                          styles={{ message: { fontSize: '0.75rem' } }}
-                        >
-                          <Stack gap={2}>
-                            <Text size="xs" fw={600}>{t('locationSet')}</Text>
-                            {location.address && (
-                              <Text size="xs" c="dimmed">{location.address}</Text>
-                            )}
-                            <Text size="xs" c="dimmed">
-                              {[location.city, location.state, location.country]
-                                .filter(Boolean)
-                                .join(', ')}
-                            </Text>
-                          </Stack>
-                        </Alert>
-                      </motion.div>
-                    )}
-                  </Stack>
-
-                  {/* Password with popover rules */}
+                  {/* Password */}
                   <Popover
                     position="bottom"
                     withArrow
                     shadow="md"
-                    opened={
-                      (passwordPopoverOpened || form.values.password.length > 0) &&
-                      !allRulesPassed
-                    }
+                    opened={(passwordPopoverOpened || form.values.password.length > 0) && !allRulesPassed}
                     width={260}
                     withinPortal={false}
                     trapFocus={false}
@@ -630,12 +336,8 @@ export default function RegisterPage() {
                           { ok: /[^a-zA-Z0-9]/.test(form.values.password), label: t('passwordRules.special') },
                         ].map((rule, i) => (
                           <Group key={i} gap={6}>
-                            <Text size="xs" c={rule.ok ? 'teal' : 'dimmed'}>
-                              {rule.ok ? '✓' : '○'}
-                            </Text>
-                            <Text size="xs" c={rule.ok ? 'teal' : 'dimmed'}>
-                              {rule.label}
-                            </Text>
+                            <Text size="xs" c={rule.ok ? 'teal' : 'dimmed'}>{rule.ok ? '✓' : '○'}</Text>
+                            <Text size="xs" c={rule.ok ? 'teal' : 'dimmed'}>{rule.label}</Text>
                           </Group>
                         ))}
                       </Stack>
@@ -643,27 +345,15 @@ export default function RegisterPage() {
                   </Popover>
 
                   {/* Confirm password */}
-                  <PasswordInput
-                    label={t('register.confirmPassword')}
-                    placeholder="••••••••"
-                    leftSection={<IconLock size={16} />}
-                    withAsterisk
-                    {...form.getInputProps('confirmPassword')}
-                  />
+                  <PasswordInput label={t('register.confirmPassword')} placeholder="••••••••" leftSection={<IconLock size={16} />} withAsterisk {...form.getInputProps('confirmPassword')} />
 
                   {/* Submit */}
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="filled"
-                      color="teal"
-                      size="md"
-                      className="ripple-btn"
-                    >
+                    <Button type="submit" fullWidth variant="filled" color="teal" size="md" className="ripple-btn">
                       {t('register.submit')}
                     </Button>
                   </motion.div>
+
                 </Stack>
               </form>
 
@@ -686,11 +376,10 @@ export default function RegisterPage() {
           <AnimatedSection delay={0.3}>
             <Text ta="center" mt="md" size="sm">
               {t('register.hasAccount')}{' '}
-              <Anchor component={Link} to="/login" fw={600}>
-                {t('register.login')}
-              </Anchor>
+              <Anchor component={Link} to="/login" fw={600}>{t('register.login')}</Anchor>
             </Text>
           </AnimatedSection>
+
         </Container>
       </Box>
     </>

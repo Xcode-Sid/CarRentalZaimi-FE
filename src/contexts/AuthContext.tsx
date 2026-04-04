@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { type User } from '../data/users';
 import { post } from '../utils/api.utils';
+import { toImagePath } from '../utils/general';
 
 interface AuthContextType {
   user: User | null;
@@ -12,6 +13,38 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+
+const mapApiResponseToUser = (raw: any): User => ({
+  id: raw.id,
+  firstName: raw.firstName,
+  lastName: raw.lastName,
+  email: raw.email,
+  phoneNumber: raw.phoneNumber ?? '',
+  username: raw.username ?? null,
+  dateOfBirth: raw.dateOfBirth ? new Date(raw.dateOfBirth) : null,
+  role: raw.role
+    ? {
+        id: raw.role.id,
+        name: raw.role.name ?? null,
+        normalizedName: raw.role.normalizedName ?? null,
+        concurrencyStamp: raw.role.concurrencyStamp ?? null,
+      }
+    : null,
+  image: raw.image
+    ? {
+        id: raw.image.id,
+        imageName: raw.image.imageName ?? null,
+        imagePath: raw.image.imagePath ? toImagePath(raw.image.imagePath) : null,
+      }
+    : null,
+  location: raw.location ?? null,
+  savedVehicles: raw.savedVehicles ?? [],
+  customerStatus: raw.customerStatus ?? undefined,
+});
+
+// Derive admin status from the role object directly
+const isAdminRole = (user: User | null): boolean =>
+  user?.role?.normalizedName?.toLowerCase() === 'admin';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
@@ -34,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (response.success) {
-        const loggedInUser: User = response.data.user;
+        const loggedInUser = mapApiResponseToUser(response.data.user);
         setUser(loggedInUser);
         localStorage.setItem('az-user', JSON.stringify(loggedInUser));
         return loggedInUser;
@@ -47,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      console.log("entered")
       await post('Authentication/logout', {});
     } catch {
       // proceed with local logout regardless
@@ -70,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        isAdmin: user?.role === 'admin',
+        isAdmin: isAdminRole(user),
         isLoggedIn: !!user,
         login,
         logout,
