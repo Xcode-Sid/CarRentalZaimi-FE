@@ -50,6 +50,7 @@ export default function ProfilePage() {
       // ✅ Read from image object instead of user.name / user.date
       imageName: user?.image?.imageName || '',
       imagePath: user?.image?.imagePath || '',
+      imageBase64: '',
     },
     validate: {
       firstName: (v) => v.trim().length < 2 ? t('register.firstNameMin') : null,
@@ -72,10 +73,11 @@ export default function ProfilePage() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const base64 = (reader.result as string).split(',')[1];
-      // ✅ Use imageName / imagePath instead of name / date
+      const dataUrl = reader.result as string;
+      const base64 = dataUrl.split(',')[1]; // for upload
       form.setFieldValue('imageName', file.name);
-      form.setFieldValue('imagePath', base64);
+      form.setFieldValue('imagePath', dataUrl); // ← full data URL for preview
+      form.setFieldValue('imageBase64', base64); // ← raw base64 for API
     };
     reader.readAsDataURL(file);
   };
@@ -121,7 +123,7 @@ export default function ProfilePage() {
         dateOfBirth: values.dateOfBirth,
         // ✅ Use imageName / imagePath
         name: values.imageName || null,
-        data: values.imagePath || null,
+        data: values.imageBase64 || null,
         location: loc.location ? JSON.stringify(loc.location) : null,
       });
 
@@ -221,8 +223,8 @@ export default function ProfilePage() {
 
                     <StaggerItem>
                       <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                        <DateInput label={t('account.dateOfBirth')} placeholder="DD/MM/YYYY" leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
-                        <TextInput label={t('account.username')} leftSection={<IconUser size={16} />} disabled {...form.getInputProps('username')} />
+                        <DateInput label={t('register.dateOfBirth')} placeholder="DD/MM/YYYY" leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
+                        <TextInput label={t('username')} leftSection={<IconUser size={16} />} disabled {...form.getInputProps('username')} />
                       </SimpleGrid>
                     </StaggerItem>
 
