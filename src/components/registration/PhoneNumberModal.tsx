@@ -7,6 +7,7 @@ import { IconPhone, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
 import { get, post } from '../../utils/api.utils';
+import { useNavigate } from 'react-router-dom';
 
 interface PhoneNumberModalProps {
     opened: boolean;
@@ -27,7 +28,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({ opened, userId, onS
     const [phoneNumber, setPhoneNumber] = useState('');
     const [phoneError, setPhoneError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
-
+    const navigate = useNavigate();
     const [phonePrefix, setPhonePrefix] = useState('+355');
     const [phonePrefixes, setPhonePrefixes] = useState<PhonePrefix[]>([]);
 
@@ -84,6 +85,7 @@ const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({ opened, userId, onS
                 color: 'green',
             });
             onSuccess();
+            navigate('/account', { replace: true });
         } catch (err) {
             const msg = err instanceof Error ? err.message : t('phoneAddFailed');
             setPhoneError(msg);

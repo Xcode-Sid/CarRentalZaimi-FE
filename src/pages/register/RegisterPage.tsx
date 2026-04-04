@@ -177,7 +177,7 @@ export default function RegisterPage() {
         password: values.password,
         confirmPassword: values.confirmPassword,
         role: 'User',
-        location: loc.location ? JSON.stringify(loc.location) : null,
+        location: loc.location,
       });
 
       if (response.success) {

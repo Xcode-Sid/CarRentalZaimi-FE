@@ -181,8 +181,13 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
       updateProfile(userData);
 
       if (authData.token) localStorage.setItem('authToken', authData.token);
-      notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
-      navigate(authData.role === 'admin' ? '/admin' : '/account', { replace: true });
+      const phone = authData.user?.phoneNumber;
+      if (!phone) {
+        setPendingAuthData(authData);
+        setPhoneModalOpen(true);
+      } else {
+        completeLogin(authData);
+      }
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Authentication failed';
