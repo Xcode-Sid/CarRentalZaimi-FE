@@ -73,7 +73,6 @@ export default function ResetPasswordPage() {
             navigate('/login');
         } catch (err) {
             console.error(err);
-            notifications.show({ message: t('passwordResetFailed'), color: 'red' });
         }
         setLoading(false);
     };

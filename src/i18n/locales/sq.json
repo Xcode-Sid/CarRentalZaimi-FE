@@ -553,5 +553,8 @@
   "confirmPhoneNumber": "Konfirmo numrin e telefonit",
   "emailDoesNotExist": "Email-i nuk ekziston",
   "thisAccountIsConfirmed": "Kjo llogari është tashmë e konfirmuar",
-  "somethingWentWrong": "Diçka shkoi keq"
+  "somethingWentWrong": "Diçka shkoi keq",
+  "common.errorTitle": "Gabim",
+  "common.warningTitle": "Paralajmërim",
+  "common.infoTitle": "Informacion"
 }

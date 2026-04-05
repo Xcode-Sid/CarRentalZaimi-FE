@@ -553,5 +553,8 @@
   "confirmPhoneNumber": "Conferma il numero di telefono",
   "emailDoesNotExist": "L'email non esiste",
   "thisAccountIsConfirmed": "Questo account è già confermato",
-  "somethingWentWrong": "Qualcosa è andato storto"
+  "somethingWentWrong": "Qualcosa è andato storto",
+  "common.errorTitle": "Errore",
+  "common.warningTitle": "Avviso",
+  "common.infoTitle": "Informazione"
 }

@@ -63,8 +63,6 @@ export default function VerifyPhonePage() {
         }
 
         setLoading(true);
-        console.log("code", code);
-        console.log("userId", userId);
         try {
             const response = await post('Phone/confirm-phone', {
                 userId,
@@ -78,20 +76,9 @@ export default function VerifyPhonePage() {
                     message: t('phoneVerifiedSuccessfully'),
                 });
                 navigate('/login', { replace: true });
-            } else {
-                notifications.show({
-                    color: 'red',
-                    title: t('error'),
-                    message: response.message ?? t('invalidOrExpiredCode'),
-                });
             }
         } catch (err) {
             console.error('Verify phone error:', err);
-            notifications.show({
-                color: 'red',
-                title: t('error'),
-                message: t('somethingWentWrong'),
-            });
         } finally {
             setLoading(false);
         }
@@ -113,20 +100,8 @@ export default function VerifyPhonePage() {
                     message: t('verificationCodeSent'),
                 });
                 startCooldown();
-            } else {
-                notifications.show({
-                    color: 'red',
-                    title: t('error'),
-                    message: response.message ?? t('resendFailed'),
-                });
             }
         } catch (err) {
-            console.error('Resend error:', err);
-            notifications.show({
-                color: 'red',
-                title: t('error'),
-                message: t('somethingWentWrong'),
-            });
         } finally {
             setResendLoading(false);
         }

@@ -183,11 +183,9 @@ export default function RegisterPage() {
       if (response.success) {
         notifications.show({ color: 'teal', title: t('success'), message: t('register.success') });
         await sendVerificationCode(values.email);
-      } else {
-        notifications.show({ color: 'red', title: t('error'), message: response.message ?? t('registrationFailed') });
       }
     } catch (error: any) {
-      notifications.show({ color: 'red', title: t('error'), message: error?.message ?? t('registrationFailed') });
+      console.error(error);
     } finally {
       setTimeout(() => setLoading(false), 400);
     }
@@ -212,28 +210,10 @@ export default function RegisterPage() {
           navigate("/verify-phone", {
             state: { userId: id },
           });
-        } else {
-          notifications.show({
-            color: 'red',
-            title: t('error'),
-            message: smsResponse.message ?? t('resendFailed'),
-          });
         }
-      } else {
-        notifications.show({
-          color: 'red',
-          title: t('error'),
-          message: t('emailDoesNotExist'),
-        });
-        return;
       }
     } catch (err) {
       console.error('Something went wrong:', err);
-      notifications.show({
-        color: 'red',
-        title: t('error'),
-        message: t('somethingWentWrong'),
-      });
     }
   };
 

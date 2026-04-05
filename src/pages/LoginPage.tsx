@@ -39,7 +39,6 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [forgotLoading, setForgotLoading] = useState(false);
   const [successModalOpened, setSuccessModalOpened] = useState(false);
 
   const form = useForm({
@@ -86,16 +85,15 @@ export default function LoginPage() {
       form.setFieldError('email', emailError ?? t('login.emailRequired'));
       return;
     }
-    setForgotLoading(true);
+    setLoading(true);
     try {
       const response = await post('Authentication/forgot-password', { email: form.values.email });
       if (!response.success) throw new Error(response.message?.toString());
       setSuccessModalOpened(true);
     } catch (err) {
       console.error('Forgot password error:', err);
-      notifications.show({ message: t('login.forgotError'), color: 'red' });
     }
-    setForgotLoading(false);
+    setLoading(false);
   };
 
   const handleConfirmPhone = async () => {
@@ -156,20 +154,9 @@ export default function LoginPage() {
         navigate("/verify-phone", {
           state: { userId: id },
         });
-      } else {
-        notifications.show({
-          color: 'red',
-          title: t('error'),
-          message: smsResponse.message ?? t('resendFailed'),
-        });
       }
     } catch (err) {
       console.error('Something went wrong:', err);
-      notifications.show({
-        color: 'red',
-        title: t('error'),
-        message: t('somethingWentWrong'),
-      });
     }
   };
 
@@ -260,7 +247,7 @@ export default function LoginPage() {
                 fw={600}
                 onClick={handleForgotPassword}
               >
-                {forgotLoading ? <Loader size={12} /> : t('forgotPassword')}
+                { t('forgotPassword')}
               </Anchor>
             </Text>
             <Text ta="center" mt="md" size="sm">
@@ -270,7 +257,7 @@ export default function LoginPage() {
                 fw={600}
                 onClick={handleConfirmPhone}
               >
-                {forgotLoading ? <Loader size={12} /> : t('confirmPhoneNumber')}
+                { t('confirmPhoneNumber')}
               </Anchor>
             </Text>
           </AnimatedSection>
