@@ -177,19 +177,43 @@ export default function RegisterPage() {
         password: values.password,
         confirmPassword: values.confirmPassword,
         role: 'User',
-        location: loc.location ? JSON.stringify(loc.location) : null,
+        location: loc.location,
       });
 
       if (response.success) {
         notifications.show({ color: 'teal', title: t('success'), message: t('register.success') });
-        navigate('/login');
-      } else {
-        notifications.show({ color: 'red', title: t('error'), message: response.message ?? t('registrationFailed') });
+        await sendVerificationCode(values.email);
       }
     } catch (error: any) {
-      notifications.show({ color: 'red', title: t('error'), message: error?.message ?? t('registrationFailed') });
+      console.error(error);
     } finally {
       setTimeout(() => setLoading(false), 400);
+    }
+  };
+
+  const sendVerificationCode = async (email: string) => {
+    try {
+      const userRes = await get(`User/user/email/${email}`);
+      const id = userRes.data.id;
+
+      if (userRes.success && id) {
+        const smsResponse = await post('Phone/send-verification-code', {
+          userId: id,
+        });
+
+        if (smsResponse.success) {
+          notifications.show({
+            color: 'green',
+            title: t('success'),
+            message: t('verificationCodeSent'),
+          });
+          navigate("/verify-phone", {
+            state: { userId: id },
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Something went wrong:', err);
     }
   };
 

@@ -28,37 +28,39 @@ import { ThemeToggle } from './components/common/ThemeToggle';
 import { Box } from '@mantine/core';
 import { AdPageShell, AdsVerticalLayout } from './layouts/AdPageShell';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyPhonePage from './pages/register/VerifyPhonePage ';
 
 export default function App() {
   return (
     <>
-    
- <div
-  style={{
-    position: "fixed",
-    bottom: 16,
-    left: 16,
-    zIndex: 9999,
-    display: "flex",
-    gap: 8,
-    alignItems: "center",
-  }}
->
-  <LanguageSwitcher />
-  <ThemeToggle />
-</div>
-    <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/fleet" element={<FleetPage />} />
-        <Route path="/fleet/:id" element={<VehicleDetailPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-      </Route>
+
+      <div
+        style={{
+          position: "fixed",
+          bottom: 16,
+          left: 16,
+          zIndex: 9999,
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+        }}
+      >
+        <LanguageSwitcher />
+        <ThemeToggle />
+      </div>
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/fleet" element={<FleetPage />} />
+          <Route path="/fleet/:id" element={<VehicleDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Route>
 
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />      
-              <Route path="reset-password" element={<ResetPasswordPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verify-phone" element={<VerifyPhonePage />} />
 
         <Route element={<UserAccountRoute />}>
           <Route element={<AccountLayout />}>
@@ -83,15 +85,15 @@ export default function App() {
           </Route>
         </Route>
 
-      <Route
-        path="*"
-        element={
-          <AdsVerticalLayout>
-            <NotFoundPage />
-          </AdsVerticalLayout>
-        }
-      />
-    </Routes>
+        <Route
+          path="*"
+          element={
+            <AdsVerticalLayout>
+              <NotFoundPage />
+            </AdsVerticalLayout>
+          }
+        />
+      </Routes>
     </>
   );
 }

@@ -142,8 +142,9 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
       localStorage.setItem('az-user', JSON.stringify(userData));
       updateProfile(userData);
 
+      console.log('authData.user',authData.user)
       if (authData.token) localStorage.setItem('authToken', authData.token);
-      const phone = (authData.user as Record<string, unknown>).phone as string | undefined;
+      const phone = authData.user?.phoneNumber;
       if (!phone) {
         setPendingAuthData(authData);
         setPhoneModalOpen(true);
@@ -166,7 +167,7 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
   const completeLogin = (authData: PendingAuthData) => {
     const roleName = getRoleName(authData.role);
     notifications.show({ title: t('success'), message: t('loginSuccessful'), color: 'green' });
-    navigate(roleName === 'admin' ? '/admin' : '/account', { replace: true });
+    navigate('/account', { replace: true });
   };
 
 

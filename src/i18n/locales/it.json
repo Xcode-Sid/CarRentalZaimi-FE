@@ -535,5 +535,26 @@
   "typeToSearchAddress": "Scrivi per cercare un indirizzo...",
   "useMyCurrentLocation": "Usa la mia posizione attuale",
   "locationSet": "Posizione impostata",
-  "givePermissionToLocation": "Per favore consenti l'accesso alla posizione nelle impostazioni del browser."
+  "givePermissionToLocation": "Per favore consenti l'accesso alla posizione nelle impostazioni del browser.",
+  "verifyPhone": {
+    "title": "Verifica il tuo telefono",
+    "subtitle": "Inserisci il codice a 6 cifre inviato al tuo numero di telefono",
+    "enterCode": "Inserisci il tuo codice di verifica",
+    "verify": "Verifica telefono",
+    "didntReceive": "Non hai ricevuto il codice?",
+    "resend": "Invia di nuovo",
+    "resendIn": "Invia di nuovo tra"
+  },
+  "phoneVerifiedSuccessfully": "Numero di telefono verificato con successo!",
+  "enterFullCode": "Inserisci il codice completo a 6 cifre",
+  "invalidOrExpiredCode": "Codice non valido o scaduto",
+  "sending": "Invio in corso...",
+  "backToLogin": "Torna al login",
+  "confirmPhoneNumber": "Conferma il numero di telefono",
+  "emailDoesNotExist": "L'email non esiste",
+  "thisAccountIsConfirmed": "Questo account è già confermato",
+  "somethingWentWrong": "Qualcosa è andato storto",
+  "common.errorTitle": "Errore",
+  "common.warningTitle": "Avviso",
+  "common.infoTitle": "Informazione"
 }
