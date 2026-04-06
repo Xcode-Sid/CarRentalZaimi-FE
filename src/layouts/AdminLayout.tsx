@@ -19,6 +19,7 @@ import {
   IconChartBar,
   IconFileText,
   IconAd,
+  IconClipboardList,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -28,6 +29,7 @@ import { AdBanner } from '../components/common/AdBanner';
 
 const navItems = [
   { path: '/admin', icon: IconDashboard, labelKey: 'admin.dashboard', badge: null },
+  { path: '/admin/car-data', icon: IconClipboardList, labelKey: 'admin.carDatas', badge: null },
   { path: '/admin/cars', icon: IconCar, labelKey: 'admin.cars', badge: null },
   { path: '/admin/bookings', icon: IconCalendar, labelKey: 'admin.bookings', badge: '3' },
   { path: '/admin/customers', icon: IconUsers, labelKey: 'admin.customers', badge: null },

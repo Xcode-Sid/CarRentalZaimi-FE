@@ -1,3 +1,23 @@
+export interface GeneralData {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface CarCategory extends GeneralData {
+  description?: string;
+}
+
+export interface CarCompanyName extends GeneralData {
+  models?: CarCompanyModel[];
+}
+
+export interface CarCompanyModel extends GeneralData {
+  carCompanyNameId: string;
+  carCompanyName?: string;
+}
+
+
 export interface VehicleSpecs {
   seats: number;
   engine: string;
