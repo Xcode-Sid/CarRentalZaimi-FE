@@ -274,12 +274,15 @@ export const put = async (
   }
 };
 
+
 export const del = async (
   endpoint: string,
   params?: Record<string, any>,
   headers?: any,
-): Promise<any> => {
+): Promise<ApiResponse<any>> => {
   try {
+    window.dispatchEvent(new Event("mutation-start"));
+
     const ok = await ensureFreshToken();
     if (!ok) throw new Error(i18next.t("auth.sessionExpired"));
 
@@ -301,13 +304,40 @@ export const del = async (
       delResponse = await doDelete();
     }
 
-    return delResponse.json();
+    // SAFELY read body (works for 200, 400, 409, etc.)
+    const raw = await delResponse.text();
+
+    let res: ApiResponse<any>;
+    try {
+      res = JSON.parse(raw);
+    } catch {
+      throw new Error(raw || i18next.t("common.somethingWentWrong"));
+    }
+
+    if (!res.success) {
+      const msg =
+        (Array.isArray(res.errors) && res.errors.length > 0 && res.errors[0]) ||
+        res.message ||
+        i18next.t("common.somethingWentWrong");
+
+      throw new Error(msg);
+    }
+
+    return res;
   } catch (error) {
     console.error(`DELETE ${endpoint} failed:`, error);
-    window.dispatchEvent(new CustomEvent(API_REQUEST_FAILED));
+
+    // ✅ pass REAL error to global handler
+    window.dispatchEvent(
+      new CustomEvent(API_REQUEST_FAILED, {
+        detail: (error as Error).message,
+      })
+    );
+
     throw error;
+  } finally {
+    window.dispatchEvent(new Event(MUTATION_END));
   }
 };
-
 // Expose saveTokens so AuthContext can call it after login/refresh
 export { saveTokens };
