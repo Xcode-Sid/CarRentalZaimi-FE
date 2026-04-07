@@ -12,14 +12,15 @@ import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components
 export default function SavedCarsPage() {
   const { t } = useTranslation();
   const { favorites } = useFavorites();
-  const savedVehicles = vehicles.filter((v) => favorites.includes(v.id));
+  const savedVehicles = vehicles.filter((v) => favorites.includes(Number(v.carId)));
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | null>(null);
 
   const filteredVehicles = savedVehicles.filter((v) => {
     const q = search.trim().toLowerCase();
-    if (q && !v.name.toLowerCase().includes(q)) return false;
-    if (category && v.category !== category) return false;
+    const name = (v.title || v.carName || '').toLowerCase();
+    if (q && !name.includes(q)) return false;
+    if (category && v.categoryName !== category) return false;
     return true;
   });
 
@@ -100,7 +101,7 @@ export default function SavedCarsPage() {
               <StaggerContainer stagger={0.07}>
                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
                   {filteredVehicles.map((v, i) => (
-                    <StaggerItem key={v.id} scale>
+                    <StaggerItem key={v.carId} scale>
                       <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}

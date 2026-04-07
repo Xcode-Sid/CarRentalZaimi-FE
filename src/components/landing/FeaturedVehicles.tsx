@@ -59,7 +59,7 @@ export function FeaturedVehicles() {
         <StaggerContainer stagger={0.12}>
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
             {featured.map((vehicle, i) => (
-              <StaggerItem key={vehicle.id} scale>
+              <StaggerItem key={vehicle.carId} scale>
                 <VehicleCard vehicle={vehicle} index={i} />
               </StaggerItem>
             ))}

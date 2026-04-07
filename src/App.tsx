@@ -16,7 +16,7 @@ import SavedCarsPage from './pages/account/SavedCarsPage';
 import BookingsPage from './pages/account/BookingsPage';
 import SettingsPage from './pages/account/SettingsPage';
 import AdminDashboardPage from './pages/admin/DashboardPage';
-import AdminCarsPage from './pages/admin/CarsPage';
+import AdminCarsPage from './pages/admin/cars/CarsPage';
 import AdminBookingsPage from './pages/admin/BookingsPage';
 import AdminCustomersPage from './pages/admin/CustomersPage';
 import AdminSettingsPage from './pages/admin/SettingsPage';
@@ -29,6 +29,7 @@ import { Box } from '@mantine/core';
 import { AdPageShell, AdsVerticalLayout } from './layouts/AdPageShell';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyPhonePage from './pages/register/VerifyPhonePage ';
+import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage ';
 
 export default function App() {
   return (
@@ -82,6 +83,7 @@ export default function App() {
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
             <Route path="/admin/ads" element={<AdminAdsPage />} />
             <Route path="/admin/reports" element={<AdminReportsPage />} />
+            <Route path="/admin/car-data" element={<AdminCarDataPage />}  />
           </Route>
         </Route>
 

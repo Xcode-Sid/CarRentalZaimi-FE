@@ -33,45 +33,31 @@ import {
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
-import { vehicles } from '../../data/vehicles';
+import type { Vehicle } from '../../data/vehicles';
 import { reviews as allReviews } from '../../data/reviews';
 import { ImageGallery } from './ImageGallery';
 import { RentalBookingModal } from './RentalBookingModal';
-import { VehicleCard } from '../common/VehicleCard';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
 
 export function VehicleDetailView({
-  vehicleId,
+  vehicle,
+  similarVehicles = [],
   showBreadcrumbs = true,
   containerized = true,
 }: {
-  vehicleId: number;
+  vehicle: Vehicle;
+  similarVehicles?: Vehicle[];
   showBreadcrumbs?: boolean;
   containerized?: boolean;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const vehicle = vehicles.find((v) => v.id === Number(vehicleId));
-  const vehicleReviews = allReviews.filter((r) => r.vehicleId === Number(vehicleId));
+  const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.carId);
 
   const [rentalOpen, setRentalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
-
-  if (!vehicle) {
-    const Content = (
-      <Stack>
-        <Text>{t('common.error')}</Text>
-        <Button mt="md" onClick={() => navigate('/fleet')}>{t('common.back')}</Button>
-      </Stack>
-    );
-    return containerized ? (
-      <Container size="lg" py="xl">{Content}</Container>
-    ) : (
-      <Box p="xl">{Content}</Box>
-    );
-  }
 
   const avgRating =
     vehicleReviews.length > 0
@@ -81,27 +67,46 @@ export function VehicleDetailView({
   const ratingBreakdown = [5, 4, 3, 2, 1].map((star) => ({
     star,
     count: vehicleReviews.filter((r) => r.rating === star).length,
-    pct: vehicleReviews.length ? (vehicleReviews.filter((r) => r.rating === star).length / vehicleReviews.length) * 100 : 0,
+    pct: vehicleReviews.length
+      ? (vehicleReviews.filter((r) => r.rating === star).length / vehicleReviews.length) * 100
+      : 0,
   }));
 
-  const priceDisplay = `€${vehicle.price}/${t('vehicle.perDay')}`;
+  const priceDisplay = `€${vehicle.pricePerDay}/${t('vehicle.perDay')}`;
+
+  const features = [
+    vehicle.abs && 'ABS',
+    vehicle.bluetooth && 'Bluetooth',
+    vehicle.airConditioner && 'A/C',
+    vehicle.gps && 'GPS',
+    vehicle.camera && 'Camera',
+    vehicle.heatedSeats && 'Heated Seats',
+    vehicle.panoramicRoof && 'Panoramic Roof',
+    vehicle.parkingSensors && 'Parking Sensors',
+    vehicle.cruiseControl && 'Cruise Control',
+    vehicle.climateControl && 'Climate Control',
+    vehicle.ledHeadlights && 'LED Headlights',
+    vehicle.appleCarPlay && 'Apple CarPlay',
+    vehicle.androidAuto && 'Android Auto',
+    vehicle.laneDepartureAlert && 'Lane Departure Alert',
+    vehicle.adaptiveCruiseControl && 'Adaptive Cruise Control',
+    vehicle.wirelessCharging && 'Wireless Charging',
+    vehicle.electricWindows && 'Electric Windows',
+    vehicle.thirdRowSeats && 'Third Row Seats',
+  ].filter(Boolean) as string[];
 
   const specRows = [
-    [t('vehicle.brand'), vehicle.name.split(' ').slice(0, -1).join(' ')],
-    [t('vehicle.model'), vehicle.name.split(' ').slice(-1)[0]],
+    [t('vehicle.brand'), vehicle.carName ?? '—'],
+    [t('vehicle.model'), vehicle.modelName ?? '—'],
     [t('vehicle.year'), vehicle.year],
-    [t('vehicle.mileage'), vehicle.specs.mileage],
-    [t('vehicle.engine'), vehicle.specs.engine],
-    [t('vehicle.transmission'), vehicle.specs.transmission],
-    [t('vehicle.fuel'), vehicle.specs.fuel],
-    [t('vehicle.color'), vehicle.specs.color],
-    [t('vehicle.seatsLabel'), vehicle.specs.seats],
-    [t('vehicle.doors'), vehicle.specs.doors],
+    [t('vehicle.mileage'), vehicle.mileage ?? '—'],
+    [t('vehicle.engine'), vehicle.horsePower ? `${vehicle.horsePower} HP` : '—'],
+    [t('vehicle.transmission'), vehicle.transmissionType ?? '—'],
+    [t('vehicle.fuel'), vehicle.fuelType ?? '—'],
+    [t('vehicle.color'), vehicle.exteriorColor ?? '—'],
+    [t('vehicle.seatsLabel'), vehicle.seats],
+    [t('vehicle.doors'), vehicle.doors],
   ];
-
-  const similarCars = vehicles
-    .filter((v) => v.id !== vehicle.id && v.category === vehicle.category)
-    .slice(0, 4);
 
   const handleReviewSubmit = () => {
     if (reviewRating && reviewText) {
@@ -121,9 +126,10 @@ export function VehicleDetailView({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
+      style={{ padding: containerized ? 0 : '1rem' }}
     >
-      <Box py={containerized ? 'xl' : 0}>
-        {/* Breadcrumbs */}
+      <Box py={containerized ? 'xl' : 'lg'} px={containerized ? 0 : 'lg'}>
+
         {showBreadcrumbs && (
           <AnimatedSection>
             <Breadcrumbs
@@ -136,30 +142,34 @@ export function VehicleDetailView({
               <Anchor component="button" size="sm" c="dimmed" onClick={() => navigate('/fleet')}>
                 {t('nav.fleet')}
               </Anchor>
-              <Text size="sm" fw={500}>{vehicle.name}</Text>
+              <Text size="sm" fw={500}>{vehicle.title}</Text>
             </Breadcrumbs>
           </AnimatedSection>
         )}
 
         <div
-          style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: '2rem', alignItems: 'start' }}
-          className="vehicle-detail-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: containerized ? 'minmax(0, 1fr) 340px' : '1fr',
+            gap: containerized ? '2rem' : '1.5rem',
+            alignItems: 'start',
+            padding: containerized ? 0 : '0.5rem',
+          }}
         >
           <AnimatedSection direction="left">
             <Stack gap="xl" style={{ minWidth: 0 }}>
-              <ImageGallery images={vehicle.images} name={vehicle.name} />
+
+              <ImageGallery images={vehicle.carImages} name={vehicle.title} />
 
               <Group gap="sm" wrap="wrap">
                 <Badge color="teal" size="lg">{t('fleet.forRent')}</Badge>
-                <Badge variant="light" size="lg">{vehicle.category}</Badge>
-                <Group gap={6}>
-                  <span className={`status-dot ${vehicle.status === 'available' ? 'status-dot-available' : vehicle.status === 'maintenance' ? 'status-dot-maintenance' : 'status-dot-unavailable'}`} />
-                  <Text size="xs" c="dimmed" tt="capitalize">{vehicle.status}</Text>
-                </Group>
+                {vehicle.categoryName && (
+                  <Badge variant="light" size="lg">{vehicle.categoryName}</Badge>
+                )}
               </Group>
 
               <div>
-                <Title order={1} fw={800}>{vehicle.name}</Title>
+                <Title order={1} fw={800}>{vehicle.title}</Title>
                 <Text c="dimmed">{vehicle.year}</Text>
               </div>
 
@@ -178,16 +188,18 @@ export function VehicleDetailView({
                       <Text fw={600} mb="xs">{t('vehicle.description')}</Text>
                       <Text c="dimmed">{vehicle.description}</Text>
                     </div>
-                    <div>
-                      <Text fw={600} mb="xs">{t('vehicle.highlights')}</Text>
-                      <Group gap="xs" wrap="wrap">
-                        {vehicle.features.map((f) => (
-                          <Badge key={f} variant="outline" size="md" radius="xl">
-                            {f}
-                          </Badge>
-                        ))}
-                      </Group>
-                    </div>
+                    {features.length > 0 && (
+                      <div>
+                        <Text fw={600} mb="xs">{t('vehicle.highlights')}</Text>
+                        <Group gap="xs" wrap="wrap">
+                          {features.map((f) => (
+                            <Badge key={f} variant="outline" size="md" radius="xl">
+                              {f}
+                            </Badge>
+                          ))}
+                        </Group>
+                      </div>
+                    )}
                   </Stack>
                 </Tabs.Panel>
 
@@ -237,8 +249,12 @@ export function VehicleDetailView({
                       >
                         <Box
                           className="glass-card"
-                          p="md"
-                          style={{ borderRadius: 'var(--mantine-radius-md)' }}
+                          p="xl"
+                          style={{
+                            borderRadius: 'var(--mantine-radius-xl)',
+                            position: containerized ? 'sticky' : 'static',
+                            top: 90,
+                          }}
                         >
                           <Group justify="space-between" mb="xs" wrap="wrap">
                             <Group gap="sm">
@@ -297,11 +313,7 @@ export function VehicleDetailView({
             <Box
               className="glass-card"
               p="xl"
-              style={{
-                borderRadius: 'var(--mantine-radius-xl)',
-                position: 'sticky',
-                top: 90,
-              }}
+              style={{ borderRadius: 'var(--mantine-radius-xl)', position: 'sticky', top: 90 }}
             >
               <Stack gap="md">
                 <Text size="2rem" fw={800} c="teal">{priceDisplay}</Text>
@@ -367,19 +379,23 @@ export function VehicleDetailView({
         </div>
 
         {/* Similar Cars */}
-        {similarCars.length > 0 && (
+        {similarVehicles.length > 0 && (
           <Box mt={60}>
             <Divider mb="xl" />
             <AnimatedSection>
               <Title order={3} fw={700} mb="lg">
-                {t('vehicle.similarCars') || 'Similar Cars'}
+                {t('vehicle.similarCars')}
               </Title>
             </AnimatedSection>
             <StaggerContainer stagger={0.1}>
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                {similarCars.map((car, i) => (
-                  <StaggerItem key={car.id} scale>
-                    <VehicleCard vehicle={car} index={i} />
+                {similarVehicles.map((car, i) => (
+                  <StaggerItem key={car.carId} scale>
+                    {/* Replace with your VehicleCard once updated for new Vehicle type */}
+                    <Box p="md" className="glass-card">
+                      <Text fw={600}>{car.title}</Text>
+                      <Text size="sm" c="dimmed">€{car.pricePerDay}/{t('vehicle.perDay')}</Text>
+                    </Box>
                   </StaggerItem>
                 ))}
               </SimpleGrid>
@@ -398,4 +414,3 @@ export function VehicleDetailView({
 
   return containerized ? <Container size="xl">{Body}</Container> : Body;
 }
-
