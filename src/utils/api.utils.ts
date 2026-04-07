@@ -18,13 +18,8 @@ const api = ky.create({
 // ─── Token helpers ────────────────────────────────────────────────────────────
 
 function getAccessToken(): string | null {
-  return (
-    localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) ||
-    sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) ||
-    localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) ||
-    sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) ||
-    null
-  );
+  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  return token || sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) || null;
 }
 
 function getRefreshToken(): string | null {
@@ -52,6 +47,7 @@ function saveTokens(tokens: LoginTokens) {
 }
 
 function clearTokens() {
+    console.trace('clearTokens called!'); 
   localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
   localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
   localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN_EXPIRY);
@@ -87,7 +83,7 @@ async function tryRefresh(): Promise<boolean> {
       }
       return false;
     } catch {
-      return false;
+      return false; 
     } finally {
       refreshPromise = null;
     }
@@ -174,9 +170,10 @@ export const post = async (
     window.dispatchEvent(new Event("mutation-start"));
 
     // Don't run the refresh gate for auth endpoints (login, refresh itself)
-    const isAuthEndpoint =
-      endpoint.includes("Authentication/login") ||
-      endpoint.includes("Authentication/refresh");
+const isAuthEndpoint =
+  endpoint.includes("Authentication/login") ||
+  endpoint.includes("Authentication/refresh") ||
+  endpoint.includes("Authentication/logout"); // ← add this
 
     if (!isAuthEndpoint) {
       const ok = await ensureFreshToken();
@@ -224,7 +221,6 @@ export const post = async (
     window.dispatchEvent(new Event(MUTATION_END));
   }
 };
-
 export const put = async (
   endpoint: string,
   body: Record<string, any>,
@@ -236,35 +232,35 @@ export const put = async (
     const ok = await ensureFreshToken();
     if (!ok) throw new Error(i18next.t("auth.sessionExpired"));
 
-    const doPut = () =>
-      api.put(endpoint, {
-        json: body,
-        headers: buildAuthHeaders(headers?.headers),
-        throwHttpErrors: false,
-      });
+    const authHeaders = buildAuthHeaders(headers?.headers);
+    
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+      },
+      body: JSON.stringify(body),
+    });
 
-    let putResponse = await doPut();
 
-    if (putResponse.status === 401) {
+    if (response.status === 401) {
       const refreshed = await tryRefresh();
       if (!refreshed) {
-        dispatchSessionExpired();
         throw new Error(i18next.t("auth.sessionExpired"));
       }
-      putResponse = await doPut();
+      const retryResponse = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...buildAuthHeaders(),
+        },
+        body: JSON.stringify(body),
+      });
+      return retryResponse.json();
     }
 
-    const res = await putResponse.json<ApiResponse<any>>();
-
-    if (!res.success) {
-      const msg =
-        (Array.isArray(res.errors) && res.errors.length > 0 && res.errors[0]) ||
-        res.message ||
-        i18next.t("common.somethingWentWrong");
-      showApiError(msg);
-    }
-
-    return res;
+    return response.json();
   } catch (error) {
     console.error(`PUT ${endpoint} failed:`, error);
     window.dispatchEvent(new CustomEvent(API_REQUEST_FAILED));

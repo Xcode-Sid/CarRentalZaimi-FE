@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { Image, Group, Box, Modal } from '@mantine/core';
+import type { VehicleImage } from '../../data/vehicles';
 
 interface Props {
-  images: string[];
+  images: VehicleImage[];
   name: string;
 }
 
 export function ImageGallery({ images, name }: Props) {
-  const [selected, setSelected] = useState(0);
+  const primaryIndex = images.findIndex((img) => img.isPrimary);
+  const [selected, setSelected] = useState(primaryIndex !== -1 ? primaryIndex : 0);
   const [lightbox, setLightbox] = useState(false);
 
   return (
     <>
       <Box>
         <Image
-          src={images[selected]}
+          src={images[selected].data ?? undefined}
           alt={name}
           radius="lg"
           h={400}
@@ -28,8 +30,8 @@ export function ImageGallery({ images, name }: Props) {
           {images.map((img, i) => (
             <Image
               key={i}
-              src={img}
-              alt={`${name} ${i + 1}`}
+              src={img.data ?? undefined}
+              alt={img.name ?? `${name} ${i + 1}`}
               w={80}
               h={60}
               fit="cover"
@@ -55,8 +57,8 @@ export function ImageGallery({ images, name }: Props) {
         padding={0}
       >
         <Image
-          src={images[selected]}
-          alt={name}
+          src={images[selected].data ?? undefined}
+          alt={images[selected].name ?? name}
           fit="contain"
           mah="80vh"
         />

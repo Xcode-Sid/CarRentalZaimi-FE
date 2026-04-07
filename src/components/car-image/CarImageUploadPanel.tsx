@@ -5,6 +5,7 @@ import {
     Box, Stack, Text, Paper, Alert, SimpleGrid,
     Badge, ActionIcon, Center, useMantineColorScheme,
 } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,6 +29,7 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [dragging, setDragging] = useState(false);
     const { colorScheme } = useMantineColorScheme();
+    const { t } = useTranslation();
     const isDark = colorScheme === "dark";
 
     const colors = {
@@ -131,10 +133,10 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
                         </Box>
                     </Center>
                     <Text fw={500} size="sm" style={{ color: colors.foreground }}>
-                        {dragging ? "Drop images here" : "Upload car images"}
+                        {dragging ? t('dropImagesHere') : t('uploadCarImages')}
                     </Text>
                     <Text size="xs" style={{ color: colors.mutedFg }} mt={4}>
-                        Drag & drop or click to browse — multiple images supported
+                        {t('uploadCarImagesHint')}
                     </Text>
                     <input
                         ref={fileInputRef}
@@ -151,9 +153,9 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
             {images.length > 0 && (
                 <Box>
                     <Text size="xs" style={{ color: colors.mutedFg }} mb="xs" ml={4}>
-                        {images.length} image{images.length !== 1 ? "s" : ""} —{" "}
+                        {t('imageCount', { count: images.length })} —{" "}
                         <Text span size="xs" c="teal.5" fw={500}>
-                            tap crown to set primary
+                            {t('tapCrownToSetPrimary')}
                         </Text>
                     </Text>
                     <SimpleGrid cols={3} spacing="xs">
@@ -181,7 +183,7 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
                                 >
                                     <img
                                         src={image.data ?? undefined}
-                                        alt={image.name ?? "Car image"}
+                                        alt={image.name ?? t('carImage')}
                                         style={{
                                             width: "100%",
                                             height: "100%",
@@ -197,7 +199,7 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
                                             style={{ position: "absolute", top: 6, left: 6 }}
                                             leftSection={<Crown size={9} />}
                                         >
-                                            Primary
+                                            {t('primary')}
                                         </Badge>
                                     )}
 
@@ -221,7 +223,7 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
                                                 color="teal"
                                                 variant="filled"
                                                 radius="md"
-                                                title="Set as primary"
+                                                title={t('setAsPrimary')}
                                                 onClick={(e) => { e.stopPropagation(); setPrimary(image.id); }}
                                             >
                                                 <Crown size={13} />
@@ -232,7 +234,7 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
                                             color="red"
                                             variant="filled"
                                             radius="md"
-                                            title="Remove"
+                                            title={t('remove')}
                                             onClick={(e) => { e.stopPropagation(); removeImage(image.id); }}
                                         >
                                             <X size={13} />
@@ -253,7 +255,7 @@ export const CarImageUploadPanel = ({ images, onImagesChange }: CarImageUploadPa
                 radius="md"
                 styles={{ message: { fontSize: "0.75rem", color: colors.mutedFg } }}
             >
-                Upload multiple car images. The primary image is shown as the main photo in listings.
+                {t('uploadImagesInfo')}
             </Alert>
 
             <style>{`

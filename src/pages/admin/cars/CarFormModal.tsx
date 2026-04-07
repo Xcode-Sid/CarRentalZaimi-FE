@@ -1,6 +1,8 @@
 import {
     Modal, Stack, SimpleGrid, TextInput, Select, Button, Text, Checkbox, NumberInput,
     Textarea,
+    Group,
+    ThemeIcon,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect } from 'react';
@@ -10,6 +12,7 @@ import type {
     Vehicle, CarCategory, CarCompanyName, CarCompanyModel, GeneralData,
     FormValues,
 } from '../../../data/vehicles';
+import { IconInfoCircle } from '@tabler/icons-react';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -17,7 +20,6 @@ const toSelectData = (items: GeneralData[]) =>
     items.map((x) => ({ value: x.id, label: x.name }));
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
 
 export const INITIAL_VALUES: FormValues = {
     title: '', description: '',
@@ -75,8 +77,35 @@ type CarFormModalProps = {
 export function CarFormModal({
     opened, onClose, editingCar, lookups, lookupsLoading, onSave, saving,
 }: CarFormModalProps) {
-    const { t } = useTranslation();
-    const form = useForm<FormValues>({ initialValues: INITIAL_VALUES });
+    const { t, i18n  } = useTranslation();
+
+    const form = useForm<FormValues>({
+        initialValues: INITIAL_VALUES,
+        validate: {
+            title: (v) =>
+                !v || v.trim().length < 2 ? t('validation.titleMin') : null,
+            year: (v) =>
+                !v || v < 1900 || v > new Date().getFullYear() + 1
+                    ? t('validation.invalidYear')
+                    : null,
+            licensePlate: (v) =>
+                !v || v.trim().length < 2 ? t('validation.licensePlateRequired') : null,
+            pricePerDay: (v) =>
+                v === null || v === undefined || v <= 0 ? t('validation.priceRequired') : null,
+            categoryId: (v) =>
+                !v ? t('validation.categoryRequired') : null,
+            nameId: (v) =>
+                !v ? t('validation.brandRequired') : null,
+            transmissionTypeId: (v) =>
+                !v ? t('validation.transmissionRequired') : null,
+            fuelTypeId: (v) =>
+                !v ? t('validation.fuelRequired') : null,
+            carImages: (v) =>
+                !v || (v as UploadedCarImage[]).length === 0
+                    ? t('validation.imagesRequired')
+                    : null,
+        },
+    });
 
     const filteredModels = form.values.nameId
         ? lookups.companyModels.filter((m) => m.carCompanyName?.id === form.values.nameId)
@@ -128,6 +157,20 @@ export function CarFormModal({
         }
     }, [opened, editingCar]);
 
+    useEffect(() => {
+    // When language changes, re-run validation to refresh translated errors
+    if (Object.keys(form.errors).length > 0) {
+        form.validate();
+    }
+}, [i18n.language]);
+
+  const handleSave = () => {
+  const result = form.validate();
+  if (!result.hasErrors) {
+    onSave(form.values);
+  }
+};
+
     return (
         <Modal
             opened={opened}
@@ -137,9 +180,20 @@ export function CarFormModal({
             centered
         >
             <Stack gap="md">
+                <Group gap={6}>
+                    <ThemeIcon color="red" variant="light" size="sm">
+                        <IconInfoCircle size={14} />
+                    </ThemeIcon>
 
-
-                <TextInput label={t('title')} {...form.getInputProps('title')} />
+                    <Text size="sm" c="red">
+                        {t("validation.fillRequired")} *
+                    </Text>
+                </Group>
+                <TextInput
+                    required
+                    label={t('title')}
+                    {...form.getInputProps('title')}
+                />
                 <Textarea
                     label={t('description')}
                     {...form.getInputProps('description')}
@@ -147,14 +201,30 @@ export function CarFormModal({
                     minRows={2}
                     maxRows={4}
                 />
+
                 <SimpleGrid cols={2}>
-                    <NumberInput label={t('year')} {...form.getInputProps('year')} />
-                    <TextInput label={t('licensePlate')} {...form.getInputProps('licensePlate')} />
+                    <NumberInput
+                        required
+                        label={t('year')}
+                        {...form.getInputProps('year')}
+                    />
+                    <TextInput
+                        required
+                        label={t('licensePlate')}
+                        {...form.getInputProps('licensePlate')}
+                    />
                 </SimpleGrid>
 
                 <SimpleGrid cols={2}>
-                    <NumberInput label={`${t('price')} (€/${t('vehicle.perDay')})`} {...form.getInputProps('pricePerDay')} />
-                    <NumberInput label={t('horsePower')} {...form.getInputProps('horsePower')} />
+                    <NumberInput
+                        required
+                        label={`${t('price')} (€/${t('vehicle.perDay')})`}
+                        {...form.getInputProps('pricePerDay')}
+                    />
+                    <NumberInput
+                        label={t('horsePower')}
+                        {...form.getInputProps('horsePower')}
+                    />
                 </SimpleGrid>
 
                 <SimpleGrid cols={2}>
@@ -163,25 +233,30 @@ export function CarFormModal({
                 </SimpleGrid>
 
                 <SimpleGrid cols={2}>
-
                     <Select
-                        label={t('category')} placeholder={t('selectCategory')}
+                        required
+                        label={t('category')}
+                        placeholder={t('selectCategory')}
                         data={toSelectData(lookups.categories)}
-                        disabled={lookupsLoading} clearable searchable
+                        disabled={lookupsLoading}
+                        clearable
+                        searchable
                         {...form.getInputProps('categoryId')}
                     />
                     <TextInput label={t('mileage')} {...form.getInputProps('mileage')} />
                 </SimpleGrid>
 
-
                 <SimpleGrid cols={3}>
                     <Select
-                        label={t('brand')} placeholder={t('selectBrand')}
+                        required
+                        label={t('brand')}
+                        placeholder={t('selectBrand')}
                         data={toSelectData(lookups.companyNames)}
-                        disabled={lookupsLoading} clearable searchable
+                        disabled={lookupsLoading}
+                        clearable
+                        searchable
                         {...form.getInputProps('nameId')}
                         onChange={(val) => {
-
                             form.setFieldValue('nameId', val);
                             form.setFieldValue('modelId', null);
                         }}
@@ -191,34 +266,49 @@ export function CarFormModal({
                         placeholder={form.values.nameId ? t('selectModel') : t('selectBrandFirst')}
                         data={toSelectData(filteredModels)}
                         disabled={lookupsLoading || !form.values.nameId}
-                        clearable searchable
+                        clearable
+                        searchable
                         {...form.getInputProps('modelId')}
                     />
                     <Select
-                        label={t('transmission')} placeholder={t('selectTransmission')}
+                        required
+                        label={t('transmission')}
+                        placeholder={t('selectTransmission')}
                         data={toSelectData(lookups.transmissions)}
-                        disabled={lookupsLoading} clearable searchable
+                        disabled={lookupsLoading}
+                        clearable
+                        searchable
                         {...form.getInputProps('transmissionTypeId')}
                     />
                 </SimpleGrid>
 
                 <SimpleGrid cols={3}>
                     <Select
-                        label={t('fuelType')} placeholder={t('selectFuel')}
+                        required
+                        label={t('fuelType')}
+                        placeholder={t('selectFuel')}
                         data={toSelectData(lookups.fuels)}
-                        disabled={lookupsLoading} clearable searchable
+                        disabled={lookupsLoading}
+                        clearable
+                        searchable
                         {...form.getInputProps('fuelTypeId')}
                     />
                     <Select
-                        label={t('exteriorColor')} placeholder={t('selectExteriorColor')}
+                        label={t('exteriorColor')}
+                        placeholder={t('selectExteriorColor')}
                         data={toSelectData(lookups.exteriorColors)}
-                        disabled={lookupsLoading} clearable searchable
+                        disabled={lookupsLoading}
+                        clearable
+                        searchable
                         {...form.getInputProps('exteriorColorTypeId')}
                     />
                     <Select
-                        label={t('interiorColor')} placeholder={t('selectInteriorColor')}
+                        label={t('interiorColor')}
+                        placeholder={t('selectInteriorColor')}
                         data={toSelectData(lookups.interiorColors)}
-                        disabled={lookupsLoading} clearable searchable
+                        disabled={lookupsLoading}
+                        clearable
+                        searchable
                         {...form.getInputProps('interiorColorTypeId')}
                     />
                 </SimpleGrid>
@@ -237,19 +327,32 @@ export function CarFormModal({
                     ))}
                 </SimpleGrid>
 
-<Text>Images</Text>
-                <CarImageUploadPanel
-                    images={form.values.carImages as UploadedCarImage[]}
-                    onImagesChange={(imgs) => form.setFieldValue('carImages', imgs)}
-                />
+                {/* Images — required */}
+                <Stack gap={4}>
+                    <Text size="sm" fw={500}>
+                        {t('images')} <span style={{ color: 'var(--mantine-color-red-6)' }}>*</span>
+                    </Text>
+                    {form.errors.carImages && (
+                        <Text size="xs" c="red">{form.errors.carImages}</Text>
+                    )}
+                    <CarImageUploadPanel
+                        images={form.values.carImages as UploadedCarImage[]}
+                        onImagesChange={(imgs) => {
+                            form.setFieldValue('carImages', imgs);
+                            if (imgs.length > 0) form.clearFieldError('carImages');
+                        }}
+                    />
+                </Stack>
 
                 <Button
-                    variant="filled" color="teal" fullWidth loading={saving}
-                    onClick={() => onSave(form.values)}
+                    variant="filled"
+                    color="teal"
+                    fullWidth
+                    loading={saving}
+                    onClick={handleSave}
                 >
                     {t('admin.saveCar')}
                 </Button>
-
             </Stack>
         </Modal>
     );

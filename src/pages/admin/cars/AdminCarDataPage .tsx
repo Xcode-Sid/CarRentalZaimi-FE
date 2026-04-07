@@ -22,14 +22,11 @@ import { useTranslation } from "react-i18next";
 import { get, post, put, del } from "../../../utils/api.utils";
 import Spinner from "../../../components/spinner/Spinner";
 import type { CarCategory, CarCompanyModel, CarCompanyName, GeneralData } from "../../../data/vehicles";
+import { useForm } from "@mantine/form";
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type CarExteriorColor = GeneralData;
-type CarFuel = GeneralData;
-type CarInteriorColor = GeneralData;
-type CarTransmission = GeneralData;
 
 type TabKey =
     | "categories"
@@ -111,7 +108,7 @@ const deleteItem = async (endpoint: string, id: string): Promise<void> => {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function AdminCarDataPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [activeTab, setActiveTab] = useState<TabKey>("categories");
 
@@ -130,10 +127,6 @@ export default function AdminCarDataPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<GeneralData | null>(null);
     const [editTarget, setEditTarget] = useState<any>(null);
-
-    const [formName, setFormName] = useState("");
-    const [formDesc, setFormDesc] = useState("");
-    const [formCompanyId, setFormCompanyId] = useState("");
 
     const [search, setSearch] = useState("");
 
@@ -158,6 +151,31 @@ export default function AdminCarDataPage() {
         }
     }, [t]);
 
+    const form = useForm({
+        initialValues: {
+            name: "",
+            description: "",
+            companyId: "",
+        },
+        validate: {
+            name: (v) =>
+                !v.trim()
+                    ? t("validation.required")
+                    : null,
+
+            companyId: (v) =>
+                activeTab === "companyModels" && !v
+                    ? t("validation.required")
+                    : null,
+        },
+    });
+
+    useEffect(() => {
+        if (Object.keys(form.errors).length > 0) {
+            form.validate();
+        }
+    }, [i18n.language]);
+
     useEffect(() => {
         fetchTab(activeTab);
     }, [activeTab, fetchTab]);
@@ -174,20 +192,28 @@ export default function AdminCarDataPage() {
 
     const openCreate = () => {
         setEditTarget(null);
-        setFormName("");
-        setFormDesc("");
-        setFormCompanyId(data.companyNames[0]?.id || "");
+        form.setValues({
+            name: "",
+            description: "",
+            companyId: data.companyNames[0]?.id || "",
+        });
         setModalOpen(true);
     };
 
     const openEdit = (item: any) => {
         setEditTarget(item);
-        setFormName(item.name);
-        setFormDesc(item.description || "");
-        const brandId = typeof item.carCompanyNameId === "string"
-            ? item.carCompanyNameId
-            : item.carCompanyName?.id ?? data.companyNames[0]?.id ?? "";
-        setFormCompanyId(brandId);
+
+        const brandId =
+            typeof item.carCompanyNameId === "string"
+                ? item.carCompanyNameId
+                : item.carCompanyName?.id ?? data.companyNames[0]?.id ?? "";
+
+        form.setValues({
+            name: item.name,
+            description: item.description || "",
+            companyId: brandId,
+        });
+
         setModalOpen(true);
     };
 
@@ -199,55 +225,113 @@ export default function AdminCarDataPage() {
     // ─── Save ─────────────────────────────────────────────────────────────────────
 
     const handleSave = async () => {
-        if (!formName.trim()) return;
+        const result = form.validate();
+        if (result.hasErrors) return;
+
+        const { name, description, companyId } = form.values;
+
         setLoading(true);
         const endpoint = ENDPOINTS[activeTab];
         const isEdit = !!editTarget;
 
         try {
             if (activeTab === "categories") {
-                const body = { name: formName, description: formDesc };
+                const body = { name, description };
+
                 if (!isEdit) {
                     const created = await createItem<CarCategory>(endpoint, body);
                     setData((p) => ({ ...p, categories: [created, ...p.categories] }));
                 } else {
-                    const updated = await updateItem<CarCategory>(endpoint, editTarget.id, { id: editTarget.id, ...body });
-                    setData((p) => ({ ...p, categories: p.categories.map((x) => (x.id === editTarget.id ? updated : x)) }));
+                    const updated = await updateItem<CarCategory>(
+                        endpoint,
+                        editTarget.id,
+                        { id: editTarget.id, ...body }
+                    );
+                    setData((p) => ({
+                        ...p,
+                        categories: p.categories.map((x) =>
+                            x.id === editTarget.id ? updated : x
+                        ),
+                    }));
                 }
-            } else if (activeTab === "companyNames") {
-                const body = { name: formName };
+            }
+
+            else if (activeTab === "companyNames") {
+                const body = { name };
+
                 if (!isEdit) {
                     const created = await createItem<CarCompanyName>(endpoint, body);
                     setData((p) => ({ ...p, companyNames: [created, ...p.companyNames] }));
                 } else {
-                    const updated = await updateItem<CarCompanyName>(endpoint, editTarget.id, { id: editTarget.id, ...body });
-                    setData((p) => ({ ...p, companyNames: p.companyNames.map((x) => (x.id === editTarget.id ? updated : x)) }));
-                }
-            } else if (activeTab === "companyModels") {
-                const brandName = data.companyNames.find((c) => c.id === formCompanyId)?.name || "";
-                const body = { name: formName, companyNameId: formCompanyId };
-                if (!isEdit) {
-                    const created = await createItem<CarCompanyModel>(endpoint, body);
-                    setData((p) => ({ ...p, companyModels: [{ ...created, carCompanyName: brandName }, ...p.companyModels] }));
-                } else {
-                    const updated = await updateItem<CarCompanyModel>(endpoint, editTarget.id, { id: editTarget.id, ...body });
+                    const updated = await updateItem<CarCompanyName>(
+                        endpoint,
+                        editTarget.id,
+                        { id: editTarget.id, ...body }
+                    );
                     setData((p) => ({
                         ...p,
-                        companyModels: p.companyModels.map((x) =>
-                            x.id === editTarget.id ? { ...updated, carCompanyName: brandName } : x
+                        companyNames: p.companyNames.map((x) =>
+                            x.id === editTarget.id ? updated : x
                         ),
                     }));
                 }
-            } else {
-                const body = { name: formName };
+            }
+
+            else if (activeTab === "companyModels") {
+                const brandName =
+                    data.companyNames.find((c) => c.id === companyId)?.name || "";
+
+                const body = {
+                    name,
+                    companyNameId: companyId,
+                };
+
                 if (!isEdit) {
-                    const created = await createItem<GeneralData>(endpoint, body);
-                    setData((p) => ({ ...p, [activeTab]: [created, ...p[activeTab]] }));
-                } else {
-                    const updated = await updateItem<GeneralData>(endpoint, editTarget.id, { id: editTarget.id, ...body });
+                    const created = await createItem<CarCompanyModel>(endpoint, body);
                     setData((p) => ({
                         ...p,
-                        [activeTab]: p[activeTab].map((x) => (x.id === editTarget.id ? updated : x)),
+                        companyModels: [
+                            { ...created, carCompanyName: brandName },
+                            ...p.companyModels,
+                        ],
+                    }));
+                } else {
+                    const updated = await updateItem<CarCompanyModel>(
+                        endpoint,
+                        editTarget.id,
+                        { id: editTarget.id, ...body }
+                    );
+                    setData((p) => ({
+                        ...p,
+                        companyModels: p.companyModels.map((x) =>
+                            x.id === editTarget.id
+                                ? { ...updated, carCompanyName: brandName }
+                                : x
+                        ),
+                    }));
+                }
+            }
+
+            else {
+                const body = { name };
+
+                if (!isEdit) {
+                    const created = await createItem<GeneralData>(endpoint, body);
+                    setData((p) => ({
+                        ...p,
+                        [activeTab]: [created, ...p[activeTab]],
+                    }));
+                } else {
+                    const updated = await updateItem<GeneralData>(
+                        endpoint,
+                        editTarget.id,
+                        { id: editTarget.id, ...body }
+                    );
+                    setData((p) => ({
+                        ...p,
+                        [activeTab]: p[activeTab].map((x) =>
+                            x.id === editTarget.id ? updated : x
+                        ),
                     }));
                 }
             }
@@ -257,9 +341,13 @@ export default function AdminCarDataPage() {
                 message: isEdit ? t("carData.updated") : t("carData.created"),
                 color: "teal",
             });
+
             closeModal();
         } catch {
-            notifications.show({ message: t("carData.saveFailed"), color: "red" });
+            notifications.show({
+                message: t("carData.saveFailed"),
+                color: "red",
+            });
         } finally {
             setLoading(false);
         }
@@ -273,7 +361,7 @@ export default function AdminCarDataPage() {
         try {
             await deleteItem(ENDPOINTS[activeTab], deleteTarget.id);
             setData((p) => ({ ...p, [activeTab]: p[activeTab].filter((x) => x.id !== deleteTarget.id) }));
-            notifications.show({ message: t("carData.deleted"), color: "red" });
+            notifications.show({title: t("success"), message: t("carData.deleted"), color: "green" });
             setDeleteTarget(null);
         } catch (e: any) {
             notifications.show({
@@ -469,9 +557,8 @@ export default function AdminCarDataPage() {
                             <TextInput
                                 label={t("carData.fieldName")}
                                 placeholder={t("carData.fieldNamePlaceholder", { label: tabSingular.toLowerCase() })}
-                                value={formName}
-                                onChange={(e) => setFormName(e.currentTarget.value)}
                                 required
+                                {...form.getInputProps("name")}
                             />
 
                             {activeTab === "categories" && (
@@ -479,8 +566,7 @@ export default function AdminCarDataPage() {
                                     label={t("carData.fieldDescription")}
                                     placeholder={t("carData.fieldDescriptionPlaceholder")}
                                     minRows={3}
-                                    value={formDesc}
-                                    onChange={(e) => setFormDesc(e.currentTarget.value)}
+                                    {...form.getInputProps("description")}
                                 />
                             )}
 
@@ -489,8 +575,7 @@ export default function AdminCarDataPage() {
                                     label={t("carData.fieldBrand")}
                                     required
                                     data={data.companyNames.map((c) => ({ value: c.id, label: c.name }))}
-                                    value={formCompanyId}
-                                    onChange={(val) => setFormCompanyId(val || "")}
+                                    {...form.getInputProps("companyId")}
                                 />
                             )}
 

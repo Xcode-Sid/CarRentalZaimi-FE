@@ -641,5 +641,30 @@
   "toyotaSafetySense": "Toyota Safety Sense",
   "thirdRowSeats": "Rreshti i tretë i sediljeve",
   "wirelessCharging": "Karikimi pa tel",
-  "electricWindows": "Dritaret elektrike"
+  "electricWindows": "Dritaret elektrike",
+  "images": "Imazhet",
+  "validation": {
+    "fillRequired": "Plotësoni të gjitha fushat e detyrueshme",
+    "titleMin": "Titulli duhet të ketë të paktën 2 karaktere",
+    "invalidYear": "Ju lutemi shkruani një vit të vlefshëm",
+    "licensePlateRequired": "Targa është e detyrueshme",
+    "priceRequired": "Çmimi duhet të jetë më i madh se 0",
+    "categoryRequired": "Kategoria është e detyrueshme",
+    "brandRequired": "Marka është e detyrueshme",
+    "transmissionRequired": "Transmisioni është i detyrueshëm",
+    "fuelRequired": "Lloji i karburantit është i detyrueshëm",
+    "imagesRequired": "Të paktën një imazh është i detyrueshëm",
+    "required": "Kjo fushë është e detyrueshme"
+  },
+  "dropImagesHere": "Lësho imazhet këtu",
+  "uploadCarImages": "Ngarko imazhet e makinës",
+  "uploadCarImagesHint": "Tërhiq dhe lësho ose kliko për të shfletuar — mbështet disa imazhe",
+  "imageCount": "{{count}} imazh",
+  "imageCount_other": "{{count}} imazhe",
+  "tapCrownToSetPrimary": "kliko kurorën për ta vendosur si kryesor",
+  "carImage": "Imazh i makinës",
+  "primary": "Kryesor",
+  "setAsPrimary": "Vendos si kryesor",
+  "remove": "Hiq",
+  "uploadImagesInfo": "Ngarko disa imazhe të makinës. Imazhi kryesor shfaqet si foto kryesore në listimet."
 }

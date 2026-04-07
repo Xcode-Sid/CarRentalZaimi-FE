@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { type User } from '../data/users';
-import { post } from '../utils/api.utils';
+import { post, saveTokens } from '../utils/api.utils';
 import { toImagePath } from '../utils/general';
 
 interface AuthContextType {
@@ -24,18 +24,18 @@ const mapApiResponseToUser = (raw: any): User => ({
   dateOfBirth: raw.dateOfBirth ? new Date(raw.dateOfBirth) : null,
   role: raw.role
     ? {
-        id: raw.role.id,
-        name: raw.role.name ?? null,
-        normalizedName: raw.role.normalizedName ?? null,
-        concurrencyStamp: raw.role.concurrencyStamp ?? null,
-      }
+      id: raw.role.id,
+      name: raw.role.name ?? null,
+      normalizedName: raw.role.normalizedName ?? null,
+      concurrencyStamp: raw.role.concurrencyStamp ?? null,
+    }
     : null,
   image: raw.image
     ? {
-        id: raw.image.id,
-        imageName: raw.image.imageName ?? null,
-        imagePath: raw.image.imagePath ? toImagePath(raw.image.imagePath) : null,
-      }
+      id: raw.image.id,
+      imageName: raw.image.imageName ?? null,
+      imagePath: raw.image.imagePath ? toImagePath(raw.image.imagePath) : null,
+    }
     : null,
   location: raw.location ?? null,
   savedVehicles: raw.savedVehicles ?? [],
@@ -68,8 +68,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.success) {
         const loggedInUser = mapApiResponseToUser(response.data.user);
-        setUser(loggedInUser);
+        saveTokens({
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+          accessTokenExpiresAt: response.data.accessTokenExpiresAt,
+          refreshTokenExpiresAt: response.data.refreshTokenExpiresAt,
+          user: response.data.user,
+          role: response.data.role,
+        });
         localStorage.setItem('az-user', JSON.stringify(loggedInUser));
+        setUser(loggedInUser);
         return loggedInUser;
       }
       return null;

@@ -73,7 +73,7 @@ export default function App() {
           </Route>
         </Route>
 
-        {/* <Route element={<ProtectedRoute requireAdmin />}> */}
+        <Route element={<ProtectedRoute requireAdmin />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/cars" element={<AdminCarsPage />} />
@@ -85,7 +85,7 @@ export default function App() {
             <Route path="/admin/reports" element={<AdminReportsPage />} />
             <Route path="/admin/car-data" element={<AdminCarDataPage />}  />
           </Route>
-        {/* </Route> */}
+        </Route>
 
         <Route
           path="*"

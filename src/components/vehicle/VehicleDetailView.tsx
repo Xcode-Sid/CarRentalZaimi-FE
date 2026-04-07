@@ -53,7 +53,7 @@ export function VehicleDetailView({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.carId);
+  const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.carId);
 
   const [rentalOpen, setRentalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
@@ -73,8 +73,6 @@ const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.
   }));
 
   const priceDisplay = `€${vehicle.pricePerDay}/${t('vehicle.perDay')}`;
-
-  const images = vehicle.carImages.map((img) => img.data ?? '').filter(Boolean);
 
   const features = [
     vehicle.abs && 'ABS',
@@ -98,16 +96,16 @@ const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.
   ].filter(Boolean) as string[];
 
   const specRows = [
-    [t('vehicle.brand'),        vehicle.carName ?? '—'],
-    [t('vehicle.model'),        vehicle.modelName ?? '—'],
-    [t('vehicle.year'),         vehicle.year],
-    [t('vehicle.mileage'),      vehicle.mileage ?? '—'],
-    [t('vehicle.engine'),       vehicle.horsePower ? `${vehicle.horsePower} HP` : '—'],
+    [t('vehicle.brand'), vehicle.carName ?? '—'],
+    [t('vehicle.model'), vehicle.modelName ?? '—'],
+    [t('vehicle.year'), vehicle.year],
+    [t('vehicle.mileage'), vehicle.mileage ?? '—'],
+    [t('vehicle.engine'), vehicle.horsePower ? `${vehicle.horsePower} HP` : '—'],
     [t('vehicle.transmission'), vehicle.transmissionType ?? '—'],
-    [t('vehicle.fuel'),         vehicle.fuelType ?? '—'],
-    [t('vehicle.color'),        vehicle.exteriorColor ?? '—'],
-    [t('vehicle.seatsLabel'),   vehicle.seats],
-    [t('vehicle.doors'),        vehicle.doors],
+    [t('vehicle.fuel'), vehicle.fuelType ?? '—'],
+    [t('vehicle.color'), vehicle.exteriorColor ?? '—'],
+    [t('vehicle.seatsLabel'), vehicle.seats],
+    [t('vehicle.doors'), vehicle.doors],
   ];
 
   const handleReviewSubmit = () => {
@@ -124,8 +122,13 @@ const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.
   };
 
   const Body = (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-      <Box py={containerized ? 'xl' : 0}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      style={{ padding: containerized ? 0 : '1rem' }}
+    >
+      <Box py={containerized ? 'xl' : 'lg'} px={containerized ? 0 : 'lg'}>
 
         {showBreadcrumbs && (
           <AnimatedSection>
@@ -145,13 +148,18 @@ const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.
         )}
 
         <div
-          style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: '2rem', alignItems: 'start' }}
-          className="vehicle-detail-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: containerized ? 'minmax(0, 1fr) 340px' : '1fr',
+            gap: containerized ? '2rem' : '1.5rem',
+            alignItems: 'start',
+            padding: containerized ? 0 : '0.5rem',
+          }}
         >
           <AnimatedSection direction="left">
             <Stack gap="xl" style={{ minWidth: 0 }}>
 
-              <ImageGallery images={images} name={vehicle.title} />
+              <ImageGallery images={vehicle.carImages} name={vehicle.title} />
 
               <Group gap="sm" wrap="wrap">
                 <Badge color="teal" size="lg">{t('fleet.forRent')}</Badge>
@@ -241,8 +249,12 @@ const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.
                       >
                         <Box
                           className="glass-card"
-                          p="md"
-                          style={{ borderRadius: 'var(--mantine-radius-md)' }}
+                          p="xl"
+                          style={{
+                            borderRadius: 'var(--mantine-radius-xl)',
+                            position: containerized ? 'sticky' : 'static',
+                            top: 90,
+                          }}
                         >
                           <Group justify="space-between" mb="xs" wrap="wrap">
                             <Group gap="sm">

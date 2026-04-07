@@ -88,7 +88,7 @@ export default function CarsPage() {
     setError(null);
     try {
       const params = new URLSearchParams({ pageNr: '1', pageSize: '100' });
-      if (search)         params.set('search', search);
+      if (search) params.set('search', search);
       if (categoryFilter) params.set('categoryId', categoryFilter);
 
       const res = await get(`Cars?${params.toString()}`);
@@ -104,7 +104,7 @@ export default function CarsPage() {
     }
   }, [search, categoryFilter]);
 
-  useEffect(() => { fetchCars(); },    [fetchCars]);
+  useEffect(() => { fetchCars(); }, [fetchCars]);
   useEffect(() => { fetchLookups(); }, []);
 
   const openAddModal = () => {
@@ -124,7 +124,11 @@ export default function CarsPage() {
         ...values,
         carImages: values.carImages.map((img) => ({
           name: img.name,
-          data: img.data?.includes(',') ? img.data.split(',')[1] ?? null : img.data,
+          data: img.data?.startsWith('http')
+            ? null
+            : img.data?.includes(',')
+              ? img.data.split(',')[1] ?? null
+              : img.data,
           isPrimary: img.isPrimary,
         })),
       };
@@ -133,7 +137,6 @@ export default function CarsPage() {
         editingCar
           ? await put(`Cars/update/${editingCar.carId}`, payload)
           : await post('Cars/create', payload);
-
       if (res.success) {
         setModalOpen(false);
         notifications.show({ message: t('admin.carSaved'), color: 'teal' });
@@ -141,7 +144,7 @@ export default function CarsPage() {
       } else {
         notifications.show({ message: 'Save failed. Check API.', color: 'red' });
       }
-    } catch {
+    } catch(err) {
       notifications.show({ message: 'Save failed. Check API.', color: 'red' });
     } finally {
       setSaving(false);
@@ -163,130 +166,130 @@ export default function CarsPage() {
   };
 
   return (
-   <>
-   <Spinner visible={loading} />
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-      <Stack gap="xl">
+    <>
+      <Spinner visible={loading} />
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <Stack gap="xl">
 
-        <AnimatedSection>
-          <Group justify="space-between">
-            <Title order={2} fw={700}>{t('admin.manageCars')}</Title>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button leftSection={<IconPlus size={16} />} variant="filled" color="teal" onClick={openAddModal}>
-                {t('admin.addCar')}
-              </Button>
-            </motion.div>
-          </Group>
-        </AnimatedSection>
+          <AnimatedSection>
+            <Group justify="space-between">
+              <Title order={2} fw={700}>{t('admin.manageCars')}</Title>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button leftSection={<IconPlus size={16} />} variant="filled" color="teal" onClick={openAddModal}>
+                  {t('admin.addCar')}
+                </Button>
+              </motion.div>
+            </Group>
+          </AnimatedSection>
 
-        <AnimatedSection delay={0.1}>
-          <Group>
-            <TextInput
-              placeholder={t('admin.searchPlaceholder')}
-              leftSection={<IconSearch size={16} />}
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
-              style={{ flex: 1, maxWidth: 300 }}
-            />
-            <Select
-              placeholder={t('admin.category')}
-              data={toSelectData(lookups.categories)}
-              value={categoryFilter}
-              onChange={(val) => setCategoryFilter(val)}
-              clearable
-              w={200}
-            />
-          </Group>
-        </AnimatedSection>
-
-        <AnimatedSection delay={0.15}>
-          {loading && <Center py="xl"><Loader color="teal" /></Center>}
-          {error && <Text c="red">{error}</Text>}
-          {!loading && !error && (
-            <Table.ScrollContainer minWidth={800}>
-              <Table striped highlightOnHover>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>#</Table.Th>
-                    <Table.Th />
-                    <Table.Th>{t('admin.carName')}</Table.Th>
-                    <Table.Th>{t('admin.category')}</Table.Th>
-                    <Table.Th>{t('admin.pricePerDay')}</Table.Th>
-                    <Table.Th>{t('admin.carActions')}</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {cars.map((car, idx) => (
-                    <motion.tr
-                      key={car.carId}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.03, duration: 0.3 }}
-                    >
-                      <Table.Td>#{String(idx + 1).padStart(3, '0')}</Table.Td>
-                      <Table.Td>
-                        <Image src={getPrimaryImageSrc(car)} w={50} h={35} radius="sm" fit="cover" fallbackSrc="/placeholder-car.png" />
-                      </Table.Td>
-                      <Table.Td fw={500}>{getDisplayName(car)}</Table.Td>
-                      <Table.Td>
-                        <Badge color="teal" variant="light" size="sm">
-                          {car.categoryName ?? '—'}
-                        </Badge>
-                      </Table.Td>
-                      <Table.Td>€{car.pricePerDay}/{t('vehicle.perDay')}</Table.Td>
-                      <Table.Td>
-                        <Group gap={4}>
-                          <ActionIcon variant="subtle" color="blue" size="sm" onClick={() => setPreviewCar(car)}>
-                            <IconEye size={16} />
-                          </ActionIcon>
-                          <ActionIcon variant="subtle" color="yellow" size="sm" onClick={() => openEditModal(car)}>
-                            <IconEdit size={16} />
-                          </ActionIcon>
-                          <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDelete(car.carId)}>
-                            <IconTrash size={16} />
-                          </ActionIcon>
-                        </Group>
-                      </Table.Td>
-                    </motion.tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Table.ScrollContainer>
-          )}
-        </AnimatedSection>
-
-        <CarFormModal
-          opened={modalOpen}
-          onClose={() => setModalOpen(false)}
-          editingCar={editingCar}
-          lookups={lookups}
-          lookupsLoading={lookupsLoading}
-          onSave={handleSave}
-          saving={saving}
-        />
-
-        <Modal
-          opened={previewCar !== null}
-          onClose={() => setPreviewCar(null)}
-          title={t('admin.previewVehicle')}
-          size="xl" centered radius="xl"
-          overlayProps={{ backgroundOpacity: 0.6, blur: 4 }}
-          transitionProps={{ transition: 'pop', duration: 180 }}
-          styles={{ body: { padding: 0 } }}
-        >
-          {previewCar !== null && (
-            <div style={{ maxHeight: '75vh', overflow: 'auto' }}>
-              <VehicleDetailView
-                vehicle={previewCar}
-                showBreadcrumbs={false}
-                containerized={false}
+          <AnimatedSection delay={0.1}>
+            <Group>
+              <TextInput
+                placeholder={t('admin.searchPlaceholder')}
+                leftSection={<IconSearch size={16} />}
+                value={search}
+                onChange={(e) => setSearch(e.currentTarget.value)}
+                style={{ flex: 1, maxWidth: 300 }}
               />
-            </div>
-          )}
-        </Modal>
+              <Select
+                placeholder={t('admin.category')}
+                data={toSelectData(lookups.categories)}
+                value={categoryFilter}
+                onChange={(val) => setCategoryFilter(val)}
+                clearable
+                w={200}
+              />
+            </Group>
+          </AnimatedSection>
 
-      </Stack>
-    </motion.div>
-   </>
+          <AnimatedSection delay={0.15}>
+            {loading && <Center py="xl"><Loader color="teal" /></Center>}
+            {error && <Text c="red">{error}</Text>}
+            {!loading && !error && (
+              <Table.ScrollContainer minWidth={800}>
+                <Table striped highlightOnHover>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>#</Table.Th>
+                      <Table.Th />
+                      <Table.Th>{t('admin.carName')}</Table.Th>
+                      <Table.Th>{t('admin.category')}</Table.Th>
+                      <Table.Th>{t('admin.pricePerDay')}</Table.Th>
+                      <Table.Th>{t('admin.carActions')}</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {cars.map((car, idx) => (
+                      <motion.tr
+                        key={car.carId}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.03, duration: 0.3 }}
+                      >
+                        <Table.Td>#{String(idx + 1).padStart(3, '0')}</Table.Td>
+                        <Table.Td>
+                          <Image src={getPrimaryImageSrc(car)} w={50} h={35} radius="sm" fit="cover" fallbackSrc="/placeholder-car.png" />
+                        </Table.Td>
+                        <Table.Td fw={500}>{getDisplayName(car)}</Table.Td>
+                        <Table.Td>
+                          <Badge color="teal" variant="light" size="sm">
+                            {car.categoryName ?? '—'}
+                          </Badge>
+                        </Table.Td>
+                        <Table.Td>€{car.pricePerDay}/{t('vehicle.perDay')}</Table.Td>
+                        <Table.Td>
+                          <Group gap={4}>
+                            <ActionIcon variant="subtle" color="blue" size="sm" onClick={() => setPreviewCar(car)}>
+                              <IconEye size={16} />
+                            </ActionIcon>
+                            <ActionIcon variant="subtle" color="yellow" size="sm" onClick={() => openEditModal(car)}>
+                              <IconEdit size={16} />
+                            </ActionIcon>
+                            <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDelete(car.carId)}>
+                              <IconTrash size={16} />
+                            </ActionIcon>
+                          </Group>
+                        </Table.Td>
+                      </motion.tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
+            )}
+          </AnimatedSection>
+
+          <CarFormModal
+            opened={modalOpen}
+            onClose={() => setModalOpen(false)}
+            editingCar={editingCar}
+            lookups={lookups}
+            lookupsLoading={lookupsLoading}
+            onSave={handleSave}
+            saving={saving}
+          />
+
+          <Modal
+            opened={previewCar !== null}
+            onClose={() => setPreviewCar(null)}
+            title={t('admin.previewVehicle')}
+            size="xl" centered radius="xl"
+            overlayProps={{ backgroundOpacity: 0.6, blur: 4 }}
+            transitionProps={{ transition: 'pop', duration: 180 }}
+            styles={{ body: { padding: 0 } }}
+          >
+            {previewCar !== null && (
+              <div style={{ maxHeight: '75vh', overflow: 'auto' }}>
+                <VehicleDetailView
+                  vehicle={previewCar}
+                  showBreadcrumbs={false}
+                  containerized={false}
+                />
+              </div>
+            )}
+          </Modal>
+
+        </Stack>
+      </motion.div>
+    </>
   );
 }
