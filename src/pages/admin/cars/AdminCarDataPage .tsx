@@ -19,9 +19,9 @@ import { notifications } from "@mantine/notifications";
 import { motion } from "framer-motion";
 import { IconSearch, IconPlus, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
-import { get, post, put, del } from "../../utils/api.utils";
-import Spinner from "../../components/spinner/Spinner";
-import type { CarCategory, CarCompanyModel, CarCompanyName, GeneralData } from "../../data/vehicles";
+import { get, post, put, del } from "../../../utils/api.utils";
+import Spinner from "../../../components/spinner/Spinner";
+import type { CarCategory, CarCompanyModel, CarCompanyName, GeneralData } from "../../../data/vehicles";
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────

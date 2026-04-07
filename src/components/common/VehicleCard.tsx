@@ -30,8 +30,12 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
-  const fav = isFavorite(vehicle.id);
-  const priceBadgeText = `€${vehicle.price}/${t('vehicle.perDay')}`;
+  const carIdNum = Number(vehicle.carId);
+  const fav = isFavorite(carIdNum);
+  const priceBadgeText = `€${vehicle.pricePerDay}/${t('vehicle.perDay')}`;
+  const displayName = vehicle.title || vehicle.carName || '';
+  const categoryName = vehicle.categoryName ?? '';
+  const firstImage = vehicle.carImages.map((img) => (img as any).data ?? '').filter(Boolean)[0] ?? '';
 
   return (
     <motion.div
@@ -52,16 +56,19 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
             boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
           }),
         }}
-        onClick={() => navigate(`/fleet/${vehicle.id}`)}
+        onClick={() => navigate(`/fleet/${vehicle.carId}`)}
       >
         {/* Image section */}
         <Box style={{ position: 'relative' }}>
           <Box className="card-image-zoom">
             <Image
-              src={vehicle.image}
-              h={210}
-              alt={vehicle.name}
+              src={firstImage}
+              alt={displayName}
+              radius="lg"
+              h={220}
+              fit="cover"
               fallbackSrc="https://placehold.co/800x400?text=AutoZaimi"
+              className="animate-fade-in"
             />
           </Box>
 
@@ -93,7 +100,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
             }}
             onClick={(e) => {
               e.stopPropagation();
-              toggleFavorite(vehicle.id);
+              toggleFavorite(carIdNum);
             }}
           >
             <IconDeviceFloppy size={18} color={fav ? undefined : '#fff'} />
@@ -101,15 +108,17 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
 
           {/* Status dot + category badge overlay */}
           <Box style={{ position: 'absolute', top: 12, left: 12, zIndex: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span className={`status-dot ${statusDotClass[vehicle.status] || 'status-dot-available'}`} />
-            <Badge
-              color={categoryColors[vehicle.category]}
-              variant="filled"
-              size="sm"
-              style={{ backdropFilter: 'blur(4px)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-            >
-              {vehicle.category}
-            </Badge>
+            <span className={`status-dot ${statusDotClass['available'] || 'status-dot-available'}`} />
+            {categoryName && (
+              <Badge
+                color={categoryColors[categoryName]}
+                variant="filled"
+                size="sm"
+                style={{ backdropFilter: 'blur(4px)', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+              >
+                {categoryName}
+              </Badge>
+            )}
           </Box>
 
           {/* Rating overlay */}
@@ -130,7 +139,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
               lineClamp={1}
               style={!isDark ? { color: '#1a1b1e' } : undefined}
             >
-              {vehicle.name}
+              {displayName}
             </Text>
             <Group gap={6} mt={2}>
               <Text size="xs" c={isDark ? 'dimmed' : undefined} style={!isDark ? { color: '#868e96' } : undefined}>
@@ -148,20 +157,20 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
           <Group gap={6} wrap="wrap">
             <Box className="spec-pill" px="xs" py={4}>
               <IconUsers size={14} />
-              <Text size="sm">{vehicle.specs.seats}</Text>
+              <Text size="sm">{vehicle.seats}</Text>
             </Box>
-            <Box className="spec-pill" px="xs" py={4}>
-              <IconManualGearbox size={13} />
-              {vehicle.specs.transmission}
-            </Box>
-            <Box className="spec-pill" px="xs" py={4}>
-              <IconManualGearbox size={13} />
-              {vehicle.specs.transmission}
-            </Box>
-            <Box className="spec-pill" px="xs" py={4}>
-              <IconGasStation size={13} />
-              {vehicle.specs.fuel}
-            </Box>
+            {vehicle.transmissionType && (
+              <Box className="spec-pill" px="xs" py={4}>
+                <IconManualGearbox size={13} />
+                {vehicle.transmissionType}
+              </Box>
+            )}
+            {vehicle.fuelType && (
+              <Box className="spec-pill" px="xs" py={4}>
+                <IconGasStation size={13} />
+                {vehicle.fuelType}
+              </Box>
+            )}
           </Group>
 
           <Group grow mt={4}>
@@ -172,7 +181,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
               radius="md"
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/fleet/${vehicle.id}`);
+                navigate(`/fleet/${vehicle.carId}`);
               }}
               style={{
                 transition: 'all 0.2s',
@@ -194,7 +203,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
                 className="btn-glow ripple-btn"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/fleet/${vehicle.id}`);
+                  navigate(`/fleet/${vehicle.carId}`);
                 }}
               >
                 {t('vehicle.rentNow')}

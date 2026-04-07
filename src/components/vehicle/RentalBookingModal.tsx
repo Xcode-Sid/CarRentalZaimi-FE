@@ -91,7 +91,7 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
   }, [dateRange]);
 
   const { baseBeforeDiscount, discountPct, discountAmount, baseAfterDiscount, insuranceCost, gpsCost, childSeatCost, total } = useMemo(() => {
-    const base = vehicle.price * days;
+    const base = vehicle.pricePerDay * days;
     const discount = getDayDiscount(days);
     const discounted = getDiscountedBaseTotal(base, discount.percent);
     const ins = insurance ? 15 * days : 0;
@@ -107,7 +107,7 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
       childSeatCost: c,
       total: discounted.total + ins + g + c,
     };
-  }, [vehicle.price, days, insurance, gps, childSeat]);
+  }, [vehicle.pricePerDay, days, insurance, gps, childSeat]);
 
   const canContinue = !!(dateRange[0] && dateRange[1] && days >= 1);
 
@@ -124,8 +124,8 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
       id: `b-${Date.now()}`,
       ref,
       userId: user?.id || 'guest',
-      vehicleId: vehicle.id,
-      vehicleName: vehicle.name,
+      vehicleId: Number(vehicle.carId), //TODO fix later
+      vehicleName: vehicle.title,
       paymentMethod: paymentMethod as 'cash' | 'card',
       startDate: dateRange[0]!,
       endDate: dateRange[1]!,
@@ -168,6 +168,8 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
   const addonGpsLabel = `€10/${t('vehicle.perDay')}`;
   const addonChildLabel = `€5/${t('vehicle.perDay')}`;
   const discountText = discountPct > 0 ? `-${discountPct}%` : '';
+
+  const primaryImage = vehicle.carImages?.[0]?.data ?? '';
 
   return (
     <Modal
@@ -268,12 +270,10 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                       </ThemeIcon>
                       <div>
                         <Text size="sm" fw={600}>{t('rental.fullInsurance')}</Text>
-                        <Text size="xs" c="dimmed">
-                          {addonDayLabel}
-                        </Text>
+                        <Text size="xs" c="dimmed">{addonDayLabel}</Text>
                       </div>
                     </Group>
-                    <Switch checked={insurance} onChange={() => {}} color="teal" />
+                    <Switch checked={insurance} onChange={() => { }} color="teal" />
                   </Group>
                 </Paper>
 
@@ -296,12 +296,10 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                       </ThemeIcon>
                       <div>
                         <Text size="sm" fw={600}>{t('rental.gps')}</Text>
-                        <Text size="xs" c="dimmed">
-                          {addonGpsLabel}
-                        </Text>
+                        <Text size="xs" c="dimmed">{addonGpsLabel}</Text>
                       </div>
                     </Group>
-                    <Switch checked={gps} onChange={() => {}} color="teal" />
+                    <Switch checked={gps} onChange={() => { }} color="teal" />
                   </Group>
                 </Paper>
 
@@ -324,12 +322,10 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                       </ThemeIcon>
                       <div>
                         <Text size="sm" fw={600}>{t('rental.childSeat')}</Text>
-                        <Text size="xs" c="dimmed">
-                          {addonChildLabel}
-                        </Text>
+                        <Text size="xs" c="dimmed">{addonChildLabel}</Text>
                       </div>
                     </Group>
-                    <Switch checked={childSeat} onChange={() => {}} color="teal" />
+                    <Switch checked={childSeat} onChange={() => { }} color="teal" />
                   </Group>
                 </Paper>
 
@@ -345,7 +341,12 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                       className="glass-card"
                       p="sm"
                       radius="md"
-                      style={{ cursor: 'pointer', borderColor: paymentMethod === 'cash' ? 'var(--mantine-color-teal-6)' : undefined, borderWidth: paymentMethod === 'cash' ? 2 : 1, transition: 'all 0.2s' }}
+                      style={{
+                        cursor: 'pointer',
+                        borderColor: paymentMethod === 'cash' ? 'var(--mantine-color-teal-6)' : undefined,
+                        borderWidth: paymentMethod === 'cash' ? 2 : 1,
+                        transition: 'all 0.2s',
+                      }}
                       onClick={() => setPaymentMethod('cash')}
                     >
                       <Group gap="sm">
@@ -357,7 +358,12 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                       className="glass-card"
                       p="sm"
                       radius="md"
-                      style={{ cursor: 'pointer', borderColor: paymentMethod === 'card' ? 'var(--mantine-color-teal-6)' : undefined, borderWidth: paymentMethod === 'card' ? 2 : 1, transition: 'all 0.2s' }}
+                      style={{
+                        cursor: 'pointer',
+                        borderColor: paymentMethod === 'card' ? 'var(--mantine-color-teal-6)' : undefined,
+                        borderWidth: paymentMethod === 'card' ? 2 : 1,
+                        transition: 'all 0.2s',
+                      }}
                       onClick={() => setPaymentMethod('card')}
                     >
                       <Group gap="sm">
@@ -373,8 +379,15 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                 <Paper className="glass-card" p="md" radius="md">
                   <Text fw={600} mb="sm">{t('rental.summary')}</Text>
                   <Group gap="sm" mb="xs">
-                    <Image src={vehicle.image} w={60} h={40} radius="sm" fit="cover" />
-                    <Text fw={500}>{vehicle.name}</Text>
+                    <Image
+                      src={primaryImage}
+                      w={60}
+                      h={40}
+                      radius="sm"
+                      fit="cover"
+                      fallbackSrc="/placeholder-car.png"
+                    />
+                    <Text fw={500}>{vehicle.title}</Text>
                   </Group>
                   <Stack gap="xs">
                     <Group justify="space-between">
@@ -391,7 +404,7 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
                     </Group>
                     <Group justify="space-between">
                       <Text size="sm" c="dimmed">{t('rental.basePrice')}</Text>
-                      <Text size="sm">{`€${vehicle.price}/${t('vehicle.perDay')} × ${days} = €${baseBeforeDiscount}`}</Text>
+                      <Text size="sm">{`€${vehicle.pricePerDay}/${t('vehicle.perDay')} × ${days} = €${baseBeforeDiscount}`}</Text>
                     </Group>
                     {discountPct > 0 && (
                       <Group justify="space-between" className="animate-scale-in">
