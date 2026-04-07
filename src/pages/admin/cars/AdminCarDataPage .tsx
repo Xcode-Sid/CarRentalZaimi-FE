@@ -14,10 +14,14 @@ import {
     Tabs,
     Text,
     Box,
+    Paper,
+    ThemeIcon,
+    Tooltip,
+    Center,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { motion } from "framer-motion";
-import { IconSearch, IconPlus, IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconEdit, IconTrash, IconDeviceFloppy, IconX } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { get, post, put, del } from "../../../utils/api.utils";
 import Spinner from "../../../components/spinner/Spinner";
@@ -104,6 +108,22 @@ const updateItem = async <T,>(endpoint: string, id: string, body: Record<string,
 const deleteItem = async (endpoint: string, id: string): Promise<void> => {
     await del(`${endpoint}/${id}`);
 };
+
+
+const inputStyles = {
+    input: {
+        transition: 'border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.18s',
+        '&:focus': {
+            transform: 'translateY(-1px)',
+            boxShadow: '0 0 0 3px rgba(29, 158, 117, 0.12)',
+        },
+    },
+    label: {
+        transition: 'color 0.15s',
+        '&:has(+ * :focus)': { color: 'var(--mantine-color-teal-7)' },
+    },
+};
+
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -382,44 +402,77 @@ export default function AdminCarDataPage() {
 
     // ─── Render ───────────────────────────────────────────────────────────────────
 
-    return (
-        <>
-            <Spinner visible={loading} />
-            <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-            >
-                <Stack gap="xl">
+// CarDataPage — redesigned return block
+// Drop-in replacement for your existing return statement.
+// All existing props, state, handlers, and helpers remain unchanged.
 
-                    {/* ── Header ── */}
-                    <Group justify="space-between">
-                        <Box>
-                            <Title order={2} fw={700}>
-                                {t("carData.title")}
-                            </Title>
-                            <Text size="sm" c="dimmed" mt={4}>
-                                {t("carData.subtitle")}
-                            </Text>
-                        </Box>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            <Button
-                                leftSection={<IconPlus size={16} />}
-                                variant="filled"
-                                color="teal"
-                                onClick={openCreate}
-                            >
-                                {t("carData.add", { label: tabSingular })}
-                            </Button>
-                        </motion.div>
-                    </Group>
+return (
+    <>
+        <Spinner visible={loading} />
 
-                    {/* ── Tabs ── */}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
+            <Stack gap="xl">
+
+                {/* ── Header ─────────────────────────────────────────── */}
+                <Group justify="space-between" align="center">
+                    <Stack gap={2}>
+                        <Title order={2} fw={500} style={{ letterSpacing: '-0.01em' }}>
+                            {t('carData.title')}
+                        </Title>
+                        <Text size="sm" c="dimmed">
+                            {t('carData.subtitle')}
+                        </Text>
+                    </Stack>
+
+                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                            leftSection={<IconPlus size={15} />}
+                            variant="filled"
+                            color="teal"
+                            radius="md"
+                            size="sm"
+                            onClick={openCreate}
+                            styles={{
+                                root: {
+                                    transition: 'box-shadow 0.15s',
+                                    '&:hover': { boxShadow: '0 4px 14px rgba(15,110,86,0.25)' },
+                                },
+                            }}
+                        >
+                            {t('carData.add', { label: tabSingular })}
+                        </Button>
+                    </motion.div>
+                </Group>
+
+                {/* ── Tabs ───────────────────────────────────────────── */}
+                <Paper
+                    radius="md"
+                    withBorder
+                    p="xs"
+                    style={{ borderColor: 'var(--mantine-color-default-border)' }}
+                >
                     <Tabs
                         value={activeTab}
                         onChange={(val) => {
                             setActiveTab(val as TabKey);
-                            setSearch("");
+                            setSearch('');
+                        }}
+                        styles={{
+                            list: { border: 'none', gap: 4 },
+                            tab: {
+                                borderRadius: 'var(--mantine-radius-md)',
+                                border: 'none',
+                                fontWeight: 500,
+                                fontSize: 13,
+                                transition: 'background 0.15s',
+                                '&[data-active]': {
+                                    background: 'var(--mantine-color-teal-light)',
+                                },
+                            },
                         }}
                     >
                         <Tabs.List>
@@ -430,202 +483,349 @@ export default function AdminCarDataPage() {
                             ))}
                         </Tabs.List>
                     </Tabs>
+                </Paper>
 
-                    {/* ── Search + Count ── */}
-                    <Group>
-                        <TextInput
-                            placeholder={t("carData.searchPlaceholder", { label: tabLabel.toLowerCase() })}
-                            leftSection={<IconSearch size={16} />}
-                            value={search}
-                            onChange={(e) => setSearch(e.currentTarget.value)}
-                            style={{ flex: 1, maxWidth: 300 }}
-                        />
-                        <Badge color={tab.color} variant="light" size="lg">
-                            {loading ? "…" : filtered.length} {tabLabel}
-                        </Badge>
-                    </Group>
+                {/* ── Search + Count ─────────────────────────────────── */}
+                <Group gap="sm">
+                    <TextInput
+                        placeholder={t('carData.searchPlaceholder', { label: tabLabel.toLowerCase() })}
+                        leftSection={<IconSearch size={15} />}
+                        value={search}
+                        onChange={(e) => setSearch(e.currentTarget.value)}
+                        radius="md"
+                        style={{ flex: 1, maxWidth: 320 }}
+                        styles={{
+                            input: {
+                                transition: 'border-color 0.18s, box-shadow 0.18s',
+                                '&:focus': { boxShadow: '0 0 0 3px rgba(29,158,117,0.12)' },
+                            },
+                        }}
+                    />
+                    {search && (
+                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                            <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                radius="md"
+                                onClick={() => setSearch('')}
+                                title="Clear search"
+                            >
+                                <IconX size={15} />
+                            </ActionIcon>
+                        </motion.div>
+                    )}
+                    <Badge
+                        color={tab.color}
+                        variant="light"
+                        size="lg"
+                        radius="md"
+                        style={{ fontVariantNumeric: 'tabular-nums' }}
+                    >
+                        {loading ? '…' : filtered.length} {tabLabel}
+                    </Badge>
+                </Group>
 
-                    {/* ── Table ── */}
+                {/* ── Table ──────────────────────────────────────────── */}
+                <Paper
+                    radius="lg"
+                    withBorder
+                    style={{ overflow: 'hidden', borderColor: 'var(--mantine-color-default-border)' }}
+                >
                     <Table.ScrollContainer minWidth={600}>
-                        <Table striped highlightOnHover>
+                        <Table
+                            highlightOnHover
+                            verticalSpacing="sm"
+                            horizontalSpacing="md"
+                            styles={{
+                                thead: {
+                                    background: 'var(--mantine-color-default-hover)',
+                                    borderBottom: '0.5px solid var(--mantine-color-default-border)',
+                                },
+                                th: {
+                                    fontWeight: 500,
+                                    fontSize: 12,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    color: 'var(--mantine-color-dimmed)',
+                                },
+                            }}
+                        >
                             <Table.Thead>
                                 <Table.Tr>
-                                    <Table.Th>#</Table.Th>
-                                    <Table.Th>{t("carData.colName")}</Table.Th>
-                                    {activeTab === "categories" && <Table.Th>{t("carData.colDescription")}</Table.Th>}
-                                    {activeTab === "companyModels" && <Table.Th>{t("carData.colBrand")}</Table.Th>}
-                                    <Table.Th>{t("carData.colCreated")}</Table.Th>
-                                    <Table.Th>{t("carData.colActions")}</Table.Th>
+                                    <Table.Th w={60}>#</Table.Th>
+                                    <Table.Th>{t('carData.colName')}</Table.Th>
+                                    {activeTab === 'categories' && <Table.Th>{t('carData.colDescription')}</Table.Th>}
+                                    {activeTab === 'companyModels' && <Table.Th>{t('carData.colBrand')}</Table.Th>}
+                                    <Table.Th>{t('carData.colCreated')}</Table.Th>
+                                    <Table.Th w={90}>{t('carData.colActions')}</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>
+
                             <Table.Tbody>
-                                {loading ? (
+                                {/* Skeleton rows while loading */}
+                                {loading &&
                                     [1, 2, 3, 4].map((i) => (
                                         <Table.Tr key={i}>
-                                            <Table.Td colSpan={6}>
-                                                <Box
-                                                    style={{
-                                                        height: 14,
-                                                        borderRadius: 4,
-                                                        background: "var(--mantine-color-dark-5)",
-                                                        opacity: 0.4,
-                                                        width: `${50 + i * 10}%`,
-                                                    }}
-                                                />
-                                            </Table.Td>
+                                            {[60, 30 + i * 12, 20, 15].map((w, j) => (
+                                                <Table.Td key={j}>
+                                                    <Box
+                                                        style={{
+                                                            height: 12,
+                                                            borderRadius: 6,
+                                                            background: 'var(--mantine-color-default-border)',
+                                                            opacity: 0.5,
+                                                            width: `${w}%`,
+                                                            animation: 'pulse 1.4s ease-in-out infinite',
+                                                        }}
+                                                    />
+                                                </Table.Td>
+                                            ))}
                                         </Table.Tr>
-                                    ))
-                                ) : filtered.length === 0 ? (
+                                    ))}
+
+                                {/* Empty state */}
+                                {!loading && filtered.length === 0 && (
                                     <Table.Tr>
                                         <Table.Td colSpan={6}>
-                                            <Text ta="center" c="dimmed" py="xl" size="sm">
-                                                {search
-                                                    ? t("carData.noResultsSearch")
-                                                    : t("carData.noResultsEmpty")}
-                                            </Text>
+                                            <Center py="xl">
+                                                <Stack align="center" gap="xs">
+                                                    <ThemeIcon size={40} radius="xl" color={tab.color} variant="light">
+                                                        <IconSearch size={18} />
+                                                    </ThemeIcon>
+                                                    <Text size="sm" c="dimmed">
+                                                        {search
+                                                            ? t('carData.noResultsSearch')
+                                                            : t('carData.noResultsEmpty')}
+                                                    </Text>
+                                                </Stack>
+                                            </Center>
                                         </Table.Td>
                                     </Table.Tr>
-                                ) : (
+                                )}
+
+                                {/* Data rows */}
+                                {!loading &&
                                     filtered.map((item, idx) => (
                                         <motion.tr
                                             key={item.id}
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: idx * 0.03, duration: 0.3 }}
+                                            initial={{ opacity: 0, y: 6 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.03, duration: 0.25, ease: 'easeOut' }}
                                         >
-                                            <Table.Td c="dimmed" fz="xs">
-                                                #{String(idx + 1).padStart(3, "0")}
+                                            <Table.Td>
+                                                <Text size="xs" c="dimmed" fw={500}>
+                                                    #{String(idx + 1).padStart(3, '0')}
+                                                </Text>
                                             </Table.Td>
-                                            <Table.Td fw={500}>{item.name}</Table.Td>
-                                            {activeTab === "categories" && (
-                                                <Table.Td c="dimmed" fz="sm">
-                                                    {item.description || "—"}
+
+                                            <Table.Td>
+                                                <Text size="sm" fw={500}>{item.name}</Text>
+                                            </Table.Td>
+
+                                            {activeTab === 'categories' && (
+                                                <Table.Td>
+                                                    <Text size="sm" c="dimmed" lineClamp={1}>
+                                                        {item.description || '—'}
+                                                    </Text>
                                                 </Table.Td>
                                             )}
-                                            {activeTab === "companyModels" && (
+
+                                            {activeTab === 'companyModels' && (
                                                 <Table.Td>
-                                                    <Badge color="blue" variant="light" size="sm">
+                                                    <Badge color="blue" variant="light" size="sm" radius="md">
                                                         {resolveBrandName(item.carCompanyName)}
                                                     </Badge>
                                                 </Table.Td>
                                             )}
-                                            <Table.Td c="dimmed" fz="xs">
-                                                {fmtDate(item)}
+
+                                            <Table.Td>
+                                                <Text size="xs" c="dimmed">{fmtDate(item)}</Text>
                                             </Table.Td>
+
                                             <Table.Td>
                                                 <Group gap={4}>
-                                                    <ActionIcon
-                                                        variant="subtle"
-                                                        color="yellow"
-                                                        size="sm"
-                                                        onClick={() => openEdit(item)}
-                                                        aria-label={t("carData.colActions")}
-                                                    >
-                                                        <IconEdit size={16} />
-                                                    </ActionIcon>
-                                                    <ActionIcon
-                                                        variant="subtle"
-                                                        color="red"
-                                                        size="sm"
-                                                        onClick={() => setDeleteTarget(item)}
-                                                        aria-label={t("delete")}
-                                                    >
-                                                        <IconTrash size={16} />
-                                                    </ActionIcon>
+                                                    <Tooltip label={t('edit')} withArrow fz="xs">
+                                                        <ActionIcon
+                                                            variant="subtle"
+                                                            color="yellow"
+                                                            size="sm"
+                                                            radius="md"
+                                                            onClick={() => openEdit(item)}
+                                                        >
+                                                            <IconEdit size={15} />
+                                                        </ActionIcon>
+                                                    </Tooltip>
+                                                    <Tooltip label={t('delete')} withArrow fz="xs">
+                                                        <ActionIcon
+                                                            variant="subtle"
+                                                            color="red"
+                                                            size="sm"
+                                                            radius="md"
+                                                            onClick={() => setDeleteTarget(item)}
+                                                        >
+                                                            <IconTrash size={15} />
+                                                        </ActionIcon>
+                                                    </Tooltip>
                                                 </Group>
                                             </Table.Td>
                                         </motion.tr>
-                                    ))
-                                )}
+                                    ))}
                             </Table.Tbody>
                         </Table>
                     </Table.ScrollContainer>
+                </Paper>
 
-                    {/* ── Create / Edit Modal ── */}
-                    <Modal
-                        opened={modalOpen}
-                        onClose={closeModal}
-                        title={
-                            editTarget
-                                ? t("carData.editTitle", { label: tabSingular })
-                                : t("carData.addTitle", { label: tabSingular })
-                        }
-                        size="md"
-                        centered
-                    >
-                        <Stack gap="md">
-                            <TextInput
-                                label={t("carData.fieldName")}
-                                placeholder={t("carData.fieldNamePlaceholder", { label: tabSingular.toLowerCase() })}
-                                required
-                                {...form.getInputProps("name")}
-                            />
-
-                            {activeTab === "categories" && (
-                                <Textarea
-                                    label={t("carData.fieldDescription")}
-                                    placeholder={t("carData.fieldDescriptionPlaceholder")}
-                                    minRows={3}
-                                    {...form.getInputProps("description")}
-                                />
-                            )}
-
-                            {activeTab === "companyModels" && (
-                                <Select
-                                    label={t("carData.fieldBrand")}
-                                    required
-                                    data={data.companyNames.map((c) => ({ value: c.id, label: c.name }))}
-                                    {...form.getInputProps("companyId")}
-                                />
-                            )}
-
-                            <Button
-                                variant="filled"
-                                color="teal"
-                                fullWidth
-                                loading={loading}
-                                onClick={handleSave}
-                            >
-                                {editTarget ? t("carData.saveChanges") : t("carData.createEntry")}
-                            </Button>
-                        </Stack>
-                    </Modal>
-
-                    {/* ── Delete Confirm Modal ── */}
-                    <Modal
-                        opened={!!deleteTarget}
-                        onClose={() => setDeleteTarget(null)}
-                        title={t("carData.deleteTitle")}
-                        size="sm"
-                        centered
-                    >
-                        <Stack gap="md" align="center" py="sm">
-                            <Text size="xl">⚠️</Text>
-                            <Text ta="center" size="sm">
-                                {t("carData.deleteWarning", { name: deleteTarget?.name })}
-                                <br />
-                                <Text component="span" c="dimmed" size="xs">
-                                    {t("carData.deleteUndone")}
-                                </Text>
+                {/* ── Create / Edit Modal ────────────────────────────── */}
+                <Modal
+                    opened={modalOpen}
+                    onClose={closeModal}
+                    title={
+                        <Group gap={10}>
+                            <ThemeIcon color="teal" variant="light" size={32} radius="md">
+                                {editTarget ? <IconEdit size={16} /> : <IconPlus size={16} />}
+                            </ThemeIcon>
+                            <Text fw={500} size="md">
+                                {editTarget
+                                    ? t('carData.editTitle', { label: tabSingular })
+                                    : t('carData.addTitle', { label: tabSingular })}
                             </Text>
-                            <Group w="100%">
-                                <Button
-                                    variant="default"
-                                    flex={1}
-                                    onClick={() => setDeleteTarget(null)}
-                                    disabled={loading}
-                                >
-                                    {t("cancel")}
-                                </Button>
-                                <Button color="red" flex={1} loading={loading} onClick={handleDelete}>
-                                    {t("delete")}
-                                </Button>
-                            </Group>
-                        </Stack>
-                    </Modal>
+                        </Group>
+                    }
+                    size="md"
+                    centered
+                    radius="lg"
+                    styles={{
+                        header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+                        body: { padding: '20px 24px 24px' },
+                    }}
+                >
+                    <Stack gap="md">
+                        <TextInput
+                            label={t('carData.fieldName')}
+                            placeholder={t('carData.fieldNamePlaceholder', { label: tabSingular.toLowerCase() })}
+                            required
+                            radius="md"
+                            {...form.getInputProps('name')}
+                                       styles={inputStyles}
+                        />
 
-                </Stack>
-            </motion.div>
-        </>
-    );
+                        {activeTab === 'categories' && (
+                            <Textarea
+                                label={t('carData.fieldDescription')}
+                                placeholder={t('carData.fieldDescriptionPlaceholder')}
+                                minRows={3}
+                                radius="md"
+                                {...form.getInputProps('description')}
+                                           styles={inputStyles}
+                            />
+                        )}
+
+                        {activeTab === 'companyModels' && (
+                            <Select
+                                label={t('carData.fieldBrand')}
+                                required
+                                radius="md"
+                                data={data.companyNames.map((c) => ({ value: c.id, label: c.name }))}
+                                {...form.getInputProps('companyId')}
+                                          styles={inputStyles}
+                            />
+                        )}
+
+                        <Button
+                            variant="filled"
+                            color="teal"
+                            fullWidth
+                            radius="md"
+                            size="md"
+                            loading={loading}
+                            leftSection={editTarget ? <IconDeviceFloppy size={16} /> : <IconPlus size={16} />}
+                            onClick={handleSave}
+                            styles={{
+                                root: {
+                                    transition: 'transform 0.12s, box-shadow 0.15s',
+                                    '&:hover': {
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 4px 14px rgba(15,110,86,0.25)',
+                                    },
+                                    '&:active': { transform: 'scale(0.99)' },
+                                },
+                            }}
+                        >
+                            {editTarget ? t('carData.saveChanges') : t('carData.createEntry')}
+                        </Button>
+                    </Stack>
+                </Modal>
+
+                {/* ── Delete Confirm Modal ───────────────────────────── */}
+                <Modal
+                    opened={!!deleteTarget}
+                    onClose={() => setDeleteTarget(null)}
+                    title={
+                        <Group gap={10}>
+                            <ThemeIcon color="red" variant="light" size={32} radius="md">
+                                <IconTrash size={16} />
+                            </ThemeIcon>
+                            <Text fw={500} size="md">{t('carData.deleteTitle')}</Text>
+                        </Group>
+                    }
+                    size="sm"
+                    centered
+                    radius="lg"
+                    styles={{
+                        header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+                        body: { padding: '20px 24px 24px' },
+                    }}
+                >
+                    <Stack gap="lg" align="center">
+                        <Paper
+                            radius="md"
+                            p="md"
+                            w="100%"
+                            style={{
+                                background: 'var(--mantine-color-red-light)',
+                                border: '0.5px solid var(--mantine-color-red-light-hover)',
+                            }}
+                        >
+                            <Stack gap={4} align="center">
+                                <Text size="sm" ta="center" fw={500} c="red.8">
+                                    {t('carData.deleteWarning', { name: deleteTarget?.name })}
+                                </Text>
+                                <Text size="xs" ta="center" c="dimmed">
+                                    {t('carData.deleteUndone')}
+                                </Text>
+                            </Stack>
+                        </Paper>
+
+                        <Group w="100%" gap="sm">
+                            <Button
+                                variant="default"
+                                flex={1}
+                                radius="md"
+                                onClick={() => setDeleteTarget(null)}
+                                disabled={loading}
+                            >
+                                {t('cancel')}
+                            </Button>
+                            <Button
+                                color="red"
+                                flex={1}
+                                radius="md"
+                                loading={loading}
+                                leftSection={<IconTrash size={15} />}
+                                onClick={handleDelete}
+                            >
+                                {t('delete')}
+                            </Button>
+                        </Group>
+                    </Stack>
+                </Modal>
+
+            </Stack>
+        </motion.div>
+
+        {/* Skeleton pulse keyframe */}
+        <style>{`@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:.2} }`}</style>
+    </>
+);
+
 }

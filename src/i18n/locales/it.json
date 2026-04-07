@@ -238,6 +238,9 @@
     "settingsSaved": "Impostazioni salvate con successo!"
   },
   "admin": {
+    "deleteTitle": "Elimina veicolo",
+    "deleteWarning": "Sei sicuro di voler eliminare questo veicolo?",
+    "deleteUndone": "Questa azione non può essere annullata.",
     "dashboard": "Dashboard",
     "cars": "Auto a noleggio",
     "bookings": "Prenotazioni",
@@ -375,7 +378,12 @@
     "reports_card_financial_title": "Riepilogo finanziario",
     "reports_card_financial_desc": "Panoramica finanziaria completa",
     "reports_card_performance_title": "Rapporto performance",
-    "reports_card_performance_desc": "KPI e metriche operative"
+    "reports_card_performance_desc": "KPI e metriche operative",
+    "carsTotal": "Totale auto",
+    "preview": "Anteprima",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "noCarsFound": "Nessuna auto trovata"
   },
   "login": {
     "title": "Bentornato",
@@ -666,5 +674,14 @@
   "primary": "Principale",
   "setAsPrimary": "Imposta come principale",
   "remove": "Rimuovi",
-  "uploadImagesInfo": "Carica più immagini dell'auto. L'immagine principale viene mostrata come foto principale negli annunci."
+  "uploadImagesInfo": "Carica più immagini dell'auto. L'immagine principale viene mostrata come foto principale negli annunci.",
+  "basicInfo": "Informazioni di base",
+  "details": "Dettagli",
+  "brandAndSpecifications": "Marca e specifiche",
+  "description": "Descrizione",
+  "title": "Titolo",
+  "titleEx": "es. Toyota Corolla 2022",
+  "descriptionEx": "Breve descrizione del veicolo…",
+  "required": "Questo campo è obbligatorio",
+  "edit": "Modifica"
 }

@@ -238,6 +238,9 @@
     "settingsSaved": "Settings saved successfully!"
   },
   "admin": {
+    "deleteTitle": "Delete Vehicle",
+    "deleteWarning": "Are you sure you want to delete this vehicle?",
+    "deleteUndone": "This action cannot be undone.",
     "dashboard": "Dashboard",
     "cars": "Rental Cars",
     "bookings": "Bookings",
@@ -375,7 +378,12 @@
     "reports_card_financial_title": "Financial Summary",
     "reports_card_financial_desc": "Comprehensive financial overview",
     "reports_card_performance_title": "Performance Report",
-    "reports_card_performance_desc": "KPIs and operational metrics"
+    "reports_card_performance_desc": "KPIs and operational metrics",
+    "carsTotal": "Total Cars",
+    "preview": "Preview",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noCarsFound": "No cars found"
   },
   "login": {
     "title": "Welcome Back",
@@ -668,5 +676,12 @@
   "primary": "Primary",
   "setAsPrimary": "Set as primary",
   "remove": "Remove",
-  "uploadImagesInfo": "Upload multiple car images. The primary image is shown as the main photo in listings."
+  "uploadImagesInfo": "Upload multiple car images. The primary image is shown as the main photo in listings.",
+  "basicInfo": "Basic Information",
+  "details": "Details",
+  "brandAndSpecifications": "Brand & Specifications",
+  "titleEx": "e.g. Toyota Corolla 2022",
+  "descriptionEx": "Brief description of the vehicle…",
+  "required": "This field is required",
+  "edit": "Edit"
 }

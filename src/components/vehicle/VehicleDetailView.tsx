@@ -384,7 +384,7 @@ export function VehicleDetailView({
             <Divider mb="xl" />
             <AnimatedSection>
               <Title order={3} fw={700} mb="lg">
-                {t('vehicle.similarCars') || 'Similar Cars'}
+                {t('vehicle.similarCars')}
               </Title>
             </AnimatedSection>
             <StaggerContainer stagger={0.1}>

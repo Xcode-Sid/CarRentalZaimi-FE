@@ -238,6 +238,9 @@
     "settingsSaved": "Cilësimet u ruajtën me sukses!"
   },
   "admin": {
+    "deleteTitle": "Fshi mjetin",
+    "deleteWarning": "Jeni të sigurt që doni të fshini këtë mjet?",
+    "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
     "dashboard": "Paneli Kryesor",
     "cars": "Makina me qira",
     "bookings": "Rezervimet",
@@ -375,7 +378,12 @@
     "reports_card_financial_title": "Përmbledhje financiare",
     "reports_card_financial_desc": "Përmbledhje e plotë financiare",
     "reports_card_performance_title": "Raporti i performancës",
-    "reports_card_performance_desc": "KPI dhe metrika operacionale"
+    "reports_card_performance_desc": "KPI dhe metrika operacionale",
+    "carsTotal": "Totali i makinave",
+    "preview": "Pamje paraprake",
+    "edit": "Ndrysho",
+    "delete": "Fshi",
+    "noCarsFound": "Nuk u gjet asnjë makinë"
   },
   "login": {
     "title": "Mirë se Vini Përsëri",
@@ -666,5 +674,14 @@
   "primary": "Kryesor",
   "setAsPrimary": "Vendos si kryesor",
   "remove": "Hiq",
-  "uploadImagesInfo": "Ngarko disa imazhe të makinës. Imazhi kryesor shfaqet si foto kryesore në listimet."
+  "uploadImagesInfo": "Ngarko disa imazhe të makinës. Imazhi kryesor shfaqet si foto kryesore në listimet.",
+  "basicInfo": "Informacione bazë",
+  "details": "Detaje",
+  "brandAndSpecifications": "Marka dhe specifikimet",
+  "description": "Përshkrim",
+  "title": "Titulli",
+  "titleEx": "p.sh. Toyota Corolla 2022",
+  "descriptionEx": "Përshkrim i shkurtër i mjetit…",
+  "required": "Ky fushë është e detyrueshme",
+  "edit": "Ndrysho"
 }

@@ -2,8 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Title, TextInput, Select, Button, Table, Badge,
   Group, ActionIcon, Image, Stack, Modal, Loader, Center, Text,
+  ThemeIcon,
+  Tooltip,
+  Paper,
+  Alert,
 } from '@mantine/core';
-import { IconSearch, IconPlus, IconEye, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconEye, IconEdit, IconTrash, IconCar, IconInfoCircle, IconX, IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
@@ -18,8 +22,8 @@ import Spinner from '../../../components/spinner/Spinner';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function getDisplayName(car: Vehicle): string {
-  return car.title || car.carName || `Car #${car.carId}`;
+function getDisplayName(car: Vehicle | null): string {
+  return car?.title ?? (car?.carId ? `Car #${car.carId}` : 'Unknown');
 }
 
 function getPrimaryImageSrc(car: Vehicle): string {
@@ -49,6 +53,7 @@ export default function CarsPage() {
   const [editingCar, setEditingCar] = useState<Vehicle | null>(null);
   const [previewCar, setPreviewCar] = useState<Vehicle | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Vehicle | null>(null);
   const [lookups, setLookups] = useState<Lookups>({
     categories: [], companyNames: [], companyModels: [],
     exteriorColors: [], interiorColors: [], transmissions: [], fuels: [],
@@ -139,24 +144,25 @@ export default function CarsPage() {
           : await post('Cars/create', payload);
       if (res.success) {
         setModalOpen(false);
-        notifications.show({ message: t('admin.carSaved'), color: 'teal' });
+        notifications.show({ title: t('success'), message: t('admin.carSaved'), color: 'teal' });
         await fetchCars();
       } else {
-        notifications.show({ message: 'Save failed. Check API.', color: 'red' });
+        notifications.show({title: t('error'), message: 'Save failed. Check API.', color: 'red' });
       }
-    } catch(err) {
-      notifications.show({ message: 'Save failed. Check API.', color: 'red' });
+    } catch (err) {
+      notifications.show({title: t('error'), message: 'Save failed. Check API.', color: 'red' });
     } finally {
       setSaving(false);
     }
   };
-
-  const handleDelete = async (carId: string) => {
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const res = await del(`Cars/${carId}`);
+      const res = await del(`Cars/${deleteTarget.carId}`);
       if (res.success) {
-        setCars((prev) => prev.filter((c) => c.carId !== carId));
+        setCars((prev) => prev.filter((c) => c.carId !== deleteTarget.carId));
         notifications.show({ message: t('admin.carDeleted'), color: 'red' });
+        setDeleteTarget(null);
       } else {
         notifications.show({ message: 'Delete failed.', color: 'red' });
       }
@@ -165,99 +171,268 @@ export default function CarsPage() {
     }
   };
 
+  // AdminCarsPage — redesigned return block
+  // Drop-in replacement for your existing return statement.
+  // All existing props, state, and handlers remain unchanged.
+
   return (
     <>
       <Spinner visible={loading} />
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
         <Stack gap="xl">
 
+          {/* ── Header ─────────────────────────────────────────── */}
           <AnimatedSection>
-            <Group justify="space-between">
-              <Title order={2} fw={700}>{t('admin.manageCars')}</Title>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button leftSection={<IconPlus size={16} />} variant="filled" color="teal" onClick={openAddModal}>
+            <Group justify="space-between" align="center">
+              <Stack gap={2}>
+                <Title order={2} fw={500} style={{ letterSpacing: '-0.01em' }}>
+                  {t('admin.manageCars')}
+                </Title>
+                <Text size="sm" c="dimmed">
+                  {cars.length} {t('admin.carsTotal') ?? 'vehicles listed'}
+                </Text>
+              </Stack>
+
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  leftSection={<IconPlus size={15} />}
+                  variant="filled"
+                  color="teal"
+                  radius="md"
+                  size="sm"
+                  onClick={openAddModal}
+                  styles={{
+                    root: {
+                      transition: 'box-shadow 0.15s',
+                      '&:hover': { boxShadow: '0 4px 14px rgba(15,110,86,0.25)' },
+                    },
+                  }}
+                >
                   {t('admin.addCar')}
                 </Button>
               </motion.div>
             </Group>
           </AnimatedSection>
 
-          <AnimatedSection delay={0.1}>
-            <Group>
-              <TextInput
-                placeholder={t('admin.searchPlaceholder')}
-                leftSection={<IconSearch size={16} />}
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-                style={{ flex: 1, maxWidth: 300 }}
-              />
-              <Select
-                placeholder={t('admin.category')}
-                data={toSelectData(lookups.categories)}
-                value={categoryFilter}
-                onChange={(val) => setCategoryFilter(val)}
-                clearable
-                w={200}
-              />
-            </Group>
+          {/* ── Filters ────────────────────────────────────────── */}
+          <AnimatedSection delay={0.08}>
+            <Paper
+              radius="md"
+              p="sm"
+              withBorder
+              style={{ borderColor: 'var(--mantine-color-default-border)' }}
+            >
+              <Group gap="sm">
+                <TextInput
+                  placeholder={t('admin.searchPlaceholder')}
+                  leftSection={<IconSearch size={15} />}
+                  value={search}
+                  onChange={(e) => setSearch(e.currentTarget.value)}
+                  radius="md"
+                  style={{ flex: 1, maxWidth: 320 }}
+                  styles={{
+                    input: {
+                      transition: 'border-color 0.18s, box-shadow 0.18s',
+                      '&:focus': { boxShadow: '0 0 0 3px rgba(29,158,117,0.12)' },
+                    },
+                  }}
+                />
+                <Select
+                  placeholder={t('admin.category')}
+                  data={toSelectData(lookups.categories)}
+                  value={categoryFilter}
+                  onChange={(val) => setCategoryFilter(val)}
+                  clearable
+                  radius="md"
+                  w={200}
+                  leftSection={<IconFilter size={15} />}
+                  styles={{
+                    input: {
+                      transition: 'border-color 0.18s, box-shadow 0.18s',
+                      '&:focus': { boxShadow: '0 0 0 3px rgba(29,158,117,0.12)' },
+                    },
+                  }}
+                />
+                {(search || categoryFilter) && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                  >
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      radius="md"
+                      onClick={() => { setSearch(''); setCategoryFilter(null); }}
+                      title="Clear filters"
+                    >
+                      <IconX size={15} />
+                    </ActionIcon>
+                  </motion.div>
+                )}
+              </Group>
+            </Paper>
           </AnimatedSection>
 
-          <AnimatedSection delay={0.15}>
-            {loading && <Center py="xl"><Loader color="teal" /></Center>}
-            {error && <Text c="red">{error}</Text>}
+          {/* ── Table ──────────────────────────────────────────── */}
+          <AnimatedSection delay={0.14}>
+            {loading && (
+              <Center py="xl">
+                <Loader color="teal" size="sm" />
+              </Center>
+            )}
+            {error && (
+              <Alert icon={<IconInfoCircle size={15} />} color="red" radius="md" variant="light">
+                {error}
+              </Alert>
+            )}
+
             {!loading && !error && (
-              <Table.ScrollContainer minWidth={800}>
-                <Table striped highlightOnHover>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>#</Table.Th>
-                      <Table.Th />
-                      <Table.Th>{t('admin.carName')}</Table.Th>
-                      <Table.Th>{t('admin.category')}</Table.Th>
-                      <Table.Th>{t('admin.pricePerDay')}</Table.Th>
-                      <Table.Th>{t('admin.carActions')}</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {cars.map((car, idx) => (
-                      <motion.tr
-                        key={car.carId}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.03, duration: 0.3 }}
-                      >
-                        <Table.Td>#{String(idx + 1).padStart(3, '0')}</Table.Td>
-                        <Table.Td>
-                          <Image src={getPrimaryImageSrc(car)} w={50} h={35} radius="sm" fit="cover" fallbackSrc="/placeholder-car.png" />
-                        </Table.Td>
-                        <Table.Td fw={500}>{getDisplayName(car)}</Table.Td>
-                        <Table.Td>
-                          <Badge color="teal" variant="light" size="sm">
-                            {car.categoryName ?? '—'}
-                          </Badge>
-                        </Table.Td>
-                        <Table.Td>€{car.pricePerDay}/{t('vehicle.perDay')}</Table.Td>
-                        <Table.Td>
-                          <Group gap={4}>
-                            <ActionIcon variant="subtle" color="blue" size="sm" onClick={() => setPreviewCar(car)}>
-                              <IconEye size={16} />
-                            </ActionIcon>
-                            <ActionIcon variant="subtle" color="yellow" size="sm" onClick={() => openEditModal(car)}>
-                              <IconEdit size={16} />
-                            </ActionIcon>
-                            <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDelete(car.carId)}>
-                              <IconTrash size={16} />
-                            </ActionIcon>
-                          </Group>
-                        </Table.Td>
-                      </motion.tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </Table.ScrollContainer>
+              <Paper radius="lg" withBorder style={{ overflow: 'hidden', borderColor: 'var(--mantine-color-default-border)' }}>
+                <Table.ScrollContainer minWidth={800}>
+                  <Table
+                    highlightOnHover
+                    verticalSpacing="sm"
+                    horizontalSpacing="md"
+                    styles={{
+                      thead: {
+                        background: 'var(--mantine-color-default-hover)',
+                        borderBottom: '0.5px solid var(--mantine-color-default-border)',
+                      },
+                      th: { fontWeight: 500, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--mantine-color-dimmed)' },
+                    }}
+                  >
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th w={60}>#</Table.Th>
+                        <Table.Th w={70} />
+                        <Table.Th>{t('admin.carName')}</Table.Th>
+                        <Table.Th>{t('admin.category')}</Table.Th>
+                        <Table.Th>{t('admin.pricePerDay')}</Table.Th>
+                        <Table.Th w={110}>{t('admin.carActions')}</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+
+                    <Table.Tbody>
+                      {cars.length === 0 && (
+                        <Table.Tr>
+                          <Table.Td colSpan={6}>
+                            <Center py="xl">
+                              <Stack align="center" gap="xs">
+                                <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                                  <IconCar size={20} />
+                                </ThemeIcon>
+                                <Text size="sm" c="dimmed">
+                                  {t('admin.noCarsFound') ?? 'No cars found'}
+                                </Text>
+                              </Stack>
+                            </Center>
+                          </Table.Td>
+                        </Table.Tr>
+                      )}
+
+                      {cars.map((car, idx) => (
+                        <motion.tr
+                          key={car.carId}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.03, duration: 0.25, ease: 'easeOut' }}
+                          style={{ cursor: 'default' }}
+                        >
+                          <Table.Td>
+                            <Text size="xs" c="dimmed" fw={500}>
+                              #{String(idx + 1).padStart(3, '0')}
+                            </Text>
+                          </Table.Td>
+
+                          <Table.Td>
+                            <Image
+                              src={getPrimaryImageSrc(car)}
+                              w={52}
+                              h={36}
+                              radius="md"
+                              fit="cover"
+                              fallbackSrc="/placeholder-car.png"
+                              style={{ border: '0.5px solid var(--mantine-color-default-border)' }}
+                            />
+                          </Table.Td>
+
+                          <Table.Td>
+                            <Text size="sm" fw={500}>
+                              {getDisplayName(car)}
+                            </Text>
+                          </Table.Td>
+
+                          <Table.Td>
+                            <Badge
+                              color="teal"
+                              variant="light"
+                              size="sm"
+                              radius="md"
+                            >
+                              {car.categoryName ?? '—'}
+                            </Badge>
+                          </Table.Td>
+
+                          <Table.Td>
+                            <Group gap={2} align="baseline">
+                              <Text size="sm" fw={500}>€{car.pricePerDay}</Text>
+                              <Text size="xs" c="dimmed">/{t('vehicle.perDay')}</Text>
+                            </Group>
+                          </Table.Td>
+
+                          <Table.Td>
+                            <Group gap={4}>
+                              <Tooltip label={t('admin.preview')} withArrow position="top" fz="xs">
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="blue"
+                                  size="sm"
+                                  radius="md"
+                                  onClick={() => setPreviewCar(car)}
+                                >
+                                  <IconEye size={15} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label={t('admin.edit')} withArrow position="top" fz="xs">
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="yellow"
+                                  size="sm"
+                                  radius="md"
+                                  onClick={() => openEditModal(car)}
+                                >
+                                  <IconEdit size={15} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label={t('admin.delete')} withArrow position="top" fz="xs">
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="red"
+                                  size="sm"
+                                  radius="md"
+                                  onClick={() => setDeleteTarget(car)}
+                                >
+                                  <IconTrash size={15} />
+                                </ActionIcon>
+                              </Tooltip>
+                            </Group>
+                          </Table.Td>
+                        </motion.tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </Table.ScrollContainer>
+              </Paper>
             )}
           </AnimatedSection>
 
+          {/* ── Modals ─────────────────────────────────────────── */}
           <CarFormModal
             opened={modalOpen}
             onClose={() => setModalOpen(false)}
@@ -271,14 +446,26 @@ export default function CarsPage() {
           <Modal
             opened={previewCar !== null}
             onClose={() => setPreviewCar(null)}
-            title={t('admin.previewVehicle')}
-            size="xl" centered radius="xl"
-            overlayProps={{ backgroundOpacity: 0.6, blur: 4 }}
-            transitionProps={{ transition: 'pop', duration: 180 }}
-            styles={{ body: { padding: 0 } }}
+            title={
+              <Group gap={10}>
+                <ThemeIcon color="teal" variant="light" size={32} radius="md">
+                  <IconEye size={16} />
+                </ThemeIcon>
+                <Text fw={500} size="md">{t('admin.previewVehicle')}</Text>
+              </Group>
+            }
+            size="xl"
+            centered
+            radius="lg"
+            overlayProps={{ backgroundOpacity: 0.55, blur: 6 }}
+            transitionProps={{ transition: 'pop', duration: 200 }}
+            styles={{
+              body: { padding: 0 },
+              header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+            }}
           >
             {previewCar !== null && (
-              <div style={{ maxHeight: '75vh', overflow: 'auto' }}>
+              <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                 <VehicleDetailView
                   vehicle={previewCar}
                   showBreadcrumbs={false}
@@ -288,6 +475,71 @@ export default function CarsPage() {
             )}
           </Modal>
 
+          {/* ── Delete Confirm Modal ───────────────────────────── */}
+          <Modal
+            opened={!!deleteTarget}
+            onClose={() => setDeleteTarget(null)}
+            title={
+              <Group gap={10}>
+                <ThemeIcon color="red" variant="light" size={32} radius="md">
+                  <IconTrash size={16} />
+                </ThemeIcon>
+                <Text fw={500} size="md">{t('admin.deleteTitle')}</Text>
+              </Group>
+            }
+            size="sm"
+            centered
+            radius="lg"
+            overlayProps={{ backgroundOpacity: 0.55, blur: 6 }}
+            transitionProps={{ transition: 'pop', duration: 200 }}
+            styles={{
+              header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+              body: { padding: '20px 24px 24px' },
+            }}
+          >
+            <Stack gap="lg" align="center">
+              <Paper
+                radius="md"
+                p="md"
+                w="100%"
+                style={{
+                  background: 'var(--mantine-color-red-light)',
+                  border: '0.5px solid var(--mantine-color-red-light-hover)',
+                }}
+              >
+                <Stack gap={4} align="center">
+                  <Text size="sm" ta="center" fw={500} c="red.8">
+                    {t('admin.deleteWarning', { name: getDisplayName(deleteTarget!) })}
+                  </Text>
+                  <Text size="xs" ta="center" c="dimmed">
+                    {t('admin.deleteUndone')}
+                  </Text>
+                </Stack>
+              </Paper>
+
+              <Group w="100%" gap="sm">
+                <Button
+                  variant="default"
+                  flex={1}
+                  radius="md"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={saving}
+                >
+                  {t('cancel')}
+                </Button>
+                <Button
+                  color="red"
+                  flex={1}
+                  radius="md"
+                  loading={saving}
+                  leftSection={<IconTrash size={15} />}
+                  onClick={handleDelete}
+                >
+                  {t('delete')}
+                </Button>
+              </Group>
+            </Stack>
+          </Modal>
         </Stack>
       </motion.div>
     </>
