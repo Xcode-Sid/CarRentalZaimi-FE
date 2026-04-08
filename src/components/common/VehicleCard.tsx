@@ -8,7 +8,7 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { useAuth } from '../../contexts/AuthContext'; // adjust path if needed
 import type { Vehicle } from '../../data/vehicles';
 import { post } from '../../utils/api.utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Spinner from '../spinner/Spinner';
 import { createPortal } from 'react-dom';
 
@@ -37,7 +37,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
   const { user } = useAuth();
   const isDark = colorScheme === 'dark';
   const [loading, setLoading] = useState(false);
-  const [isSaved, setIsSaved] = useState(vehicle.isSaved ?? false);
+  const [isSaved, setIsSaved] = useState(vehicle.isSaved);
   const isLoggedIn = !!user;
   const isAdmin = user?.role?.name === 'Admin';
   const canSave = isLoggedIn && !isAdmin;
@@ -45,8 +45,10 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
   const priceBadgeText = `€${vehicle.pricePerDay}/${t('vehicle.perDay')}`;
   const displayName = vehicle.title || vehicle.carName || '';
   const categoryName = vehicle.categoryName ?? '';
-  const firstImage = vehicle.carImages.map((img) => (img as any).data ?? '').filter(Boolean)[0] ?? '';
-
+  const primaryImage =
+    vehicle.carImages?.find(img => img.isPrimary)
+    ?? vehicle.carImages?.[0]
+    ?? null;
 
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -77,7 +79,6 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
     }
   };
 
-
   return (
     <>
       {loading && createPortal(<Spinner visible={loading} />, document.body)}
@@ -105,7 +106,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
           <Box style={{ position: 'relative' }}>
             <Box className="card-image-zoom">
               <Image
-                src={firstImage}
+                src={primaryImage}
                 alt={displayName}
                 radius="lg"
                 h={220}

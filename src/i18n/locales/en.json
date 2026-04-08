@@ -683,5 +683,8 @@
   "titleEx": "e.g. Toyota Corolla 2022",
   "descriptionEx": "Brief description of the vehicle…",
   "required": "This field is required",
-  "edit": "Edit"
+  "edit": "Edit",
+  "failedToUpdateSavedCar": "Failed to update saved car",
+  "carWasAddedToSaveSollection": "Car added to your saved collection",
+  "carWasRemovedFromSavecollection": "Car removed from your saved collection"
 }
