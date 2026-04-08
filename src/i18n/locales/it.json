@@ -115,6 +115,8 @@
     "rentalLengthDesc": "Evidenzia il prezzo giornaliero o orario"
   },
   "vehicle": {
+    "ratingLabel": "Valutazione",
+    "commentLabel": "Commento",
     "overview": "Panoramica",
     "specifications": "Specifiche",
     "reviews": "Recensioni",
@@ -149,7 +151,15 @@
     "reviewSuccess": "Recensione inviata con successo!",
     "similarCars": "Auto Simili",
     "saveVehicle": "Salva tra le auto a noleggio salvate",
-    "removeSavedVehicle": "Rimuovi dalle salvate"
+    "removeSavedVehicle": "Rimuovi dalle salvate",
+    "loginToReview": "Accedi per scrivere una recensione",
+    "noReviews": "Nessuna recensione ancora. Sii il primo a recensire!",
+    "reviewUpdated": "Recensione aggiornata con successo!",
+    "reviewDeleted": "Recensione eliminata con successo!",
+    "reviewError": "Qualcosa è andato storto. Riprova.",
+    "editReview": "Modifica recensione",
+    "deleteReview": "Elimina recensione",
+    "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione? Questa azione non può essere annullata."
   },
   "rental": {
     "title": "Prenota Auto",
@@ -683,5 +693,7 @@
   "titleEx": "es. Toyota Corolla 2022",
   "descriptionEx": "Breve descrizione del veicolo…",
   "required": "Questo campo è obbligatorio",
-  "edit": "Modifica"
+  "edit": "Modifica",
+  "loading": "Caricamento...",
+  "save": "Salva"
 }

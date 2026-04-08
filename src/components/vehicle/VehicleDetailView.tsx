@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -21,23 +21,50 @@ import {
   Breadcrumbs,
   Anchor,
   SimpleGrid,
+  Modal,
+  ThemeIcon,
+  Paper,
 } from '@mantine/core';
 import {
   IconShieldCheck,
   IconCopy,
   IconBrandWhatsapp,
-  IconThumbUp,
-  IconThumbDown,
   IconChevronRight,
+  IconLock,
+  IconEdit,
+  IconTrash,
+  IconDeviceFloppy,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import type { Vehicle } from '../../data/vehicles';
-import { reviews as allReviews } from '../../data/reviews';
 import { ImageGallery } from './ImageGallery';
 import { RentalBookingModal } from './RentalBookingModal';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
+import { useAuth } from '../../contexts/AuthContext';
+import { get, post, put, del } from '../../utils/api.utils';
+import Spinner from '../spinner/Spinner';
+import { toImagePath } from '../../utils/general';
+
+type CarReview = {
+  id: string;
+  createdOn: string;
+  modifiedOn: string;
+  rating: number;
+  comment: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    image: {
+      imageName: string;
+      imageData: string;
+    } | null;
+  };
+};
 
 export function VehicleDetailView({
   vehicle,
@@ -52,24 +79,58 @@ export function VehicleDetailView({
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const vehicleReviews = allReviews.filter((r) => String(r.vehicleId) === vehicle.carId);
-
+  const [loading, setLoading] = useState(false);
   const [rentalOpen, setRentalOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
+  const [activeTab, setActiveTab] = useState<string | null>('overview');
+  const [vehicleReviews, setVehicleReviews] = useState<CarReview[]>([]);
+
+  const [editingReview, setEditingReview] = useState<CarReview | null>(null);
+  const [editRating, setEditRating] = useState(0);
+  const [editText, setEditText] = useState('');
+  const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
+
+  const refreshReviews = async () => {
+    const res = await get(`CarReview/getAll/${vehicle.carId}`);
+    setVehicleReviews(res.data);
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'reviews') return;
+
+    const fetchReviews = async () => {
+      setLoading(true);
+      try {
+        await refreshReviews();
+      } catch {
+        notifications.show({
+          title: t('error'),
+          message: t('vehicle.reviewError'),
+          color: 'red',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [activeTab, vehicle.carId]);
 
   const avgRating =
-    vehicleReviews.length > 0
+    Array.isArray(vehicleReviews) && vehicleReviews.length > 0
       ? vehicleReviews.reduce((acc, r) => acc + r.rating, 0) / vehicleReviews.length
       : 0;
 
   const ratingBreakdown = [5, 4, 3, 2, 1].map((star) => ({
     star,
-    count: vehicleReviews.filter((r) => r.rating === star).length,
-    pct: vehicleReviews.length
-      ? (vehicleReviews.filter((r) => r.rating === star).length / vehicleReviews.length) * 100
-      : 0,
+    count: Array.isArray(vehicleReviews) ? vehicleReviews.filter((r) => r.rating === star).length : 0,
+    pct:
+      Array.isArray(vehicleReviews) && vehicleReviews.length
+        ? (vehicleReviews.filter((r) => r.rating === star).length / vehicleReviews.length) * 100
+        : 0,
   }));
 
   const priceDisplay = `€${vehicle.pricePerDay}/${t('vehicle.perDay')}`;
@@ -108,11 +169,68 @@ export function VehicleDetailView({
     [t('vehicle.doors'), vehicle.doors],
   ];
 
-  const handleReviewSubmit = () => {
-    if (reviewRating && reviewText) {
-      notifications.show({ message: t('vehicle.reviewSuccess'), color: 'teal' });
+  const handleReviewSubmit = async () => {
+    if (!reviewRating || !reviewText) return;
+    setLoading(true);
+    try {
+      const response = await post('CarReview/create', {
+        userId: user?.id,
+        carId: vehicle.carId,
+        rating: reviewRating,
+        comment: reviewText,
+      });
+
+      if (!response.success) throw new Error('Failed to submit review');
+
+      notifications.show({ title: t('success'), message: t('vehicle.reviewSuccess'), color: 'teal' });
       setReviewRating(0);
       setReviewText('');
+      await refreshReviews();
+    } catch {
+      notifications.show({ title: t('error'), message: t('vehicle.reviewError'), color: 'red' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditOpen = (review: CarReview) => {
+    setEditingReview(review);
+    setEditRating(review.rating);
+    setEditText(review.comment);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingReview || !editRating || !editText) return;
+    setLoading(true);
+    try {
+      await put(`CarReview/update/${editingReview.id}`, {
+        rating: editRating,
+        comment: editText,
+      });
+
+      notifications.show({ title: t('success'), message: t('vehicle.reviewUpdated') ?? 'Review updated!', color: 'teal' });
+      setEditingReview(null);
+      await refreshReviews();
+    } catch {
+      notifications.show({ title: t('error'), message: t('vehicle.reviewError'), color: 'red' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingReviewId) return;
+    setLoading(true);
+    try {
+      await del(`CarReview/${deletingReviewId}`);
+
+      notifications.show({ title: t('success'), message: t('vehicle.reviewDeleted') ?? 'Review deleted!', color: 'teal' });
+      setDeletingReviewId(null);
+      setVehicleReviews((prev) => prev.filter((r) => r.id !== deletingReviewId));
+    } catch {
+      notifications.show({ title: t('error'), message: t('vehicle.reviewError'), color: 'red' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,12 +291,12 @@ export function VehicleDetailView({
                 <Text c="dimmed">{vehicle.year}</Text>
               </div>
 
-              <Tabs defaultValue="overview" color="teal">
+              <Tabs value={activeTab} onChange={setActiveTab} color="teal">
                 <Tabs.List>
                   <Tabs.Tab value="overview">{t('vehicle.overview')}</Tabs.Tab>
                   <Tabs.Tab value="specs">{t('vehicle.specifications')}</Tabs.Tab>
                   <Tabs.Tab value="reviews">
-                    {t('vehicle.reviews')} ({vehicleReviews.length})
+                    {t('vehicle.reviews')} ({vehicle.totalReviews ?? vehicleReviews.length})
                   </Tabs.Tab>
                 </Tabs.List>
 
@@ -224,7 +342,9 @@ export function VehicleDetailView({
                       <Stack align="center" gap={4}>
                         <Text size="3rem" fw={800}>{avgRating.toFixed(1)}</Text>
                         <Rating value={avgRating} readOnly fractions={2} />
-                        <Text size="sm" c="dimmed">{vehicleReviews.length} {t('vehicle.reviews')}</Text>
+                        <Text size="sm" c="dimmed">
+                          {vehicle.totalReviews ?? vehicleReviews.length} {t('vehicle.reviews')}
+                        </Text>
                       </Stack>
                       <Stack gap={4} style={{ flex: 1, minWidth: 150 }}>
                         {ratingBreakdown.map((rb) => (
@@ -239,70 +359,115 @@ export function VehicleDetailView({
 
                     <Divider />
 
-                    {vehicleReviews.map((review, idx) => (
-                      <motion.div
-                        key={review.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: idx * 0.05, duration: 0.3 }}
-                      >
-                        <Box
-                          className="glass-card"
-                          p="xl"
-                          style={{
-                            borderRadius: 'var(--mantine-radius-xl)',
-                            position: containerized ? 'sticky' : 'static',
-                            top: 90,
-                          }}
-                        >
-                          <Group justify="space-between" mb="xs" wrap="wrap">
-                            <Group gap="sm">
-                              <Avatar color="teal" radius="xl" size="sm">
-                                {review.authorAvatar}
-                              </Avatar>
-                              <div>
-                                <Text size="sm" fw={600}>{review.authorName}</Text>
-                                <Text size="xs" c="dimmed">{review.date}</Text>
-                              </div>
-                            </Group>
-                            <Rating value={review.rating} readOnly size="sm" />
-                          </Group>
-                          <Text size="sm" c="dimmed">{review.text}</Text>
-                          <Group gap="lg" mt="sm">
-                            <Group gap={4}>
-                              <ActionIcon variant="subtle" size="sm"><IconThumbUp size={14} /></ActionIcon>
-                              <Text size="xs" c="dimmed">{review.helpfulCount}</Text>
-                            </Group>
-                            <Group gap={4}>
-                              <ActionIcon variant="subtle" size="sm"><IconThumbDown size={14} /></ActionIcon>
-                              <Text size="xs" c="dimmed">{review.notHelpfulCount}</Text>
-                            </Group>
-                          </Group>
-                        </Box>
-                      </motion.div>
-                    ))}
+                    {loading ? (
+                      <Text c="dimmed" ta="center">{t('loading') ?? 'Loading...'}</Text>
+                    ) : vehicleReviews.length === 0 ? (
+                      <Text c="dimmed" ta="center">{t('vehicle.noReviews')}</Text>
+                    ) : (
+                      vehicleReviews.map((review, idx) => {
+                        const isOwner = user?.id === review.user.id;
+
+                        return (
+                          <motion.div
+                            key={review.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.05, duration: 0.3 }}
+                          >
+                            <Box
+                              className="glass-card"
+                              p="xl"
+                              style={{ borderRadius: 'var(--mantine-radius-xl)' }}
+                            >
+                              <Group justify="space-between" mb="xs" wrap="wrap">
+                                <Group gap="sm">
+                                  <Avatar
+                                    color="teal"
+                                    radius="xl"
+                                    size="sm"
+                                    src={review.user.image ? toImagePath(review.user.image.imageData) : undefined}
+                                  >
+                                    {!review.user.image?.imageData &&
+                                      `${review.user.firstName?.[0] ?? ''}${review.user.lastName?.[0] ?? ''}`}
+                                  </Avatar>
+                                  <div>
+                                    <Text size="sm" fw={600}>
+                                      {review.user.firstName} {review.user.lastName}
+                                    </Text>
+                                    <Text size="xs" c="dimmed">
+                                      {new Date(review.createdOn).toLocaleDateString()}
+                                    </Text>
+                                  </div>
+                                </Group>
+
+                                <Group gap="xs">
+                                  <Rating value={review.rating} readOnly size="sm" />
+                                  {isOwner && (
+                                    <>
+                                      <Tooltip label={t('vehicle.editReview')}>
+                                        <ActionIcon
+                                          variant="subtle"
+                                          color="teal"
+                                          size="sm"
+                                          onClick={() => handleEditOpen(review)}
+                                        >
+                                          <IconEdit size={15} />
+                                        </ActionIcon>
+                                      </Tooltip>
+                                      <Tooltip label={t('vehicle.deleteReview')}>
+                                        <ActionIcon
+                                          variant="subtle"
+                                          color="red"
+                                          size="sm"
+                                          onClick={() => setDeletingReviewId(review.id)}
+                                        >
+                                          <IconTrash size={15} />
+                                        </ActionIcon>
+                                      </Tooltip>
+                                    </>
+                                  )}
+                                </Group>
+                              </Group>
+                              <Text size="sm" c="dimmed">{review.comment}</Text>
+                            </Box>
+                          </motion.div>
+                        );
+                      })
+                    )}
 
                     <Divider />
 
-                    <Stack gap="sm">
-                      <Text fw={600}>{t('vehicle.writeReview')}</Text>
-                      <Rating value={reviewRating} onChange={setReviewRating} size="lg" />
-                      <Textarea
-                        placeholder={t('vehicle.reviewPlaceholder')}
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.currentTarget.value)}
-                        minRows={3}
-                      />
+                    {user ? (
+                      <Stack gap="sm">
+                        <Text fw={600}>{t('vehicle.writeReview')}</Text>
+                        <Rating value={reviewRating} onChange={setReviewRating} size="lg" />
+                        <Textarea
+                          placeholder={t('vehicle.reviewPlaceholder')}
+                          value={reviewText}
+                          onChange={(e) => setReviewText(e.currentTarget.value)}
+                          minRows={3}
+                        />
+                        <Button
+                          variant="filled"
+                          color="teal"
+                          onClick={handleReviewSubmit}
+                          disabled={!reviewRating || !reviewText}
+                        >
+                          {t('vehicle.submitReview')}
+                        </Button>
+                      </Stack>
+                    ) : (
                       <Button
-                        variant="filled"
+                        variant="subtle"
                         color="teal"
-                        onClick={handleReviewSubmit}
-                        disabled={!reviewRating || !reviewText}
+                        leftSection={<IconLock size={16} />}
+                        onClick={() => navigate('/login')}
+                        fullWidth
                       >
-                        {t('vehicle.submitReview')}
+                        {t('vehicle.loginToReview')}
                       </Button>
-                    </Stack>
+                    )}
                   </Stack>
                 </Tabs.Panel>
               </Tabs>
@@ -378,7 +543,6 @@ export function VehicleDetailView({
           </AnimatedSection>
         </div>
 
-        {/* Similar Cars */}
         {similarVehicles.length > 0 && (
           <Box mt={60}>
             <Divider mb="xl" />
@@ -389,9 +553,8 @@ export function VehicleDetailView({
             </AnimatedSection>
             <StaggerContainer stagger={0.1}>
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
-                {similarVehicles.map((car, i) => (
+                {similarVehicles.map((car) => (
                   <StaggerItem key={car.carId} scale>
-                    {/* Replace with your VehicleCard once updated for new Vehicle type */}
                     <Box p="md" className="glass-card">
                       <Text fw={600}>{car.title}</Text>
                       <Text size="sm" c="dimmed">€{car.pricePerDay}/{t('vehicle.perDay')}</Text>
@@ -408,9 +571,131 @@ export function VehicleDetailView({
           onClose={() => setRentalOpen(false)}
           vehicle={vehicle}
         />
+
+        <Modal
+          opened={!!editingReview}
+          onClose={() => setEditingReview(null)}
+          title={
+            <Group gap={10}>
+              <ThemeIcon color="teal" variant="light" size={32} radius="md">
+                <IconEdit size={16} />
+              </ThemeIcon>
+              <Text fw={500} size="md">{t('vehicle.editReview')}</Text>
+            </Group>
+          }
+          size="md"
+          centered
+          radius="lg"
+          styles={{
+            header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+            body: { padding: '20px 24px 24px' },
+          }}
+        >
+          <Stack gap="md">
+            <div>
+              <Text size="sm" fw={500} mb={8}>{t('vehicle.ratingLabel')}</Text>
+              <Rating value={editRating} onChange={setEditRating} size="lg" color="yellow" />
+            </div>
+            <Textarea
+              label={t('vehicle.commentLabel')}
+              placeholder={t('vehicle.reviewPlaceholder')}
+              value={editText}
+              onChange={(e) => setEditText(e.currentTarget.value)}
+              minRows={3}
+              radius="md"
+              styles={{
+                input: { borderColor: 'var(--mantine-color-default-border)' },
+              }}
+            />
+            <Group justify="flex-end" gap="sm" mt={4}>
+              <Button variant="default" radius="md" onClick={() => setEditingReview(null)}>
+                {t('cancel') ?? 'Cancel'}
+              </Button>
+              <Button
+                color="teal"
+                radius="md"
+                leftSection={<IconDeviceFloppy size={16} />}
+                disabled={!editRating || !editText}
+                loading={loading}
+                onClick={handleEditSubmit}
+              >
+                {t('save')}
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+
+        <Modal
+          opened={!!deletingReviewId}
+          onClose={() => setDeletingReviewId(null)}
+          title={
+            <Group gap={10}>
+              <ThemeIcon color="red" variant="light" size={32} radius="md">
+                <IconTrash size={16} />
+              </ThemeIcon>
+              <Text fw={500} size="md">{t('vehicle.deleteReview')}</Text>
+            </Group>
+          }
+          size="sm"
+          centered
+          radius="lg"
+          styles={{
+            header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+            body: { padding: '20px 24px 24px' },
+          }}
+        >
+          <Stack gap="lg" align="center">
+            <Paper
+              radius="md"
+              p="md"
+              w="100%"
+              style={{
+                background: 'var(--mantine-color-red-light)',
+                border: '0.5px solid var(--mantine-color-red-light-hover)',
+              }}
+            >
+              <Stack gap={4} align="center">
+                <Text size="sm" ta="center" fw={500} c="red.8">
+                  {t('vehicle.deleteReviewConfirm') ?? 'Are you sure you want to delete this review?'}
+                </Text>
+                <Text size="xs" ta="center" c="dimmed">
+                  {t('carData.deleteUndone') ?? 'This action cannot be undone.'}
+                </Text>
+              </Stack>
+            </Paper>
+
+            <Group w="100%" gap="sm">
+              <Button
+                variant="default"
+                flex={1}
+                radius="md"
+                onClick={() => setDeletingReviewId(null)}
+                disabled={loading}
+              >
+                {t('cancel') ?? 'Cancel'}
+              </Button>
+              <Button
+                color="red"
+                flex={1}
+                radius="md"
+                loading={loading}
+                leftSection={<IconTrash size={15} />}
+                onClick={handleDeleteConfirm}
+              >
+                {t('delete')}
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+
       </Box>
     </motion.div>
   );
 
-  return containerized ? <Container size="xl">{Body}</Container> : Body;
+  return containerized ? (
+    <>
+      <Spinner visible={loading} />
+      <Container size="xl">{Body}</Container>
+    </>
+  ) : Body;
 }
