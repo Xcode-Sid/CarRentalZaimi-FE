@@ -43,6 +43,7 @@ export default function FleetPage() {
   // ── Results from BE ─────────────────────────────────────────────────────────
   const [items, setItems] = useState<Vehicle[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,6 +100,7 @@ export default function FleetPage() {
       if (res.success) {
         setItems(res.data.items.map(mapApiCarToVehicle));
         setTotalCount(res.data.totalCount);
+        setTotalPages(res.data.totalPages);
       } else {
         setError('Failed to load vehicles.');
       }
@@ -110,6 +112,9 @@ export default function FleetPage() {
   }, [page, debouncedSearch, categoryId, sortBy, priceRange, fuelTypeId, transmissionId, seatsFilter]);
 
   useEffect(() => { fetchVehicles(); }, [fetchVehicles]);
+
+  // ── Reset page to 1 when any filter changes ─────────────────────────────────
+  useEffect(() => { setPage(1); }, [debouncedSearch, categoryId, sortBy, priceRange, fuelTypeId, transmissionId, seatsFilter]);
 
   // ── Fetch lookups once ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -129,8 +134,9 @@ export default function FleetPage() {
     })();
   }, []);
 
-  // ── Helpers ─────────────────────────────────────────────────────────────────
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  // ── Derived ─────────────────────────────────────────────────────────────────
+  const startItem = (page - 1) * ITEMS_PER_PAGE + 1;
+  const endItem = Math.min(page * ITEMS_PER_PAGE, totalCount);
 
   const activeFilterCount = [
     categoryId,
@@ -216,7 +222,7 @@ export default function FleetPage() {
         <RangeSlider
           key={`fleet-price-${filterFormKey}`}
           value={priceRange}
-          onChangeEnd={(val) => { setPriceRange(val); setPage(1); }} // onChangeEnd avoids a fetch per pixel drag
+          onChangeEnd={(val) => { setPriceRange(val); setPage(1); }}
           min={0} max={200} step={5} color="teal"
           marks={[{ value: 0, label: '€0' }, { value: 100, label: '€100' }, { value: 200, label: '€200' }]}
         />
@@ -359,23 +365,39 @@ export default function FleetPage() {
                   )}
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <Text size="sm" c="dimmed" mb="md">
-                      {totalCount} {t('fleet.results')}
-                      {activeFilterCount > 0 && (
-                        <>
-                          {' · '}
-                          <Text component="span" size="sm" c="teal" fw={500}>
-                            {activeFilterCount} {t('fleet.activeFilters')}
-                          </Text>
-                          <Text component="span" size="sm" c="dimmed" ml={4}
-                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                            onClick={resetFleetToInitial}>
-                            <IconRotateClockwise size={12} style={{ verticalAlign: 'middle' }} />{' '}
-                            {t('fleet.resetFilters')}
-                          </Text>
-                        </>
-                      )}
-                    </Text>
+                    <Group justify="space-between" align="center" mb="md">
+                      <Text size="sm" c="dimmed">
+                        {totalCount > 0 ? (
+                          <>
+                            {t('admin.showing') ?? 'Showing'}{' '}
+                            <Text component="span" size="sm" fw={500} c="default">
+                              {startItem}–{endItem}
+                            </Text>{' '}
+                            {t('admin.of') ?? 'of'}{' '}
+                            <Text component="span" size="sm" fw={500} c="default">
+                              {totalCount}
+                            </Text>{' '}
+                            {t('fleet.results')}
+                          </>
+                        ) : (
+                          <>{totalCount} {t('fleet.results')}</>
+                        )}
+                        {activeFilterCount > 0 && (
+                          <>
+                            {' · '}
+                            <Text component="span" size="sm" c="teal" fw={500}>
+                              {activeFilterCount} {t('fleet.activeFilters')}
+                            </Text>
+                            <Text component="span" size="sm" c="dimmed" ml={4}
+                              style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                              onClick={resetFleetToInitial}>
+                              <IconRotateClockwise size={12} style={{ verticalAlign: 'middle' }} />{' '}
+                              {t('fleet.resetFilters')}
+                            </Text>
+                          </>
+                        )}
+                      </Text>
+                    </Group>
 
                     {items.length > 0 ? (
                       <>
@@ -392,7 +414,13 @@ export default function FleetPage() {
                         {totalPages > 1 && (
                           <AnimatedSection delay={0.2}>
                             <Group justify="center" mt="xl">
-                              <Pagination total={totalPages} value={page} onChange={setPage} color="teal" />
+                              <Pagination
+                                total={totalPages}
+                                value={page}
+                                onChange={setPage}
+                                color="teal"
+                                withEdges
+                              />
                             </Group>
                           </AnimatedSection>
                         )}

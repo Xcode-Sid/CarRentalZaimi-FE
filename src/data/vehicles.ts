@@ -36,7 +36,7 @@ export interface Vehicle {
   doors: number;
   mileage: string | null;
   horsePower: number | null;
-
+  isRecommended: boolean;
   categoryId: string | null;
   categoryName: string | null;
   nameId: string | null;
@@ -149,6 +149,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     interiorColorTypeId: apiCar.interiorColorType?.id ?? null,
     interiorColor: apiCar.interiorColorType?.name ?? null,
 
+    isRecommended: apiCar.isRecommended,
     abs: apiCar.abs,
     bluetooth: apiCar.bluetooth,
     airConditioner: apiCar.airConditioner,
@@ -190,6 +191,7 @@ export const vehicles: Vehicle[] = [
     seats: 5,
     doors: 4,
     mileage: '1,200 km',
+    isRecommended: false,
     horsePower: 450,
     categoryId: '1', categoryName: 'Luksoze',
     nameId: '1', carName: 'Mercedes-Benz',
@@ -221,6 +223,7 @@ export const vehicles: Vehicle[] = [
     seats: 7,
     doors: 5,
     mileage: '18,500 km',
+    isRecommended: false,
     horsePower: 340,
     categoryId: '2', categoryName: 'SUV',
     nameId: '2', carName: 'BMW',
@@ -249,6 +252,7 @@ export const vehicles: Vehicle[] = [
     year: 2024,
     licensePlate: null,
     pricePerDay: 75,
+    isRecommended: false,
     seats: 5,
     doors: 4,
     mileage: '500 km',
@@ -282,6 +286,7 @@ export const vehicles: Vehicle[] = [
     pricePerDay: 45,
     seats: 5,
     doors: 4,
+    isRecommended: false,
     mileage: '32,000 km',
     horsePower: 190,
     categoryId: '4', categoryName: 'Ekonomike',
@@ -312,6 +317,7 @@ export const vehicles: Vehicle[] = [
     licensePlate: null,
     pricePerDay: 180,
     seats: 5,
+    isRecommended: false,
     doors: 5,
     mileage: '3,500 km',
     horsePower: 400,
@@ -341,6 +347,7 @@ export const vehicles: Vehicle[] = [
     description: 'Mercedes-Benz GLE kombinon komoditetin e klasës S me hapësirën e një SUV-je. Perfekte për pushime familjare në bregdetin shqiptar.',
     year: 2023,
     licensePlate: null,
+    isRecommended: false,
     pricePerDay: 120,
     seats: 5,
     doors: 5,
@@ -391,6 +398,7 @@ export const vehicles: Vehicle[] = [
     laneDepartureAlert: false, adaptiveCruiseControl: false,
     toyotaSafetySense: false, thirdRowSeats: false,
     wirelessCharging: false, electricWindows: true,
+    isRecommended: false,
     carImages: [
       { name: 'front', data: 'https://images.unsplash.com/photo-1471444928139-48c5bf5173c8?w=800&auto=format', isPrimary: true },
       { name: 'side', data: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&auto=format', isPrimary: false },
@@ -421,6 +429,7 @@ export const vehicles: Vehicle[] = [
     ledHeadlights: true, appleCarPlay: true, androidAuto: true,
     laneDepartureAlert: true, adaptiveCruiseControl: true,
     toyotaSafetySense: false, thirdRowSeats: false,
+    isRecommended: false,
     wirelessCharging: true, electricWindows: true,
     carImages: [
       { name: 'front', data: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?w=800&auto=format', isPrimary: true },

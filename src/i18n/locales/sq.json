@@ -238,6 +238,13 @@
     "settingsSaved": "Cilësimet u ruajtën me sukses!"
   },
   "admin": {
+    "manageFeaturedCars": "Menaxho Makina të Rekomanduara",
+    "featuredCars": "Makina të Rekomanduara",
+    "carsMarkedFeatured": "makina të shënuara si të rekomanduara",
+    "featured": "Të Rekomanduara",
+    "removeFromFeatured": "Hiq nga të rekomanduarat",
+    "markAsFeatured": "Shëno si e rekomanduar",
+    "showing": "Duke shfaqur",
     "deleteTitle": "Fshi mjetin",
     "deleteWarning": "Jeni të sigurt që doni të fshini këtë mjet?",
     "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
@@ -683,5 +690,8 @@
   "titleEx": "p.sh. Toyota Corolla 2022",
   "descriptionEx": "Përshkrim i shkurtër i mjetit…",
   "required": "Ky fushë është e detyrueshme",
-  "edit": "Ndrysho"
+  "edit": "Ndrysho",
+  "failedToLoadCars": "Marrja e makinave dështoi",
+  "isNowFeatured": "është tani e featured",
+  "removedFromFeatured": "u hoq nga të rekomanduarat"
 }
