@@ -92,6 +92,7 @@ export function VehicleDetailView({
   const [editRating, setEditRating] = useState(0);
   const [editText, setEditText] = useState('');
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
+  const [writeReviewOpen, setWriteReviewOpen] = useState(false);
 
   const refreshReviews = async () => {
     const res = await get(`CarReview/getAll/${vehicle.carId}`);
@@ -185,6 +186,7 @@ export function VehicleDetailView({
       notifications.show({ title: t('success'), message: t('vehicle.reviewSuccess'), color: 'teal' });
       setReviewRating(0);
       setReviewText('');
+      setWriteReviewOpen(false);
       await refreshReviews();
     } catch {
       notifications.show({ title: t('error'), message: t('vehicle.reviewError'), color: 'red' });
@@ -446,24 +448,15 @@ export function VehicleDetailView({
                     <Divider />
 
                     {user ? (
-                      <Stack gap="sm">
-                        <Text fw={600}>{t('vehicle.writeReview')}</Text>
-                        <Rating value={reviewRating} onChange={setReviewRating} size="lg" />
-                        <Textarea
-                          placeholder={t('vehicle.reviewPlaceholder')}
-                          value={reviewText}
-                          onChange={(e) => setReviewText(e.currentTarget.value)}
-                          minRows={3}
-                        />
-                        <Button
-                          variant="filled"
-                          color="teal"
-                          onClick={handleReviewSubmit}
-                          disabled={!reviewRating || !reviewText}
-                        >
-                          {t('vehicle.submitReview')}
-                        </Button>
-                      </Stack>
+                      <Button
+                        variant="filled"
+                        color="teal"
+                        leftSection={<IconEdit size={16} />}
+                        onClick={() => setWriteReviewOpen(true)}
+                        fullWidth
+                      >
+                        {t('vehicle.writeReview')}
+                      </Button>
                     ) : (
                       <Button
                         variant="subtle"
@@ -579,6 +572,73 @@ export function VehicleDetailView({
           vehicle={vehicle}
         />
 
+        {/* Write Review Modal */}
+        <Modal
+          opened={writeReviewOpen}
+          onClose={() => {
+            setWriteReviewOpen(false);
+            setReviewRating(0);
+            setReviewText('');
+          }}
+          title={
+            <Group gap={10}>
+              <ThemeIcon color="teal" variant="light" size={32} radius="md">
+                <IconEdit size={16} />
+              </ThemeIcon>
+              <Text fw={500} size="md">{t('vehicle.writeReview')}</Text>
+            </Group>
+          }
+          size="md"
+          centered
+          radius="lg"
+          styles={{
+            header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+            body: { padding: '20px 24px 24px' },
+          }}
+        >
+          <Stack gap="md">
+            <div>
+              <Text size="sm" fw={500} mb={8}>{t('vehicle.ratingLabel')}</Text>
+              <Rating value={reviewRating} onChange={setReviewRating} size="lg" color="yellow" />
+            </div>
+            <Textarea
+              label={t('vehicle.commentLabel')}
+              placeholder={t('vehicle.reviewPlaceholder')}
+              value={reviewText}
+              onChange={(e) => setReviewText(e.currentTarget.value)}
+              minRows={3}
+              radius="md"
+              styles={{
+                input: { borderColor: 'var(--mantine-color-default-border)' },
+              }}
+            />
+            <Group justify="flex-end" gap="sm" mt={4}>
+              <Button
+                variant="default"
+                radius="md"
+                onClick={() => {
+                  setWriteReviewOpen(false);
+                  setReviewRating(0);
+                  setReviewText('');
+                }}
+              >
+                {t('cancel') ?? 'Cancel'}
+              </Button>
+              <Button
+                color="teal"
+                radius="md"
+                leftSection={<IconDeviceFloppy size={16} />}
+                disabled={!reviewRating || !reviewText}
+                loading={loading}
+                onClick={handleReviewSubmit}
+              >
+                {t('vehicle.submitReview')}
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+
+        {/* Edit Review Modal */}
         <Modal
           opened={!!editingReview}
           onClose={() => setEditingReview(null)}
@@ -632,6 +692,7 @@ export function VehicleDetailView({
           </Stack>
         </Modal>
 
+        {/* Delete Review Modal */}
         <Modal
           opened={!!deletingReviewId}
           onClose={() => setDeletingReviewId(null)}
