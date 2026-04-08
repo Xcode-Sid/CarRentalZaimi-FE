@@ -695,5 +695,6 @@
   "required": "Ky fushë është e detyrueshme",
   "edit": "Ndrysho",
   "loading": "Duke ngarkuar...",
-  "save": "Ruaj"
+  "save": "Ruaj",
+  "edited": "Modifikuar"
 }

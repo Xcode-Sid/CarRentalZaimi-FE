@@ -695,5 +695,6 @@
   "required": "Questo campo è obbligatorio",
   "edit": "Modifica",
   "loading": "Caricamento...",
-  "save": "Salva"
+  "save": "Salva",
+  "edited": "Modificato"
 }

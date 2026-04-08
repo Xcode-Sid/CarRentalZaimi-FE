@@ -380,8 +380,8 @@ export function VehicleDetailView({
                               p="xl"
                               style={{ borderRadius: 'var(--mantine-radius-xl)' }}
                             >
-                              <Group justify="space-between" mb="xs" wrap="wrap">
-                                <Group gap="sm">
+                              <Group justify="space-between" mb="xs" wrap="wrap" align="flex-start">
+                                <Group gap="sm" align="flex-start">
                                   <Avatar
                                     color="teal"
                                     radius="xl"
@@ -401,33 +401,40 @@ export function VehicleDetailView({
                                   </div>
                                 </Group>
 
-                                <Group gap="xs">
+                                <Stack gap={6} align="flex-end">
                                   <Rating value={review.rating} readOnly size="sm" />
-                                  {isOwner && (
-                                    <>
-                                      <Tooltip label={t('vehicle.editReview')}>
-                                        <ActionIcon
-                                          variant="subtle"
-                                          color="teal"
-                                          size="sm"
-                                          onClick={() => handleEditOpen(review)}
-                                        >
-                                          <IconEdit size={15} />
-                                        </ActionIcon>
-                                      </Tooltip>
-                                      <Tooltip label={t('vehicle.deleteReview')}>
-                                        <ActionIcon
-                                          variant="subtle"
-                                          color="red"
-                                          size="sm"
-                                          onClick={() => setDeletingReviewId(review.id)}
-                                        >
-                                          <IconTrash size={15} />
-                                        </ActionIcon>
-                                      </Tooltip>
-                                    </>
-                                  )}
-                                </Group>
+                                  <Stack gap={4} align="flex-end">
+                                    {isOwner && (
+                                      <Group gap="xs">
+                                        <Tooltip label={t('vehicle.editReview')}>
+                                          <ActionIcon
+                                            variant="subtle"
+                                            color="teal"
+                                            size="sm"
+                                            onClick={() => handleEditOpen(review)}
+                                          >
+                                            <IconEdit size={15} />
+                                          </ActionIcon>
+                                        </Tooltip>
+                                        <Tooltip label={t('vehicle.deleteReview')}>
+                                          <ActionIcon
+                                            variant="subtle"
+                                            color="red"
+                                            size="sm"
+                                            onClick={() => setDeletingReviewId(review.id)}
+                                          >
+                                            <IconTrash size={15} />
+                                          </ActionIcon>
+                                        </Tooltip>
+                                      </Group>
+                                    )}
+                                    {review.modifiedOn && review.modifiedOn !== review.createdOn && (
+                                      <Text size="xs" c="dimmed" fs="italic">
+                                        ({t('edited')} {new Date(review.modifiedOn).toLocaleDateString()})
+                                      </Text>
+                                    )}
+                                  </Stack>
+                                </Stack>
                               </Group>
                               <Text size="sm" c="dimmed">{review.comment}</Text>
                             </Box>
