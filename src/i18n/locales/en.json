@@ -115,6 +115,8 @@
     "rentalLengthDesc": "Day rental pricing"
   },
   "vehicle": {
+    "ratingLabel": "Rating",
+    "commentLabel": "Comment",
     "overview": "Overview",
     "specifications": "Specifications",
     "reviews": "Reviews",
@@ -149,7 +151,15 @@
     "reviewSuccess": "Review submitted successfully!",
     "similarCars": "Similar Cars",
     "saveVehicle": "Save to Saved Rental Cars",
-    "removeSavedVehicle": "Remove from Saved Rental Cars"
+    "removeSavedVehicle": "Remove from Saved Rental Cars",
+    "loginToReview": "Login to write a review",
+    "noReviews": "No reviews yet. Be the first to review!",
+    "reviewUpdated": "Review updated successfully!",
+    "reviewDeleted": "Review deleted successfully!",
+    "reviewError": "Something went wrong. Please try again.",
+    "editReview": "Edit Review",
+    "deleteReview": "Delete Review",
+    "deleteReviewConfirm": "Are you sure you want to delete this review? This action cannot be undone."
   },
   "rental": {
     "title": "Book Car",
@@ -692,6 +702,9 @@
   "descriptionEx": "Brief description of the vehicle…",
   "required": "This field is required",
   "edit": "Edit",
+  "loading": "Loading...",
+  "save": "Save",
+  "edited": "Edited",
   "failedToLoadCars": "Failed to load cars",
   "isNowFeatured": "is now featured",
   "removedFromFeatured": "removed from featured",

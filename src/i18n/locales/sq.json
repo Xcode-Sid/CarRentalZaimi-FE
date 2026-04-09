@@ -115,6 +115,8 @@
     "rentalLengthDesc": "Thekso çmimin për ditë ose për orë"
   },
   "vehicle": {
+    "ratingLabel": "Vlerësimi",
+    "commentLabel": "Koment",
     "overview": "Përmbledhje",
     "specifications": "Specifikimet",
     "reviews": "Vlerësimet",
@@ -149,7 +151,15 @@
     "reviewSuccess": "Vlerësimi u dërgua me sukses!",
     "similarCars": "Makina të Ngjashme",
     "saveVehicle": "Ruaj te makina me qira të ruajtura",
-    "removeSavedVehicle": "Hiq nga të ruajturat"
+    "removeSavedVehicle": "Hiq nga të ruajturat",
+    "loginToReview": "Hyr për të shkruar një vlerësim",
+    "noReviews": "Nuk ka vlerësime ende. Bëhu i pari që vlerëson!",
+    "reviewUpdated": "Vlerësimi u përditësua me sukses!",
+    "reviewDeleted": "Vlerësimi u fshi me sukses!",
+    "reviewError": "Diçka shkoi keq. Provo përsëri.",
+    "editReview": "Ndrysho vlerësimin",
+    "deleteReview": "Fshi vlerësimin",
+    "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
     "title": "Rezervo Makinën",
@@ -691,6 +701,9 @@
   "descriptionEx": "Përshkrim i shkurtër i mjetit…",
   "required": "Ky fushë është e detyrueshme",
   "edit": "Ndrysho",
+  "loading": "Duke ngarkuar...",
+  "save": "Ruaj",
+  "edited": "Modifikuar",
   "failedToLoadCars": "Marrja e makinave dështoi",
   "isNowFeatured": "është tani e featured",
   "removedFromFeatured": "u hoq nga të rekomanduarat",
