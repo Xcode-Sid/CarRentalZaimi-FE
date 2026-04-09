@@ -693,5 +693,8 @@
   "edit": "Ndrysho",
   "failedToLoadCars": "Marrja e makinave dështoi",
   "isNowFeatured": "është tani e featured",
-  "removedFromFeatured": "u hoq nga të rekomanduarat"
+  "removedFromFeatured": "u hoq nga të rekomanduarat",
+  "failedToUpdateSavedCar": "Dështoi përditësimi i makinës së ruajtur",
+  "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
+  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur"
 }

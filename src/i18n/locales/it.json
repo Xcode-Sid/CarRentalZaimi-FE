@@ -695,5 +695,8 @@
   "failedToLoadCars": "Impossibile caricare le auto",
   "isNowFeatured": "è ora in evidenza",
   "removedFromFeatured": "rimossa dai preferiti",
-  "failedToUpdateFaturedStatus": "Impossibile aggiornare lo stato in evidenza"
+  "failedToUpdateFaturedStatus": "Impossibile aggiornare lo stato in evidenza",
+  "failedToUpdateSavedCar": "Impossibile aggiornare l'auto salvata",
+  "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
+  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata"
 }
