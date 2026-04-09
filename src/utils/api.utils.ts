@@ -47,7 +47,7 @@ function saveTokens(tokens: LoginTokens) {
 }
 
 function clearTokens() {
-    console.trace('clearTokens called!'); 
+  console.trace('clearTokens called!');
   localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
   localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
   localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN_EXPIRY);
@@ -83,7 +83,7 @@ async function tryRefresh(): Promise<boolean> {
       }
       return false;
     } catch {
-      return false; 
+      return false;
     } finally {
       refreshPromise = null;
     }
@@ -170,10 +170,10 @@ export const post = async (
     window.dispatchEvent(new Event("mutation-start"));
 
     // Don't run the refresh gate for auth endpoints (login, refresh itself)
-const isAuthEndpoint =
-  endpoint.includes("Authentication/login") ||
-  endpoint.includes("Authentication/refresh") ||
-  endpoint.includes("Authentication/logout"); // ← add this
+    const isAuthEndpoint =
+      endpoint.includes("Authentication/login") ||
+      endpoint.includes("Authentication/refresh") ||
+      endpoint.includes("Authentication/logout"); // ← add this
 
     if (!isAuthEndpoint) {
       const ok = await ensureFreshToken();
@@ -233,7 +233,7 @@ export const put = async (
     if (!ok) throw new Error(i18next.t("auth.sessionExpired"));
 
     const authHeaders = buildAuthHeaders(headers?.headers);
-    
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'PUT',
       headers: {

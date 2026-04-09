@@ -683,5 +683,8 @@
   "titleEx": "es. Toyota Corolla 2022",
   "descriptionEx": "Breve descrizione del veicolo…",
   "required": "Questo campo è obbligatorio",
-  "edit": "Modifica"
+  "edit": "Modifica",
+  "failedToUpdateSavedCar": "Impossibile aggiornare l'auto salvata",
+  "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
+  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata"
 }

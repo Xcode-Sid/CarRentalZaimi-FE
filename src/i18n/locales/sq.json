@@ -683,5 +683,8 @@
   "titleEx": "p.sh. Toyota Corolla 2022",
   "descriptionEx": "Përshkrim i shkurtër i mjetit…",
   "required": "Ky fushë është e detyrueshme",
-  "edit": "Ndrysho"
+  "edit": "Ndrysho",
+  "failedToUpdateSavedCar": "Dështoi përditësimi i makinës së ruajtur",
+  "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
+  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur"
 }
