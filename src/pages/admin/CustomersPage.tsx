@@ -39,7 +39,7 @@ export default function CustomersPage() {
   const { t } = useTranslation();
   const { getUserBookings } = useBookings();
 
-  const customerUsers = useMemo(() => users.filter((u) => u.role === 'user'), []);
+  const customerUsers = useMemo(() => users.filter((u) => u.role?.normalizedName?.toLowerCase() === 'user'), []);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'active' | 'inactive' | null>(null);
@@ -308,7 +308,7 @@ export default function CustomersPage() {
             >
               <BookingDetailContent
                 booking={detailBooking}
-                vehicleImageUrl={detailVehicle?.image}
+                vehicleImageUrl={detailVehicle?.image ?? undefined}
                 footer={
                   <Button variant="light" color="gray" onClick={() => setDetailBooking(null)} radius="xl" fullWidth mt="md">
                     {t('account.closeModal')}

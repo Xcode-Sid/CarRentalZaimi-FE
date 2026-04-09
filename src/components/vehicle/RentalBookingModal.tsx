@@ -124,7 +124,7 @@ export function RentalBookingModal({ opened, onClose, vehicle }: Props) {
       id: `b-${Date.now()}`,
       ref,
       userId: user?.id || 'guest',
-      vehicleId: Number(vehicle.carId), //TODO fix later
+      vehicleId: vehicle.carId, //TODO fix later
       vehicleName: vehicle.title,
       paymentMethod: paymentMethod as 'cash' | 'card',
       startDate: dateRange[0]!,
