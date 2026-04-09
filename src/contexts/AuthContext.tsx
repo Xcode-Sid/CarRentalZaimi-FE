@@ -37,6 +37,7 @@ const mapApiResponseToUser = (raw: any): User => ({
       imagePath: raw.image.imagePath ? toImagePath(raw.image.imagePath) : null,
     }
     : null,
+  avatar: raw.avatar ?? null,
   location: raw.location ?? null,
   savedVehicles: raw.savedVehicles ?? [],
   customerStatus: raw.customerStatus ?? undefined,

@@ -188,7 +188,7 @@ export default function AdminBookingsPage() {
             >
               <BookingDetailContent
                 booking={liveBooking}
-                vehicleImageUrl={selectedVehicle?.image}
+                vehicleImageUrl={selectedVehicle?.image ?? undefined}
                 headerStatusSlot={null}
                 footer={
                   <Stack gap="md" mt="xl">

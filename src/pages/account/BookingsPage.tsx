@@ -231,7 +231,7 @@ export default function BookingsPage() {
                           </Table.Td>
                           <Table.Td>
                             <Group gap="sm" wrap="nowrap">
-                              <VehicleThumb imageUrl={vehicle?.image} />
+                              <VehicleThumb imageUrl={vehicle?.image ?? undefined} />
                               <Text size="sm" fw={500}>
                                 {b.vehicleName}
                               </Text>
@@ -309,7 +309,7 @@ export default function BookingsPage() {
             >
               <BookingDetailContent
                 booking={selected}
-                vehicleImageUrl={selectedVehicle?.image}
+                vehicleImageUrl={selectedVehicle?.image ?? undefined}
                 footer={
                   <Group mt="xl" grow>
                     <Button variant="light" color="gray" onClick={() => setSelected(null)} radius="xl">
