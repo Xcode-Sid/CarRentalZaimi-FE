@@ -36,7 +36,7 @@ export interface Vehicle {
   doors: number;
   mileage: string | null;
   horsePower: number | null;
-
+  isRecommended: boolean;
   categoryId: string | null;
   categoryName: string | null;
   nameId: string | null;
@@ -72,6 +72,7 @@ export interface Vehicle {
   wirelessCharging: boolean | null;
   electricWindows: boolean | null;
   totalReviews: number | null;
+  isSaved: boolean;
   carImages: VehicleImage[];
 }
 
@@ -149,6 +150,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     interiorColorTypeId: apiCar.interiorColorType?.id ?? null,
     interiorColor: apiCar.interiorColorType?.name ?? null,
 
+    isRecommended: apiCar.isRecommended,
     abs: apiCar.abs,
     bluetooth: apiCar.bluetooth,
     airConditioner: apiCar.airConditioner,
@@ -169,6 +171,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     wirelessCharging: apiCar.wirelessCharging,
     electricWindows: apiCar.electricWindows,
     totalReviews: apiCar.totalReviews,
+    isSaved: apiCar.isSaved,
     carImages: (apiCar.carImages ?? []).map((img: any) => ({
       id: img.id,
       name: img.imageName,
@@ -182,6 +185,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
 export const vehicles: Vehicle[] = [
   {
     carId: '1',
+    isSaved: false,
     title: 'Mercedes-Benz S-Class',
     description: 'Mercedes-Benz S-Class është ikona e luksit në botën e automobilave. Me teknologjinë më të fundit dhe komoditetin e pakrahasueshëm, kjo makinë ofron një eksperiencë drejtuese të jashtëzakonshme.',
     year: 2024,
@@ -191,6 +195,7 @@ export const vehicles: Vehicle[] = [
     seats: 5,
     doors: 4,
     mileage: '1,200 km',
+    isRecommended: false,
     horsePower: 450,
     categoryId: '1', categoryName: 'Luksoze',
     nameId: '1', carName: 'Mercedes-Benz',

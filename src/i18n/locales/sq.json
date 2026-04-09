@@ -248,6 +248,13 @@
     "settingsSaved": "Cilësimet u ruajtën me sukses!"
   },
   "admin": {
+    "managefeaturedCars": "Menaxho Makina të Rekomanduara",
+    "featuredCars": "Makina të Rekomanduara",
+    "carsMarkedFeatured": "makina të shënuara si të rekomanduara",
+    "featured": "Të Rekomanduara",
+    "removeFromFeatured": "Hiq nga të rekomanduarat",
+    "markAsFeatured": "Shëno si e rekomanduar",
+    "showing": "Duke shfaqur",
     "deleteTitle": "Fshi mjetin",
     "deleteWarning": "Jeni të sigurt që doni të fshini këtë mjet?",
     "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
@@ -696,5 +703,11 @@
   "edit": "Ndrysho",
   "loading": "Duke ngarkuar...",
   "save": "Ruaj",
-  "edited": "Modifikuar"
+  "edited": "Modifikuar",
+  "failedToLoadCars": "Marrja e makinave dështoi",
+  "isNowFeatured": "është tani e featured",
+  "removedFromFeatured": "u hoq nga të rekomanduarat",
+  "failedToUpdateSavedCar": "Dështoi përditësimi i makinës së ruajtur",
+  "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
+  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur"
 }
