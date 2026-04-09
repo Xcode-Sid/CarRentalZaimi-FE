@@ -31,6 +31,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyPhonePage from './pages/register/VerifyPhonePage ';
 import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage ';
 import PromotionsPage from './pages/account/PromotionsPage';
+import AdminAdditionalServicesPage from './pages/account/AdditionalServicesPage ';
+import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
 
 export default function App() {
   return (
@@ -86,6 +88,8 @@ export default function App() {
             <Route path="/admin/reports" element={<AdminReportsPage />} />
             <Route path="/admin/car-data" element={<AdminCarDataPage />}  />
             <Route path="/admin/promotion" element={<PromotionsPage />}  />
+            <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />}  />
+            <Route path="/admin/featured_cars" element={<RecomandedCarsPage />}  />
           </Route>
         </Route>
 

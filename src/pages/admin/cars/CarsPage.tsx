@@ -6,6 +6,7 @@ import {
   Tooltip,
   Paper,
   Alert,
+  Pagination,
 } from '@mantine/core';
 import { IconSearch, IconPlus, IconEye, IconEdit, IconTrash, IconCar, IconInfoCircle, IconX, IconFilter } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +42,9 @@ const normalizeArray = <T,>(raw: any): T[] => {
 const toSelectData = (items: GeneralData[]) =>
   items.map((x) => ({ value: x.id, label: x.name }));
 
+const PAGE_SIZE = 10;
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function CarsPage() {
   const { t } = useTranslation();
@@ -54,6 +58,9 @@ export default function CarsPage() {
   const [previewCar, setPreviewCar] = useState<Vehicle | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Vehicle | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [lookups, setLookups] = useState<Lookups>({
     categories: [], companyNames: [], companyModels: [],
     exteriorColors: [], interiorColors: [], transmissions: [], fuels: [],
@@ -92,13 +99,18 @@ export default function CarsPage() {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ pageNr: '1', pageSize: '100' });
+      const params = new URLSearchParams({
+        pageNr: String(page),
+        pageSize: String(PAGE_SIZE),
+      });
       if (search) params.set('search', search);
       if (categoryFilter) params.set('categoryId', categoryFilter);
 
       const res = await get(`Cars?${params.toString()}`);
       if (res.success) {
         setCars(res.data.items.map(mapApiCarToVehicle));
+        setTotalPages(res.data.totalPages);
+        setTotalCount(res.data.totalCount);
       } else {
         setError('Failed to load cars.');
       }
@@ -107,10 +119,20 @@ export default function CarsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, categoryFilter]);
+  }, [search, categoryFilter, page]);
 
   useEffect(() => { fetchCars(); }, [fetchCars]);
   useEffect(() => { fetchLookups(); }, []);
+
+  // Reset to page 1 when filters change
+  useEffect(() => { setPage(1); }, [search, categoryFilter]);
+
+  // ── Derived ───────────────────────────────────────────────────────────────
+
+  const startItem = (page - 1) * PAGE_SIZE + 1;
+  const endItem = Math.min(page * PAGE_SIZE, totalCount);
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
 
   const openAddModal = () => {
     setEditingCar(null);
@@ -147,14 +169,15 @@ export default function CarsPage() {
         notifications.show({ title: t('success'), message: t('admin.carSaved'), color: 'teal' });
         await fetchCars();
       } else {
-        notifications.show({title: t('error'), message: 'Save failed. Check API.', color: 'red' });
+        notifications.show({ title: t('error'), message: 'Save failed. Check API.', color: 'red' });
       }
     } catch (err) {
-      notifications.show({title: t('error'), message: 'Save failed. Check API.', color: 'red' });
+      notifications.show({ title: t('error'), message: 'Save failed. Check API.', color: 'red' });
     } finally {
       setSaving(false);
     }
   };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
@@ -171,9 +194,7 @@ export default function CarsPage() {
     }
   };
 
-  // AdminCarsPage — redesigned return block
-  // Drop-in replacement for your existing return statement.
-  // All existing props, state, and handlers remain unchanged.
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -194,7 +215,7 @@ export default function CarsPage() {
                   {t('admin.manageCars')}
                 </Title>
                 <Text size="sm" c="dimmed">
-                  {cars.length} {t('admin.carsTotal') ?? 'vehicles listed'}
+                  {totalCount} {t('admin.carsTotal') ?? 'vehicles listed'}
                 </Text>
               </Stack>
 
@@ -293,142 +314,171 @@ export default function CarsPage() {
             )}
 
             {!loading && !error && (
-              <Paper radius="lg" withBorder style={{ overflow: 'hidden', borderColor: 'var(--mantine-color-default-border)' }}>
-                <Table.ScrollContainer minWidth={800}>
-                  <Table
-                    highlightOnHover
-                    verticalSpacing="sm"
-                    horizontalSpacing="md"
-                    styles={{
-                      thead: {
-                        background: 'var(--mantine-color-default-hover)',
-                        borderBottom: '0.5px solid var(--mantine-color-default-border)',
-                      },
-                      th: { fontWeight: 500, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--mantine-color-dimmed)' },
-                    }}
-                  >
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th w={60}>#</Table.Th>
-                        <Table.Th w={70} />
-                        <Table.Th>{t('admin.carName')}</Table.Th>
-                        <Table.Th>{t('admin.category')}</Table.Th>
-                        <Table.Th>{t('admin.pricePerDay')}</Table.Th>
-                        <Table.Th w={110}>{t('admin.carActions')}</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-
-                    <Table.Tbody>
-                      {cars.length === 0 && (
+              <Stack gap="md">
+                <Paper radius="lg" withBorder style={{ overflow: 'hidden', borderColor: 'var(--mantine-color-default-border)' }}>
+                  <Table.ScrollContainer minWidth={800}>
+                    <Table
+                      highlightOnHover
+                      verticalSpacing="sm"
+                      horizontalSpacing="md"
+                      styles={{
+                        thead: {
+                          background: 'var(--mantine-color-default-hover)',
+                          borderBottom: '0.5px solid var(--mantine-color-default-border)',
+                        },
+                        th: { fontWeight: 500, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--mantine-color-dimmed)' },
+                      }}
+                    >
+                      <Table.Thead>
                         <Table.Tr>
-                          <Table.Td colSpan={6}>
-                            <Center py="xl">
-                              <Stack align="center" gap="xs">
-                                <ThemeIcon size={40} radius="xl" color="teal" variant="light">
-                                  <IconCar size={20} />
-                                </ThemeIcon>
-                                <Text size="sm" c="dimmed">
-                                  {t('admin.noCarsFound') ?? 'No cars found'}
-                                </Text>
-                              </Stack>
-                            </Center>
-                          </Table.Td>
+                          <Table.Th w={60}>#</Table.Th>
+                          <Table.Th w={70} />
+                          <Table.Th>{t('admin.carName')}</Table.Th>
+                          <Table.Th>{t('admin.category')}</Table.Th>
+                          <Table.Th>{t('admin.pricePerDay')}</Table.Th>
+                          <Table.Th w={110}>{t('admin.carActions')}</Table.Th>
                         </Table.Tr>
-                      )}
+                      </Table.Thead>
 
-                      {cars.map((car, idx) => (
-                        <motion.tr
-                          key={car.carId}
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.03, duration: 0.25, ease: 'easeOut' }}
-                          style={{ cursor: 'default' }}
-                        >
-                          <Table.Td>
-                            <Text size="xs" c="dimmed" fw={500}>
-                              #{String(idx + 1).padStart(3, '0')}
-                            </Text>
-                          </Table.Td>
+                      <Table.Tbody>
+                        {cars.length === 0 && (
+                          <Table.Tr>
+                            <Table.Td colSpan={6}>
+                              <Center py="xl">
+                                <Stack align="center" gap="xs">
+                                  <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                                    <IconCar size={20} />
+                                  </ThemeIcon>
+                                  <Text size="sm" c="dimmed">
+                                    {t('admin.noCarsFound') ?? 'No cars found'}
+                                  </Text>
+                                </Stack>
+                              </Center>
+                            </Table.Td>
+                          </Table.Tr>
+                        )}
 
-                          <Table.Td>
-                            <Image
-                              src={getPrimaryImageSrc(car)}
-                              w={52}
-                              h={36}
-                              radius="md"
-                              fit="cover"
-                              fallbackSrc="/placeholder-car.png"
-                              style={{ border: '0.5px solid var(--mantine-color-default-border)' }}
-                            />
-                          </Table.Td>
+                        {cars.map((car, idx) => (
+                          <motion.tr
+                            key={car.carId}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.03, duration: 0.25, ease: 'easeOut' }}
+                            style={{ cursor: 'default' }}
+                          >
+                            <Table.Td>
+                              <Text size="xs" c="dimmed" fw={500}>
+                                #{String((page - 1) * PAGE_SIZE + idx + 1).padStart(3, '0')}
+                              </Text>
+                            </Table.Td>
 
-                          <Table.Td>
-                            <Text size="sm" fw={500}>
-                              {getDisplayName(car)}
-                            </Text>
-                          </Table.Td>
+                            <Table.Td>
+                              <Image
+                                src={getPrimaryImageSrc(car)}
+                                w={52}
+                                h={36}
+                                radius="md"
+                                fit="cover"
+                                fallbackSrc="/placeholder-car.png"
+                                style={{ border: '0.5px solid var(--mantine-color-default-border)' }}
+                              />
+                            </Table.Td>
 
-                          <Table.Td>
-                            <Badge
-                              color="teal"
-                              variant="light"
-                              size="sm"
-                              radius="md"
-                            >
-                              {car.categoryName ?? '—'}
-                            </Badge>
-                          </Table.Td>
+                            <Table.Td>
+                              <Text size="sm" fw={500}>
+                                {getDisplayName(car)}
+                              </Text>
+                            </Table.Td>
 
-                          <Table.Td>
-                            <Group gap={2} align="baseline">
-                              <Text size="sm" fw={500}>€{car.pricePerDay}</Text>
-                              <Text size="xs" c="dimmed">/{t('vehicle.perDay')}</Text>
-                            </Group>
-                          </Table.Td>
+                            <Table.Td>
+                              <Badge
+                                color="teal"
+                                variant="light"
+                                size="sm"
+                                radius="md"
+                              >
+                                {car.categoryName ?? '—'}
+                              </Badge>
+                            </Table.Td>
 
-                          <Table.Td>
-                            <Group gap={4}>
-                              <Tooltip label={t('admin.preview')} withArrow position="top" fz="xs">
-                                <ActionIcon
-                                  variant="subtle"
-                                  color="blue"
-                                  size="sm"
-                                  radius="md"
-                                  onClick={() => setPreviewCar(car)}
-                                >
-                                  <IconEye size={15} />
-                                </ActionIcon>
-                              </Tooltip>
-                              <Tooltip label={t('admin.edit')} withArrow position="top" fz="xs">
-                                <ActionIcon
-                                  variant="subtle"
-                                  color="yellow"
-                                  size="sm"
-                                  radius="md"
-                                  onClick={() => openEditModal(car)}
-                                >
-                                  <IconEdit size={15} />
-                                </ActionIcon>
-                              </Tooltip>
-                              <Tooltip label={t('admin.delete')} withArrow position="top" fz="xs">
-                                <ActionIcon
-                                  variant="subtle"
-                                  color="red"
-                                  size="sm"
-                                  radius="md"
-                                  onClick={() => setDeleteTarget(car)}
-                                >
-                                  <IconTrash size={15} />
-                                </ActionIcon>
-                              </Tooltip>
-                            </Group>
-                          </Table.Td>
-                        </motion.tr>
-                      ))}
-                    </Table.Tbody>
-                  </Table>
-                </Table.ScrollContainer>
-              </Paper>
+                            <Table.Td>
+                              <Group gap={2} align="baseline">
+                                <Text size="sm" fw={500}>€{car.pricePerDay}</Text>
+                                <Text size="xs" c="dimmed">/{t('vehicle.perDay')}</Text>
+                              </Group>
+                            </Table.Td>
+
+                            <Table.Td>
+                              <Group gap={4}>
+                                <Tooltip label={t('admin.preview')} withArrow position="top" fz="xs">
+                                  <ActionIcon
+                                    variant="subtle"
+                                    color="blue"
+                                    size="sm"
+                                    radius="md"
+                                    onClick={() => setPreviewCar(car)}
+                                  >
+                                    <IconEye size={15} />
+                                  </ActionIcon>
+                                </Tooltip>
+                                <Tooltip label={t('admin.edit')} withArrow position="top" fz="xs">
+                                  <ActionIcon
+                                    variant="subtle"
+                                    color="yellow"
+                                    size="sm"
+                                    radius="md"
+                                    onClick={() => openEditModal(car)}
+                                  >
+                                    <IconEdit size={15} />
+                                  </ActionIcon>
+                                </Tooltip>
+                                <Tooltip label={t('admin.delete')} withArrow position="top" fz="xs">
+                                  <ActionIcon
+                                    variant="subtle"
+                                    color="red"
+                                    size="sm"
+                                    radius="md"
+                                    onClick={() => setDeleteTarget(car)}
+                                  >
+                                    <IconTrash size={15} />
+                                  </ActionIcon>
+                                </Tooltip>
+                              </Group>
+                            </Table.Td>
+                          </motion.tr>
+                        ))}
+                      </Table.Tbody>
+                    </Table>
+                  </Table.ScrollContainer>
+                </Paper>
+
+                {/* ── Pagination ─────────────────────────────────── */}
+                {totalPages > 1 && (
+                  <Group justify="space-between" align="center" px={4}>
+                    <Text size="xs" c="dimmed">
+                      {t('admin.showing') ?? 'Showing'}{' '}
+                      <Text component="span" size="xs" fw={500} c="default">
+                        {startItem}–{endItem}
+                      </Text>{' '}
+                      {t('admin.of') ?? 'of'}{' '}
+                      <Text component="span" size="xs" fw={500} c="default">
+                        {totalCount}
+                      </Text>{' '}
+                      {t('admin.cars') ?? 'cars'}
+                    </Text>
+
+                    <Pagination
+                      value={page}
+                      onChange={setPage}
+                      total={totalPages}
+                      color="teal"
+                      radius="md"
+                      size="sm"
+                      withEdges
+                    />
+                  </Group>
+                )}
+              </Stack>
             )}
           </AnimatedSection>
 

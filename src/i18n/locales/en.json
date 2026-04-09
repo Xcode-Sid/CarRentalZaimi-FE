@@ -115,6 +115,8 @@
     "rentalLengthDesc": "Day rental pricing"
   },
   "vehicle": {
+    "ratingLabel": "Rating",
+    "commentLabel": "Comment",
     "overview": "Overview",
     "specifications": "Specifications",
     "reviews": "Reviews",
@@ -149,7 +151,15 @@
     "reviewSuccess": "Review submitted successfully!",
     "similarCars": "Similar Cars",
     "saveVehicle": "Save to Saved Rental Cars",
-    "removeSavedVehicle": "Remove from Saved Rental Cars"
+    "removeSavedVehicle": "Remove from Saved Rental Cars",
+    "loginToReview": "Login to write a review",
+    "noReviews": "No reviews yet. Be the first to review!",
+    "reviewUpdated": "Review updated successfully!",
+    "reviewDeleted": "Review deleted successfully!",
+    "reviewError": "Something went wrong. Please try again.",
+    "editReview": "Edit Review",
+    "deleteReview": "Delete Review",
+    "deleteReviewConfirm": "Are you sure you want to delete this review? This action cannot be undone."
   },
   "rental": {
     "title": "Book Car",
@@ -239,6 +249,15 @@
   },
   "admin": {
     "promotions": "Promotions",
+    "aditionalServices": "Additional Services",
+    "managefeaturedCars": "Manage Featured Cars",
+    "featuredCars": "Featured Cars",
+    "carsMarkedFeatured": "cars marked as featured",
+    "featured": "Featured",
+    "removeFromFeatured": "Remove from featured",
+    "markAsFeatured": "Mark as featured",
+    "showing": "Showing",
+    "of": "of",
     "deleteTitle": "Delete Vehicle",
     "deleteWarning": "Are you sure you want to delete this vehicle?",
     "deleteUndone": "This action cannot be undone.",
@@ -671,7 +690,8 @@
     "maxLength": "Cannot exceed {{max}} characters",
     "mustBeGreaterThan0": "Must be greater than 0",
     "mustBeLessThan100": "Must be less than 100",
-    "carOrCategoryRequired": "Either a car or a category must be selected"
+    "carOrCategoryRequired": "Either a car or a category must be selected",
+    "mustBePositive": "Must be greater than 0"
   },
   "dropImagesHere": "Drop images here",
   "uploadCarImages": "Upload car images",
@@ -734,5 +754,42 @@
     "categoryDisabledHint": "Clear the car to select a category",
     "deleteTitle": "Delete Promotion"
   },
-  "save": "Save"
+  "save": "Save",
+  "perDay": "/ day",
+  "additionalServices": {
+    "aditionalServices": "Manage additional Services",
+    "subtitle": "Manage optional services offered per day",
+    "add": "Add Service",
+    "searchPlaceholder": "Search services…",
+    "colName": "Name",
+    "colPrice": "Price",
+    "colStatus": "Status",
+    "loadFailed": "Failed to load services",
+    "updated": "Service updated",
+    "created": "Service created",
+    "saveFailed": "Failed to save service",
+    "deleted": "Service deleted",
+    "deleteFailed": "Failed to delete service",
+    "active": "Active",
+    "inactive": "Inactive",
+    "editTitle": "Edit Service",
+    "addTitle": "Add Service",
+    "fieldName": "Service Name",
+    "fieldNamePlaceholder": "e.g. GPS Navigation",
+    "fieldIcon": "Icon",
+    "fieldIconPlaceholder": "Select an icon…",
+    "fieldPrice": "Price Per Day ($)",
+    "fieldActive": "Active",
+    "fieldActiveDesc": "Inactive services won't appear in booking"
+  },
+  "loading": "Loading...",
+  "save": "Save",
+  "edited": "Edited",
+  "failedToLoadCars": "Failed to load cars",
+  "isNowFeatured": "is now featured",
+  "removedFromFeatured": "removed from featured",
+  "failedToUpdateFaturedStatus": "Failed to update featured status",
+  "failedToUpdateSavedCar": "Failed to update saved car",
+  "carWasAddedToSaveSollection": "Car added to your saved collection",
+  "carWasRemovedFromSavecollection": "Car removed from your saved collection"
 }

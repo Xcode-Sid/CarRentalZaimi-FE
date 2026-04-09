@@ -15,9 +15,9 @@ export interface CarCompanyName extends GeneralData {
 }
 
 export interface CarCompanyModel extends GeneralData {
- id: string;
-    name: string;
-    carCompanyName: { id: string; name: string; };
+  id: string;
+  name: string;
+  carCompanyName: { id: string; name: string; };
 }
 
 export interface VehicleImage {
@@ -36,7 +36,7 @@ export interface Vehicle {
   doors: number;
   mileage: string | null;
   horsePower: number | null;
-
+  isRecommended: boolean;
   categoryId: string | null;
   categoryName: string | null;
   nameId: string | null;
@@ -71,7 +71,8 @@ export interface Vehicle {
   thirdRowSeats: boolean | null;
   wirelessCharging: boolean | null;
   electricWindows: boolean | null;
-
+  totalReviews: number | null;
+  isSaved: boolean;
   carImages: VehicleImage[];
 }
 
@@ -112,7 +113,7 @@ export type FormValues = {
   thirdRowSeats: boolean;
   wirelessCharging: boolean;
   electricWindows: boolean;
-    carImages: VehicleImage[];
+  carImages: VehicleImage[];
 };
 
 export function mapApiCarToVehicle(apiCar: any): Vehicle {
@@ -149,6 +150,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     interiorColorTypeId: apiCar.interiorColorType?.id ?? null,
     interiorColor: apiCar.interiorColorType?.name ?? null,
 
+    isRecommended: apiCar.isRecommended,
     abs: apiCar.abs,
     bluetooth: apiCar.bluetooth,
     airConditioner: apiCar.airConditioner,
@@ -168,7 +170,8 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     thirdRowSeats: apiCar.thirdRowSeats,
     wirelessCharging: apiCar.wirelessCharging,
     electricWindows: apiCar.electricWindows,
-
+    totalReviews: apiCar.totalReviews,
+    isSaved: apiCar.isSaved,
     carImages: (apiCar.carImages ?? []).map((img: any) => ({
       id: img.id,
       name: img.imageName,
@@ -182,14 +185,17 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
 export const vehicles: Vehicle[] = [
   {
     carId: '1',
+    isSaved: false,
     title: 'Mercedes-Benz S-Class',
     description: 'Mercedes-Benz S-Class është ikona e luksit në botën e automobilave. Me teknologjinë më të fundit dhe komoditetin e pakrahasueshëm, kjo makinë ofron një eksperiencë drejtuese të jashtëzakonshme.',
     year: 2024,
     licensePlate: null,
     pricePerDay: 150,
+    totalReviews: 1,
     seats: 5,
     doors: 4,
     mileage: '1,200 km',
+    isRecommended: false,
     horsePower: 450,
     categoryId: '1', categoryName: 'Luksoze',
     nameId: '1', carName: 'Mercedes-Benz',
@@ -216,6 +222,7 @@ export const vehicles: Vehicle[] = [
     title: 'BMW X5',
     description: 'BMW X5 kombinon luksin me aftësinë e lartë off-road. Me motorr të fuqishëm dhe teknologji të avancuar, është SUV-ja perfekte për familjen.',
     year: 2023,
+    totalReviews: 1,
     licensePlate: null,
     pricePerDay: 95,
     seats: 7,
@@ -253,6 +260,7 @@ export const vehicles: Vehicle[] = [
     doors: 4,
     mileage: '500 km',
     horsePower: 350,
+    totalReviews: 1,
     categoryId: '3', categoryName: 'Elektrike',
     nameId: '3', carName: 'Tesla',
     modelId: '3', modelName: 'Model 3',
@@ -284,6 +292,7 @@ export const vehicles: Vehicle[] = [
     doors: 4,
     mileage: '32,000 km',
     horsePower: 190,
+    totalReviews: 1,
     categoryId: '4', categoryName: 'Ekonomike',
     nameId: '4', carName: 'Audi',
     modelId: '4', modelName: 'A4',
@@ -315,6 +324,7 @@ export const vehicles: Vehicle[] = [
     doors: 5,
     mileage: '3,500 km',
     horsePower: 400,
+    totalReviews: 1,
     categoryId: '2', categoryName: 'SUV',
     nameId: '5', carName: 'Range Rover',
     modelId: '5', modelName: 'Sport',
@@ -343,6 +353,7 @@ export const vehicles: Vehicle[] = [
     licensePlate: null,
     pricePerDay: 120,
     seats: 5,
+    totalReviews: 1,
     doors: 5,
     mileage: '22,000 km',
     horsePower: 272,
@@ -372,6 +383,7 @@ export const vehicles: Vehicle[] = [
     description: 'Volkswagen Golf është makina më e popullarizuar në Europë. Efikase, e besueshme dhe argëtuese për drejtim. Çmimi ideal për buxhetin tuaj.',
     year: 2023,
     licensePlate: null,
+    totalReviews: 1,
     pricePerDay: 35,
     seats: 5,
     doors: 5,
@@ -404,6 +416,7 @@ export const vehicles: Vehicle[] = [
     year: 2024,
     licensePlate: null,
     pricePerDay: 85,
+    totalReviews: 1,
     seats: 5,
     doors: 4,
     mileage: '2,100 km',

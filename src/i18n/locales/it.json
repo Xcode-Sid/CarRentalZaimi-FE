@@ -115,6 +115,8 @@
     "rentalLengthDesc": "Evidenzia il prezzo giornaliero o orario"
   },
   "vehicle": {
+    "ratingLabel": "Valutazione",
+    "commentLabel": "Commento",
     "overview": "Panoramica",
     "specifications": "Specifiche",
     "reviews": "Recensioni",
@@ -149,7 +151,15 @@
     "reviewSuccess": "Recensione inviata con successo!",
     "similarCars": "Auto Simili",
     "saveVehicle": "Salva tra le auto a noleggio salvate",
-    "removeSavedVehicle": "Rimuovi dalle salvate"
+    "removeSavedVehicle": "Rimuovi dalle salvate",
+    "loginToReview": "Accedi per scrivere una recensione",
+    "noReviews": "Nessuna recensione ancora. Sii il primo a recensire!",
+    "reviewUpdated": "Recensione aggiornata con successo!",
+    "reviewDeleted": "Recensione eliminata con successo!",
+    "reviewError": "Qualcosa è andato storto. Riprova.",
+    "editReview": "Modifica recensione",
+    "deleteReview": "Elimina recensione",
+    "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione? Questa azione non può essere annullata."
   },
   "rental": {
     "title": "Prenota Auto",
@@ -239,6 +249,15 @@
   },
   "admin": {
     "promotions": "Promozioni",
+    "aditionalServices": "Servizi Aggiuntivi",
+    "managefeaturedCars": "Gestisci Auto in Evidenza",
+    "featuredCars": "Auto in Evidenza",
+    "carsMarkedFeatured": "auto contrassegnate come in evidenza",
+    "featured": "In Evidenza",
+    "removeFromFeatured": "Rimuovi dai preferiti",
+    "markAsFeatured": "Segna come in evidenza",
+    "showing": "Visualizzazione",
+    "of": "di",
     "deleteTitle": "Elimina veicolo",
     "deleteWarning": "Sei sicuro di voler eliminare questo veicolo?",
     "deleteUndone": "Questa azione non può essere annullata.",
@@ -669,7 +688,8 @@
     "maxLength": "Non può superare {{max}} caratteri",
     "mustBeGreaterThan0": "Deve essere maggiore di 0",
     "mustBeLessThan100": "Deve essere minore di 100",
-    "carOrCategoryRequired": "È necessario selezionare un'auto o una categoria"
+    "carOrCategoryRequired": "È necessario selezionare un'auto o una categoria",
+    "mustBePositive": "Deve essere maggiore di 0"
   },
   "dropImagesHere": "Rilascia le immagini qui",
   "uploadCarImages": "Carica immagini dell'auto",
@@ -734,5 +754,42 @@
     "categoryDisabledHint": "Rimuovi l'auto per selezionare una categoria",
     "deleteTitle": "Elimina"
   },
-  "save": "Salva"
+  "save": "Salva",
+  "perDay": "/ giorno",
+  "additionalServices": {
+    "aditionalServices": "Gestisci Servizi Aggiuntivi",
+    "subtitle": "Gestisci i servizi opzionali offerti al giorno",
+    "add": "Aggiungi Servizio",
+    "searchPlaceholder": "Cerca servizi…",
+    "colName": "Nome",
+    "colPrice": "Prezzo",
+    "colStatus": "Stato",
+    "loadFailed": "Caricamento dei servizi fallito",
+    "updated": "Servizio aggiornato",
+    "created": "Servizio creato",
+    "saveFailed": "Salvataggio del servizio fallito",
+    "deleted": "Servizio eliminato",
+    "deleteFailed": "Eliminazione del servizio fallita",
+    "active": "Attivo",
+    "inactive": "Inattivo",
+    "editTitle": "Modifica Servizio",
+    "addTitle": "Aggiungi Servizio",
+    "fieldName": "Nome Servizio",
+    "fieldNamePlaceholder": "es. Navigatore GPS",
+    "fieldIcon": "Icona",
+    "fieldIconPlaceholder": "Seleziona un'icona…",
+    "fieldPrice": "Prezzo al Giorno (€)",
+    "fieldActive": "Attivo",
+    "fieldActiveDesc": "I servizi inattivi non appariranno durante la prenotazione"
+  },
+  "loading": "Caricamento...",
+  "save": "Salva",
+  "edited": "Modificato",
+  "failedToLoadCars": "Impossibile caricare le auto",
+  "isNowFeatured": "è ora in evidenza",
+  "removedFromFeatured": "rimossa dai preferiti",
+  "failedToUpdateFaturedStatus": "Impossibile aggiornare lo stato in evidenza",
+  "failedToUpdateSavedCar": "Impossibile aggiornare l'auto salvata",
+  "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
+  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata"
 }

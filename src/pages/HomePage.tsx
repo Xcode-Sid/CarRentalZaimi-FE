@@ -67,7 +67,6 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <AnimatedDivider my={0} />
       <FeaturedVehicles />
       <AnimatedDivider my={0} />
       <HowItWorks />

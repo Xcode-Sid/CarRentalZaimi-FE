@@ -115,6 +115,8 @@
     "rentalLengthDesc": "Thekso çmimin për ditë ose për orë"
   },
   "vehicle": {
+    "ratingLabel": "Vlerësimi",
+    "commentLabel": "Koment",
     "overview": "Përmbledhje",
     "specifications": "Specifikimet",
     "reviews": "Vlerësimet",
@@ -149,7 +151,15 @@
     "reviewSuccess": "Vlerësimi u dërgua me sukses!",
     "similarCars": "Makina të Ngjashme",
     "saveVehicle": "Ruaj te makina me qira të ruajtura",
-    "removeSavedVehicle": "Hiq nga të ruajturat"
+    "removeSavedVehicle": "Hiq nga të ruajturat",
+    "loginToReview": "Hyr për të shkruar një vlerësim",
+    "noReviews": "Nuk ka vlerësime ende. Bëhu i pari që vlerëson!",
+    "reviewUpdated": "Vlerësimi u përditësua me sukses!",
+    "reviewDeleted": "Vlerësimi u fshi me sukses!",
+    "reviewError": "Diçka shkoi keq. Provo përsëri.",
+    "editReview": "Ndrysho vlerësimin",
+    "deleteReview": "Fshi vlerësimin",
+    "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
     "title": "Rezervo Makinën",
@@ -239,6 +249,14 @@
   },
   "admin": {
     "promotions": "Promocionet",
+    "aditionalServices": "Shërbime Shtesë",
+    "managefeaturedCars": "Menaxho Makina të Rekomanduara",
+    "featuredCars": "Makina të Rekomanduara",
+    "carsMarkedFeatured": "makina të shënuara si të rekomanduara",
+    "featured": "Të Rekomanduara",
+    "removeFromFeatured": "Hiq nga të rekomanduarat",
+    "markAsFeatured": "Shëno si e rekomanduar",
+    "showing": "Duke shfaqur",
     "deleteTitle": "Fshi mjetin",
     "deleteWarning": "Jeni të sigurt që doni të fshini këtë mjet?",
     "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
@@ -669,7 +687,8 @@
     "maxLength": "Nuk mund të kalojë {{max}} karaktere",
     "mustBeGreaterThan0": "Duhet të jetë më e madhe se 0",
     "mustBeLessThan100": "Duhet të jetë më e vogël se 100",
-    "carOrCategoryRequired": "Duhet të zgjidhni një makinë ose një kategori"
+    "carOrCategoryRequired": "Duhet të zgjidhni një makinë ose një kategori",
+    "mustBePositive": "Duhet të jetë më i madh se 0"
   },
   "dropImagesHere": "Lësho imazhet këtu",
   "uploadCarImages": "Ngarko imazhet e makinës",
@@ -734,5 +753,41 @@
     "categoryDisabledHint": "Hiqni automjetin për të zgjedhur një kategori",
     "deleteTitle": "Fshij promocion"
   },
-  "save": "Ruaj"
+  "save": "Ruaj",
+  "perDay": "/ ditë",
+  "additionalServices": {
+    "aditionalServices": "Menaxho Shërbime Shtesë",
+    "subtitle": "Menaxho shërbimet opsionale të ofruara për ditë",
+    "add": "Shto Shërbim",
+    "searchPlaceholder": "Kërko shërbime…",
+    "colName": "Emri",
+    "colPrice": "Çmimi",
+    "colStatus": "Statusi",
+    "loadFailed": "Ngarkimi i shërbimeve dështoi",
+    "updated": "Shërbimi u përditësua",
+    "created": "Shërbimi u krijua",
+    "saveFailed": "Ruajtja e shërbimit dështoi",
+    "deleted": "Shërbimi u fshi",
+    "deleteFailed": "Fshirja e shërbimit dështoi",
+    "active": "Aktiv",
+    "inactive": "Joaktiv",
+    "editTitle": "Modifiko Shërbimin",
+    "addTitle": "Shto Shërbim",
+    "fieldName": "Emri i Shërbimit",
+    "fieldNamePlaceholder": "p.sh. Navigim GPS",
+    "fieldIcon": "Ikona",
+    "fieldIconPlaceholder": "Zgjidh një ikonë…",
+    "fieldPrice": "Çmimi për Ditë (€)",
+    "fieldActive": "Aktiv",
+    "fieldActiveDesc": "Shërbimet joaktive nuk do të shfaqen gjatë rezervimit"
+  },
+  "loading": "Duke ngarkuar...",
+  "save": "Ruaj",
+  "edited": "Modifikuar",
+  "failedToLoadCars": "Marrja e makinave dështoi",
+  "isNowFeatured": "është tani e featured",
+  "removedFromFeatured": "u hoq nga të rekomanduarat",
+  "failedToUpdateSavedCar": "Dështoi përditësimi i makinës së ruajtur",
+  "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
+  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur"
 }
