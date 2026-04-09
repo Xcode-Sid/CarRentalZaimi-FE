@@ -83,7 +83,7 @@ const SERVICE_ICONS: { value: string; label: string }[] = [
     { value: "📷", label: "Dashcam" },
     { value: "🎵", label: "Sound System" },
 ];
- 
+
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -433,7 +433,7 @@ export default function AdminAdditionalServicesPage() {
 
                                                 <Table.Td>
                                                     <Group gap={8}>
-                                                         {item.icon && (
+                                                        {item.icon && (
                                                             <Text size="lg" style={{ lineHeight: 1 }}>
                                                                 {item.icon}
                                                             </Text>
@@ -541,7 +541,7 @@ export default function AdminAdditionalServicesPage() {
                                 styles={inputStyles}
                             />
 
-                             <Select
+                            <Select
                                 label={t("additionalServices.fieldIcon")}
                                 placeholder={t("additionalServices.fieldIconPlaceholder")}
                                 radius="md"

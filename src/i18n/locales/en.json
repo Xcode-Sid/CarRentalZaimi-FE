@@ -690,8 +690,7 @@
     "maxLength": "Cannot exceed {{max}} characters",
     "mustBeGreaterThan0": "Must be greater than 0",
     "mustBeLessThan100": "Must be less than 100",
-    "carOrCategoryRequired": "Either a car or a category must be selected",
-    "mustBePositive": "Must be greater than 0"
+    "carOrCategoryRequired": "Either a car or a category must be selected"
   },
   "dropImagesHere": "Drop images here",
   "uploadCarImages": "Upload car images",
@@ -754,7 +753,6 @@
     "categoryDisabledHint": "Clear the car to select a category",
     "deleteTitle": "Delete Promotion"
   },
-  "save": "Save",
   "perDay": "/ day",
   "additionalServices": {
     "aditionalServices": "Manage additional Services",

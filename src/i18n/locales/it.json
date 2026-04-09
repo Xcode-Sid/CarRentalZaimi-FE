@@ -688,8 +688,7 @@
     "maxLength": "Non può superare {{max}} caratteri",
     "mustBeGreaterThan0": "Deve essere maggiore di 0",
     "mustBeLessThan100": "Deve essere minore di 100",
-    "carOrCategoryRequired": "È necessario selezionare un'auto o una categoria",
-    "mustBePositive": "Deve essere maggiore di 0"
+    "carOrCategoryRequired": "È necessario selezionare un'auto o una categoria"
   },
   "dropImagesHere": "Rilascia le immagini qui",
   "uploadCarImages": "Carica immagini dell'auto",
@@ -754,7 +753,6 @@
     "categoryDisabledHint": "Rimuovi l'auto per selezionare una categoria",
     "deleteTitle": "Elimina"
   },
-  "save": "Salva",
   "perDay": "/ giorno",
   "additionalServices": {
     "aditionalServices": "Gestisci Servizi Aggiuntivi",

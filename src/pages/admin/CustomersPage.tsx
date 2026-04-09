@@ -26,7 +26,7 @@ import { ads } from '../../data/ads';
 import { useBookings } from '../../contexts/BookingsContext';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
 import { BookingDetailContent, bookingStatusKeys } from '../../components/booking/BookingDetailContent';
-import { vehicles } from '../../data/vehicles';
+// import { vehicles } from '../../data/vehicles';
 import type { Booking } from '../../data/bookings';
 
 const statusColors: Record<string, string> = {
@@ -35,11 +35,11 @@ const statusColors: Record<string, string> = {
   finished: 'gray',
 };
 
-export default function CustomersPage() {
+export default function AdminCustomersPage() {
   const { t } = useTranslation();
   const { getUserBookings } = useBookings();
 
-  const customerUsers = useMemo(() => users.filter((u) => u.role === 'user'), []);
+  const customerUsers = useMemo(() => users.filter((u) => u.role?.name === 'user'), []);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'active' | 'inactive' | null>(null);
@@ -75,8 +75,8 @@ export default function CustomersPage() {
     editForm.reset();
   };
 
-  const detailVehicle = detailBooking ? vehicles.find((v) => v.id === detailBooking.vehicleId) : undefined;
-
+//const detailVehicle = detailBooking ? vehicles.find((v) => v.id === detailBooking.vehicleId) : undefined;
+const detailVehicle = undefined;
   const filteredUsers = customerUsers.filter((u) => {
     const q = search.trim().toLowerCase();
     if (q) {
@@ -152,7 +152,7 @@ export default function CustomersPage() {
                   <Table.Td>
                     <Group gap="sm">
                       <Avatar size="sm" radius="xl" color="teal">
-                        {c.avatar}
+                        {/* {c.avatar} */}
                       </Avatar>
                       <Text size="sm">{c.firstName} {c.lastName}</Text>
                     </Group>
@@ -308,7 +308,7 @@ export default function CustomersPage() {
             >
               <BookingDetailContent
                 booking={detailBooking}
-                vehicleImageUrl={detailVehicle?.image}
+                // vehicleImageUrl={detailVehicle?.im}
                 footer={
                   <Button variant="light" color="gray" onClick={() => setDetailBooking(null)} radius="xl" fullWidth mt="md">
                     {t('account.closeModal')}

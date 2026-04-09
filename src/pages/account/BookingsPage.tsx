@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Title,
@@ -14,14 +14,15 @@ import {
   Button,
   TextInput,
   Select,
+  Loader,
+  Center,
+  Pagination,
 } from '@mantine/core';
 import { IconCalendar, IconCar, IconChevronRight, IconSearch } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { useBookings } from '../../contexts/BookingsContext';
-import type { Booking } from '../../data/bookings';
-import { vehicles } from '../../data/vehicles';
+import { mapApiBooking, type Booking } from '../../data/bookings';
 import { EmptyState } from '../../components/common/EmptyState';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
@@ -30,6 +31,12 @@ import {
   bookingStatusColors,
   bookingStatusKeys,
 } from '../../components/booking/BookingDetailContent';
+import { get } from '../../utils/api.utils';
+
+
+const PAGE_SIZE = 10;
+
+// ─── Sub-component ─────────────────────────────────────────────────────────────
 
 function VehicleThumb({ imageUrl }: { imageUrl?: string }) {
   const [failed, setFailed] = useState(false);
@@ -56,30 +63,79 @@ function VehicleThumb({ imageUrl }: { imageUrl?: string }) {
   );
 }
 
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
 export default function BookingsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { getUserBookings } = useBookings();
-  const [selected, setSelected] = useState<Booking | null>(null);
+
+  // ── Data state ──
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // ── Filter / pagination state ──
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<Booking['status'] | null>(null);
-  const [paymentFilter, setPaymentFilter] = useState<'cash' | 'card' | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [paymentFilter, setPaymentFilter] = useState<string | null>(null);
 
-  const userBookings = user ? getUserBookings(user.id) : [];
+  // ── Modal ──
+  const [selected, setSelected] = useState<Booking | null>(null);
 
-  const selectedVehicle = selected ? vehicles.find((v) => v.id === selected.vehicleId) : undefined;
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const filteredBookings = userBookings.filter((b) => {
-    const q = search.trim().toLowerCase();
-    if (q) {
-      const hay = `${b.ref} ${b.vehicleName}`.toLowerCase();
-      if (!hay.includes(q)) return false;
+  // Reset to page 1 when filters change
+  useEffect(() => { setPage(1); }, [debouncedSearch, statusFilter, paymentFilter]);
+
+  // ── Fetch ──
+  const fetchBookings = useCallback(async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        PageNr: String(page),
+        PageSize: String(PAGE_SIZE),
+      });
+      if (debouncedSearch.trim()) params.set('Search', debouncedSearch.trim());
+      if (statusFilter) params.set('Status', statusFilter);
+      if (paymentFilter) params.set('PaymentType', paymentFilter);
+
+      const res = await get(`Booking/getAll?${params.toString()}`);
+      if (!res.success) throw new Error(res.message || t('failedToLoadBookings'));
+
+      setBookings((res.data.items ?? []).map(mapApiBooking));
+      setTotalPages(res.data.totalPages ?? 1);
+      setTotalCount(res.data.totalCount ?? 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setBookings([]);
+    } finally {
+      setLoading(false);
     }
-    if (statusFilter && b.status !== statusFilter) return false;
-    if (paymentFilter && b.paymentMethod !== paymentFilter) return false;
-    return true;
-  });
+  }, [user?.id, page, debouncedSearch, statusFilter, paymentFilter, t]);
 
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+
+  const handleReset = () => {
+    setSearch('');
+    setStatusFilter(null);
+    setPaymentFilter(null);
+    setPage(1);
+  };
+
+  const startItem = (page - 1) * PAGE_SIZE + 1;
+  const endItem = Math.min(page * PAGE_SIZE, totalCount);
+
+  // ── Render ──
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -87,6 +143,7 @@ export default function BookingsPage() {
       transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <Stack gap="lg">
+        {/* Header */}
         <AnimatedSection>
           <Stack gap={6}>
             <Group gap={10} align="center">
@@ -118,162 +175,194 @@ export default function BookingsPage() {
           </Stack>
         </AnimatedSection>
 
-        {userBookings.length > 0 ? (
-          <AnimatedSection delay={0.08}>
-            <Group wrap="wrap" align="end" mb="sm">
-              <TextInput
-                placeholder={t('account.filterSearchBookings')}
-                leftSection={<IconSearch size={16} />}
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-                style={{ flex: 1, minWidth: 240, maxWidth: 420 }}
-              />
-              <Select
-                placeholder={t('account.status')}
-                data={[
-                  { value: 'accepted', label: t('account.accepted') },
-                  { value: 'refused', label: t('account.refused') },
-                  { value: 'finished', label: t('account.finished') },
-                ]}
-                value={statusFilter}
-                onChange={(v) => setStatusFilter((v as Booking['status'] | null) ?? null)}
-                clearable
-                w={190}
-              />
-              <Select
-                placeholder={t('account.filterPayment')}
-                data={[
-                  { value: 'card', label: t('admin.paymentCard') },
-                  { value: 'cash', label: t('admin.paymentCash') },
-                ]}
-                value={paymentFilter}
-                onChange={(v) => setPaymentFilter((v as 'cash' | 'card' | null) ?? null)}
-                clearable
-                w={190}
-              />
-              <Button
-                variant="subtle"
-                color="gray"
-                onClick={() => {
-                  setSearch('');
-                  setStatusFilter(null);
-                  setPaymentFilter(null);
-                }}
-              >
-                {t('account.filtersReset')}
-              </Button>
-            </Group>
+        {/* Filters — always visible so user can reset even when empty */}
+        <AnimatedSection delay={0.08}>
+          <Group wrap="wrap" align="end" mb="sm">
+            <TextInput
+              placeholder={t('account.filterSearchBookings')}
+              leftSection={<IconSearch size={16} />}
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+              style={{ flex: 1, minWidth: 240, maxWidth: 420 }}
+            />
+            <Select
+              placeholder={t('account.status')}
+              data={[
+                { value: 'accepted', label: t('account.accepted') },
+                { value: 'refused', label: t('account.refused') },
+                { value: 'finished', label: t('account.finished') },
+              ]}
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v ?? null)}
+              clearable
+              w={190}
+            />
+            <Select
+              placeholder={t('account.filterPayment')}
+              data={[
+                { value: 'card', label: t('admin.paymentCard') },
+                { value: 'cash', label: t('admin.paymentCash') },
+              ]}
+              value={paymentFilter}
+              onChange={(v) => setPaymentFilter(v ?? null)}
+              clearable
+              w={190}
+            />
+            <Button variant="subtle" color="gray" onClick={handleReset}>
+              {t('account.filtersReset')}
+            </Button>
+          </Group>
+        </AnimatedSection>
 
-            <Text size="xs" c="dimmed" mb="xs" style={{ letterSpacing: '0.02em' }}>
-              {t('account.clickRowForDetails')}
-            </Text>
-            <Box
-              className="glass-card card-gradient-border account-rentals-shell"
-              p={{ base: 'md', sm: 'xl' }}
-              style={{ borderRadius: 'var(--mantine-radius-xl)', overflow: 'hidden' }}
-            >
-              <Table.ScrollContainer minWidth={720} type="native">
-                <Table
-                  striped
-                  highlightOnHover
-                  withTableBorder
-                  withColumnBorders
-                  verticalSpacing="md"
-                  horizontalSpacing="md"
-                  className="account-rentals-table"
-                >
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
-                        {t('account.bookingRef')}
-                      </Table.Th>
-                      <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
-                        {t('account.vehicleName')}
-                      </Table.Th>
-                      <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
-                        {t('account.bookingDates')}
-                      </Table.Th>
-                      <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
-                        {t('account.amount')}
-                      </Table.Th>
-                      <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
-                        {t('account.status')}
-                      </Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {filteredBookings.map((b, i) => {
-                      const vehicle = vehicles.find((v) => v.id === b.vehicleId);
-                      const refused = b.status === 'refused';
-                      return (
-                        <Table.Tr
-                          key={b.id}
-                          className="account-rental-row animate-stagger-up"
-                          style={{ '--stagger-delay': `${i * 0.06}s` } as CSSProperties}
-                          onClick={() => setSelected(b)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              setSelected(b);
-                            }
-                          }}
-                          tabIndex={0}
-                          role="button"
-                          aria-label={`${t('account.bookingDetailsTitle')}: ${b.ref}`}
-                        >
-                          <Table.Td>
-                            <Group gap={4} wrap="nowrap">
-                              <Text size="sm" fw={600} ff="monospace">
-                                {b.ref}
+        {/* Content */}
+        {loading ? (
+          <Center py="xl">
+            <Loader color="var(--az-teal)" size="md" />
+          </Center>
+        ) : error ? (
+          <Center py="xl">
+            <Text c="red" size="sm">{error}</Text>
+          </Center>
+        ) : bookings.length > 0 ? (
+          <AnimatedSection delay={0.1}>
+            <Stack gap="md">
+              <Text size="xs" c="dimmed" style={{ letterSpacing: '0.02em' }}>
+                {t('account.clickRowForDetails')}
+              </Text>
+
+              <Box
+                className="glass-card card-gradient-border account-rentals-shell"
+                p={{ base: 'md', sm: 'xl' }}
+                style={{ borderRadius: 'var(--mantine-radius-xl)', overflow: 'hidden' }}
+              >
+                <Table.ScrollContainer minWidth={720} type="native">
+                  <Table
+                    striped
+                    highlightOnHover
+                    withTableBorder
+                    withColumnBorders
+                    verticalSpacing="md"
+                    horizontalSpacing="md"
+                    className="account-rentals-table"
+                  >
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.bookingRef')}
+                        </Table.Th>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.vehicleName')}
+                        </Table.Th>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.bookingDates')}
+                        </Table.Th>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.amount')}
+                        </Table.Th>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.status')}
+                        </Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {bookings.map((b, i) => {
+                        const refused = b.status === 'refused';
+                        return (
+                          <Table.Tr
+                            key={b.id}
+                            className="account-rental-row animate-stagger-up"
+                            style={{ '--stagger-delay': `${i * 0.06}s` } as CSSProperties}
+                            onClick={() => setSelected(b)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelected(b);
+                              }
+                            }}
+                            tabIndex={0}
+                            role="button"
+                            aria-label={`${t('account.bookingDetailsTitle')}: ${b.ref}`}
+                          >
+                            <Table.Td>
+                              <Group gap={4} wrap="nowrap">
+                                <Text size="sm" fw={600} ff="monospace">
+                                  {b.ref}
+                                </Text>
+                                <IconChevronRight size={14} style={{ opacity: 0.35, flexShrink: 0 }} />
+                              </Group>
+                            </Table.Td>
+                            <Table.Td>
+                              <Group gap="sm" wrap="nowrap">
+                                <VehicleThumb imageUrl={b.vehicleIamge} />
+                                <Text size="sm" fw={500}>
+                                  {b.vehicleName}
+                                </Text>
+                              </Group>
+                            </Table.Td>
+                            <Table.Td>
+                              <Text size="sm" c="dimmed">
+                                {formatBookingPeriod(b, t)}
                               </Text>
-                              <IconChevronRight size={14} style={{ opacity: 0.35, flexShrink: 0 }} />
-                            </Group>
-                          </Table.Td>
-                          <Table.Td>
-                            <Group gap="sm" wrap="nowrap">
-                              <VehicleThumb imageUrl={vehicle?.image} />
-                              <Text size="sm" fw={500}>
-                                {b.vehicleName}
+                            </Table.Td>
+                            <Table.Td>
+                              <Text
+                                size="sm"
+                                fw={700}
+                                c={refused ? 'dimmed' : 'teal'}
+                                style={{
+                                  textDecoration: refused ? 'line-through' : undefined,
+                                  opacity: refused ? 0.75 : 1,
+                                }}
+                              >
+                                €{b.total.toLocaleString()}
                               </Text>
-                            </Group>
-                          </Table.Td>
-                          <Table.Td>
-                            <Text size="sm" c="dimmed">
-                              {formatBookingPeriod(b, t)}
-                            </Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Text
-                              size="sm"
-                              fw={700}
-                              c={refused ? 'dimmed' : 'teal'}
-                              style={{
-                                textDecoration: refused ? 'line-through' : undefined,
-                                opacity: refused ? 0.75 : 1,
-                              }}
-                            >
-                              €{b.total.toLocaleString()}
-                            </Text>
-                          </Table.Td>
-                          <Table.Td>
-                            <Badge
-                              color={bookingStatusColors[b.status]}
-                              variant="light"
-                              size="md"
-                              radius="md"
-                              tt="uppercase"
-                              style={{ fontWeight: 700, letterSpacing: '0.04em' }}
-                            >
-                              {t(bookingStatusKeys[b.status])}
-                            </Badge>
-                          </Table.Td>
-                        </Table.Tr>
-                      );
-                    })}
-                  </Table.Tbody>
-                </Table>
-              </Table.ScrollContainer>
-            </Box>
+                            </Table.Td>
+                            <Table.Td>
+                              <Badge
+                                color={bookingStatusColors[b.status]}
+                                variant="light"
+                                size="md"
+                                radius="md"
+                                tt="uppercase"
+                                style={{ fontWeight: 700, letterSpacing: '0.04em' }}
+                              >
+                                {t(bookingStatusKeys[b.status])}
+                              </Badge>
+                            </Table.Td>
+                          </Table.Tr>
+                        );
+                      })}
+                    </Table.Tbody>
+                  </Table>
+                </Table.ScrollContainer>
+              </Box>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <Group justify="space-between" align="center" px={4}>
+                  <Text size="xs" c="dimmed">
+                    {t('admin.showing') ?? 'Showing'}{' '}
+                    <Text component="span" size="xs" fw={500} c="default">
+                      {startItem}–{endItem}
+                    </Text>{' '}
+                    {t('admin.of') ?? 'of'}{' '}
+                    <Text component="span" size="xs" fw={500} c="default">
+                      {totalCount}
+                    </Text>{' '}
+                    {t('account.myBookings') ?? 'bookings'}
+                  </Text>
+                  <Pagination
+                    value={page}
+                    onChange={setPage}
+                    total={totalPages}
+                    color="var(--az-teal)"
+                    radius="md"
+                    size="sm"
+                    withEdges
+                  />
+                </Group>
+              )}
+            </Stack>
           </AnimatedSection>
         ) : (
           <AnimatedSection delay={0.1}>
@@ -287,6 +376,7 @@ export default function BookingsPage() {
         )}
       </Stack>
 
+      {/* Detail Modal */}
       <Modal
         opened={!!selected}
         onClose={() => setSelected(null)}
@@ -309,16 +399,21 @@ export default function BookingsPage() {
             >
               <BookingDetailContent
                 booking={selected}
-                vehicleImageUrl={selectedVehicle?.image}
+                vehicleImageUrl={selected.vehicleIamge}
                 footer={
                   <Group mt="xl" grow>
-                    <Button variant="light" color="gray" onClick={() => setSelected(null)} radius="xl">
+                    <Button
+                      variant="light"
+                      color="gray"
+                      onClick={() => setSelected(null)}
+                      radius="xl"
+                    >
                       {t('account.closeModal')}
                     </Button>
-                    {selectedVehicle && (
+                    {selected.vehicleId && (
                       <Button
                         component={Link}
-                        to={`/fleet/${selectedVehicle.id}`}
+                        to={`/fleet/${selected.vehicleId}`}
                         variant="filled"
                         color="teal"
                         radius="xl"

@@ -169,9 +169,18 @@ export function BookingDetailContent({ booking, vehicleImageUrl, headerStatusSlo
           </Text>
         </Group>
         <Divider label={t('account.bookingAddons')} labelPosition="left" />
-        <Text size="sm" c={booking.addons?.length ? undefined : 'dimmed'}>
-          {booking.addons?.length ? booking.addons.join(' · ') : t('account.noAddons')}
-        </Text>
+        {booking.services?.length ? (
+          <Stack gap={4}>
+            {booking.services.map((s) => (
+              <Group key={s.id} justify="space-between">
+                <Text size="sm" c="dimmed">{s.name}</Text>
+                <Text size="sm" fw={600}>€{s.pricePerDay} / {t('account.typeDay')}</Text>
+              </Group>
+            ))}
+          </Stack>
+        ) : (
+          <Text size="sm" c="dimmed">{t('account.noAddons')}</Text>
+        )}
       </Stack>
       {footer}
     </Box>

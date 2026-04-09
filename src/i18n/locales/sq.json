@@ -687,8 +687,7 @@
     "maxLength": "Nuk mund të kalojë {{max}} karaktere",
     "mustBeGreaterThan0": "Duhet të jetë më e madhe se 0",
     "mustBeLessThan100": "Duhet të jetë më e vogël se 100",
-    "carOrCategoryRequired": "Duhet të zgjidhni një makinë ose një kategori",
-    "mustBePositive": "Duhet të jetë më i madh se 0"
+    "carOrCategoryRequired": "Duhet të zgjidhni një makinë ose një kategori"
   },
   "dropImagesHere": "Lësho imazhet këtu",
   "uploadCarImages": "Ngarko imazhet e makinës",
@@ -753,7 +752,6 @@
     "categoryDisabledHint": "Hiqni automjetin për të zgjedhur një kategori",
     "deleteTitle": "Fshij promocion"
   },
-  "save": "Ruaj",
   "perDay": "/ ditë",
   "additionalServices": {
     "aditionalServices": "Menaxho Shërbime Shtesë",

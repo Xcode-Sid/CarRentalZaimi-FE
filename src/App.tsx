@@ -17,7 +17,7 @@ import BookingsPage from './pages/account/BookingsPage';
 import SettingsPage from './pages/account/SettingsPage';
 import AdminDashboardPage from './pages/admin/DashboardPage';
 import AdminCarsPage from './pages/admin/cars/CarsPage';
-import AdminBookingsPage from './pages/admin/BookingsPage';
+import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 import AdminCustomersPage from './pages/admin/CustomersPage';
 import AdminSettingsPage from './pages/admin/SettingsPage';
 import AdminAnalyticsPage from './pages/admin/AnalyticsPage';

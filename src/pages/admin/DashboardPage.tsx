@@ -31,8 +31,8 @@ import {
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { useBookings } from '../../contexts/BookingsContext';
-import { vehicles } from '../../data/vehicles';
+// import { useBookings } from '../../contexts/BookingsContext';
+// import { vehicles } from '../../data/vehicles';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
 
 function AnimatedNumber({ target, prefix = '', suffix = '' }: { target: number; prefix?: string; suffix?: string }) {
@@ -130,7 +130,7 @@ const statusColors: Record<string, string> = {
 export default function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { bookings } = useBookings();
+  // const { bookings } = useBookings();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -151,10 +151,10 @@ export default function DashboardPage() {
     second: '2-digit',
   });
 
-  const availableCount = vehicles.filter((v) => v.status === 'available').length;
-  const maintenanceCount = vehicles.filter((v) => v.status === 'maintenance').length;
-  const unavailableCount = vehicles.filter((v) => v.status === 'unavailable').length;
-  const total = vehicles.length;
+  const availableCount = 0;
+  const maintenanceCount = 0;
+  const unavailableCount = 0;
+  const total = 0;
 
   const kpis = [
     {
@@ -204,10 +204,10 @@ export default function DashboardPage() {
     },
   ];
 
-  const recentBookings = bookings.slice(0, 5);
+  // const recentBookings = bookings.slice(0, 5);
 
-  const cashTotal = bookings.reduce((acc, b) => acc + (b.paymentMethod === 'cash' ? b.total : 0), 0);
-  const cardTotal = bookings.reduce((acc, b) => acc + (b.paymentMethod === 'card' ? b.total : 0), 0);
+  const cashTotal = 0;
+  const cardTotal = 0;
   const paymentsTotal = cashTotal + cardTotal;
   const cashPct = paymentsTotal ? Math.round((cashTotal / paymentsTotal) * 100) : 0;
   const cardPct = paymentsTotal ? 100 - cashPct : 0;
@@ -522,7 +522,7 @@ export default function DashboardPage() {
                 {t('admin.viewBookings')}
               </Button>
             </Group>
-            {recentBookings.length === 0 ? (
+            {/* {recentBookings.length === 0 ? (
               <Stack align="center" py="xl" gap="md">
                 <motion.div
                   animate={{ y: [0, -6, 0] }}
@@ -550,6 +550,7 @@ export default function DashboardPage() {
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
+                    
                     {recentBookings.map((b, idx) => (
                       <motion.tr
                         key={b.id}
@@ -590,7 +591,7 @@ export default function DashboardPage() {
                   </Table.Tbody>
                 </Table>
               </Table.ScrollContainer>
-            )}
+            )} */}
           </Paper>
         </AnimatedSection>
       </Stack>
