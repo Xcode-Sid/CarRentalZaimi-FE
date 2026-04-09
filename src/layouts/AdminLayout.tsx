@@ -20,6 +20,8 @@ import {
   IconFileText,
   IconAd,
   IconClipboardList,
+  IconTagsOff,
+  IconRosetteDiscount,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -32,6 +34,7 @@ const navItems = [
   { path: '/admin/car-data', icon: IconClipboardList, labelKey: 'admin.carDatas', badge: null },
   { path: '/admin/cars', icon: IconCar, labelKey: 'admin.cars', badge: null },
   { path: '/admin/bookings', icon: IconCalendar, labelKey: 'admin.bookings', badge: '3' },
+  { path: '/admin/promotion', icon: IconRosetteDiscount, labelKey: 'admin.promotions', badge: null },
   { path: '/admin/customers', icon: IconUsers, labelKey: 'admin.customers', badge: null },
   { path: '/admin/settings', icon: IconSettings, labelKey: 'admin.settings', badge: null },
   { path: '/admin/analytics', icon: IconChartBar, labelKey: 'admin.analytics', badge: null },
