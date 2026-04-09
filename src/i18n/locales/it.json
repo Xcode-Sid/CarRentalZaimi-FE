@@ -238,6 +238,14 @@
     "settingsSaved": "Impostazioni salvate con successo!"
   },
   "admin": {
+    "managefeaturedCars": "Gestisci Auto in Evidenza",
+    "featuredCars": "Auto in Evidenza",
+    "carsMarkedFeatured": "auto contrassegnate come in evidenza",
+    "featured": "In Evidenza",
+    "removeFromFeatured": "Rimuovi dai preferiti",
+    "markAsFeatured": "Segna come in evidenza",
+    "showing": "Visualizzazione",
+    "of": "di",
     "deleteTitle": "Elimina veicolo",
     "deleteWarning": "Sei sicuro di voler eliminare questo veicolo?",
     "deleteUndone": "Questa azione non può essere annullata.",
@@ -684,6 +692,10 @@
   "descriptionEx": "Breve descrizione del veicolo…",
   "required": "Questo campo è obbligatorio",
   "edit": "Modifica",
+  "failedToLoadCars": "Impossibile caricare le auto",
+  "isNowFeatured": "è ora in evidenza",
+  "removedFromFeatured": "rimossa dai preferiti",
+  "failedToUpdateFaturedStatus": "Impossibile aggiornare lo stato in evidenza",
   "failedToUpdateSavedCar": "Impossibile aggiornare l'auto salvata",
   "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
   "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata"

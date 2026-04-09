@@ -36,7 +36,7 @@ export interface Vehicle {
   doors: number;
   mileage: string | null;
   horsePower: number | null;
-
+  isRecommended: boolean;
   categoryId: string | null;
   categoryName: string | null;
   nameId: string | null;
@@ -149,6 +149,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     interiorColorTypeId: apiCar.interiorColorType?.id ?? null,
     interiorColor: apiCar.interiorColorType?.name ?? null,
 
+    isRecommended: apiCar.isRecommended,
     abs: apiCar.abs,
     bluetooth: apiCar.bluetooth,
     airConditioner: apiCar.airConditioner,
@@ -191,6 +192,7 @@ export const vehicles: Vehicle[] = [
     seats: 5,
     doors: 4,
     mileage: '1,200 km',
+    isRecommended: false,
     horsePower: 450,
     categoryId: '1', categoryName: 'Luksoze',
     nameId: '1', carName: 'Mercedes-Benz',
@@ -211,6 +213,5 @@ export const vehicles: Vehicle[] = [
       { name: 'side', data: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=800&auto=format', isPrimary: false },
       { name: 'interior', data: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=800&auto=format', isPrimary: false },
     ],
-  },
- 
+  } 
 ]
