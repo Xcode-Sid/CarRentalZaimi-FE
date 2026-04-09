@@ -238,6 +238,7 @@
     "settingsSaved": "Settings saved successfully!"
   },
   "admin": {
+    "aditionalServices": "Additional Services",
     "deleteTitle": "Delete Vehicle",
     "deleteWarning": "Are you sure you want to delete this vehicle?",
     "deleteUndone": "This action cannot be undone.",
@@ -664,7 +665,8 @@
     "transmissionRequired": "Transmission is required",
     "fuelRequired": "Fuel type is required",
     "imagesRequired": "At least one image is required",
-    "required": "This field is required"
+    "required": "This field is required",
+    "mustBePositive": "Must be greater than 0"
   },
   "dropImagesHere": "Drop images here",
   "uploadCarImages": "Upload car images",
@@ -683,5 +685,32 @@
   "titleEx": "e.g. Toyota Corolla 2022",
   "descriptionEx": "Brief description of the vehicle…",
   "required": "This field is required",
-  "edit": "Edit"
+  "edit": "Edit",
+  "perDay": "/ day",
+  "additionalServices": {
+    "aditionalServices": "Manage additional Services",
+    "subtitle": "Manage optional services offered per day",
+    "add": "Add Service",
+    "searchPlaceholder": "Search services…",
+    "colName": "Name",
+    "colPrice": "Price",
+    "colStatus": "Status",
+    "loadFailed": "Failed to load services",
+    "updated": "Service updated",
+    "created": "Service created",
+    "saveFailed": "Failed to save service",
+    "deleted": "Service deleted",
+    "deleteFailed": "Failed to delete service",
+    "active": "Active",
+    "inactive": "Inactive",
+    "editTitle": "Edit Service",
+    "addTitle": "Add Service",
+    "fieldName": "Service Name",
+    "fieldNamePlaceholder": "e.g. GPS Navigation",
+    "fieldIcon": "Icon",
+    "fieldIconPlaceholder": "Select an icon…",
+    "fieldPrice": "Price Per Day ($)",
+    "fieldActive": "Active",
+    "fieldActiveDesc": "Inactive services won't appear in booking"
+  }
 }

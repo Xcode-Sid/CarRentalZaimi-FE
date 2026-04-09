@@ -238,6 +238,7 @@
     "settingsSaved": "Cilësimet u ruajtën me sukses!"
   },
   "admin": {
+    "aditionalServices": "Shërbime Shtesë",
     "deleteTitle": "Fshi mjetin",
     "deleteWarning": "Jeni të sigurt që doni të fshini këtë mjet?",
     "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
@@ -662,7 +663,8 @@
     "transmissionRequired": "Transmisioni është i detyrueshëm",
     "fuelRequired": "Lloji i karburantit është i detyrueshëm",
     "imagesRequired": "Të paktën një imazh është i detyrueshëm",
-    "required": "Kjo fushë është e detyrueshme"
+    "required": "Kjo fushë është e detyrueshme",
+    "mustBePositive": "Duhet të jetë më i madh se 0"
   },
   "dropImagesHere": "Lësho imazhet këtu",
   "uploadCarImages": "Ngarko imazhet e makinës",
@@ -683,5 +685,32 @@
   "titleEx": "p.sh. Toyota Corolla 2022",
   "descriptionEx": "Përshkrim i shkurtër i mjetit…",
   "required": "Ky fushë është e detyrueshme",
-  "edit": "Ndrysho"
+  "edit": "Ndrysho",
+  "perDay": "/ ditë",
+  "additionalServices": {
+    "aditionalServices": "Menaxho Shërbime Shtesë",
+    "subtitle": "Menaxho shërbimet opsionale të ofruara për ditë",
+    "add": "Shto Shërbim",
+    "searchPlaceholder": "Kërko shërbime…",
+    "colName": "Emri",
+    "colPrice": "Çmimi",
+    "colStatus": "Statusi",
+    "loadFailed": "Ngarkimi i shërbimeve dështoi",
+    "updated": "Shërbimi u përditësua",
+    "created": "Shërbimi u krijua",
+    "saveFailed": "Ruajtja e shërbimit dështoi",
+    "deleted": "Shërbimi u fshi",
+    "deleteFailed": "Fshirja e shërbimit dështoi",
+    "active": "Aktiv",
+    "inactive": "Joaktiv",
+    "editTitle": "Modifiko Shërbimin",
+    "addTitle": "Shto Shërbim",
+    "fieldName": "Emri i Shërbimit",
+    "fieldNamePlaceholder": "p.sh. Navigim GPS",
+    "fieldIcon": "Ikona",
+    "fieldIconPlaceholder": "Zgjidh një ikonë…",
+    "fieldPrice": "Çmimi për Ditë (€)",
+    "fieldActive": "Aktiv",
+    "fieldActiveDesc": "Shërbimet joaktive nuk do të shfaqen gjatë rezervimit"
+  }
 }
