@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import { bookings as initialBookings, type Booking } from '../data/bookings';
+import {  type Booking } from '../data/bookings';
 
 interface BookingsContextType {
   bookings: Booking[];
@@ -11,7 +11,7 @@ interface BookingsContextType {
 const BookingsContext = createContext<BookingsContextType | null>(null);
 
 export function BookingsProvider({ children }: { children: ReactNode }) {
-  const [bookingsList, setBookingsList] = useState<Booking[]>(initialBookings);
+  const [bookingsList, setBookingsList] = useState<Booking[]>([]);
 
   const addBooking = useCallback((booking: Booking) => {
     setBookingsList((prev) => [booking, ...prev]);

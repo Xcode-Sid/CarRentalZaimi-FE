@@ -38,6 +38,13 @@ const STATUS_MAP: Record<number, Booking['status']> = {
   3: 'finished',
 };
 
+const REFUSED_MAP: Record<number, Booking['refuzedBy']> = {
+  1: 'none',
+  2: 'user',
+  3: 'admin',
+};
+
+
 const PAYMENT_MAP: Record<string, 'cash' | 'card'> = {
   '0': 'cash',
   '1': 'card',
@@ -56,8 +63,8 @@ export function mapApiBooking(dto: any): Booking {
     total: Number(dto.totalPrice ?? 0),
     phoneNumber: dto.phoneNumber ?? '',
     paymentMethod: PAYMENT_MAP[dto.paymentMethod] ?? 'cash',  // was `.toLowerCase()` on "0"
-    status: STATUS_MAP[dto.status] ?? 'pending',              // was `.toLowerCase()` on 1
-    refuzedBy: dto.refuzedBy ?? null,
+    status: STATUS_MAP[dto.status] ?? 'accepted',              // was `.toLowerCase()` on 1
+    refuzedBy: REFUSED_MAP[dto.refuzedBy] ?? '-',
     user: {
       firstName: dto.user?.firstName ?? '',
       lastName: dto.user?.lastName ?? '',
@@ -72,29 +79,3 @@ export function mapApiBooking(dto: any): Booking {
   };
 }
 
-export const bookings: Booking[] = [
-  {
-    id: 'b1',
-    ref: 'AZR-2026-00142',
-    userId: 'user-1',
-    vehicleId: 2,
-    phoneNumber: '',
-    refuzedBy: '',
-    vehicleName: 'BMW X5',
-    vehicleIamge: '',
-    paymentMethod: 'cash',
-    startDate: '2026-03-15',
-    endDate: '2026-03-20',
-    total: 570,
-    status: 'finished',
-    user: {
-      firstName: "",
-      lastName: "",
-      image: {
-        imageData: ""
-      }
-    },
-    services: []
-  },
-
-];

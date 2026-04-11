@@ -162,6 +162,9 @@
     "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione? Questa azione non può essere annullata."
   },
   "rental": {
+    "startDate": "Ritiro",
+    "endDate": "Restituzione",
+    "inclServices": "Tutti i servizi inclusi",
     "title": "Prenota Auto",
     "step1": "Date",
     "step2": "Opzioni e Riepilogo",
@@ -192,6 +195,7 @@
     "backHome": "Torna alla Home"
   },
   "account": {
+    "phoneNumber": "Telefono",
     "profile": "Il Mio Profilo",
     "savedCars": "Auto a noleggio salvate",
     "myBookings": "Le mie prenotazioni",
@@ -245,9 +249,17 @@
     "dark": "Scuro",
     "light": "Chiaro",
     "save": "Salva",
-    "settingsSaved": "Impostazioni salvate con successo!"
+    "settingsSaved": "Impostazioni salvate con successo!",
+    "cancel": "Annulla",
+    "cancelBookingTitle": "Annulla Prenotazione",
+    "cancelBookingConfirmText": "Sei sicuro di voler annullare questa prenotazione? Questa azione non può essere annullata.",
+    "cancelReason": "Motivo (opzionale)",
+    "cancelReasonPlaceholder": "Dicci perché stai annullando...",
+    "confirmCancel": "Annulla prenotazione",
+    "pending": "In attesa"
   },
   "admin": {
+    "bookingDetails": "Dettagli Prenotazione",
     "promotions": "Promozioni",
     "aditionalServices": "Servizi Aggiuntivi",
     "managefeaturedCars": "Gestisci Auto in Evidenza",
@@ -403,7 +415,21 @@
     "preview": "Anteprima",
     "edit": "Modifica",
     "delete": "Elimina",
-    "noCarsFound": "Nessuna auto trovata"
+    "noCarsFound": "Nessuna auto trovata",
+    "acceptBooking": "Accetta Prenotazione",
+    "refuseBooking": "Rifiuta Prenotazione",
+    "acceptBookingTitle": "Accetta Prenotazione",
+    "acceptBookingConfirmMessage": "Sei sicuro di voler accettare la prenotazione {{ref}}?",
+    "confirmAccept": "Conferma Accettazione",
+    "refuseBookingTitle": "Rifiuta Prenotazione",
+    "refuseReason": "Motivo (opzionale)",
+    "refuseReasonPlaceholder": "Inserisci un motivo per il rifiuto...",
+    "confirmRefuse": "Conferma Rifiuto",
+    "bookingAccepted": "Prenotazione accettata con successo",
+    "bookingRefused": "Prenotazione rifiutata con successo",
+    "bookingsLoadFailed": "Caricamento delle prenotazioni fallito",
+    "statusUpdateFailed": "Aggiornamento dello stato fallito",
+    "refusedBy": "Rifiutato da"
   },
   "login": {
     "title": "Bentornato",

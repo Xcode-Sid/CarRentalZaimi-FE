@@ -12,19 +12,18 @@ import {
   Button,
   ActionIcon,
   TextInput,
+  Textarea,
   Pagination,
   Loader,
   Center,
+  Tooltip,
 } from '@mantine/core';
-import { IconEye } from '@tabler/icons-react';
+import { IconEye, IconCheck, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notifications } from '@mantine/notifications';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
-import { displayNameForUserId } from '../../utils/userDisplay';
 import { BookingDetailContent, bookingStatusKeys } from '../../components/booking/BookingDetailContent';
-
-import { users } from '../../data/users';
 import { useDebouncedValue } from '@mantine/hooks';
 import { get, put } from '../../utils/api.utils';
 import { toImagePath } from '../../utils/general';
@@ -35,9 +34,6 @@ const statusColors: Record<string, string> = {
   refused: 'red',
   finished: 'gray',
 };
-
-
-
 
 interface PagedResponse<T> {
   items: T[];
@@ -62,6 +58,13 @@ export default function AdminBookingsPage() {
   const [paymentFilter, setPaymentFilter] = useState<'cash' | 'card' | null>(null);
   const liveBooking = selected ? bookings.find((b) => b.id === selected.id) ?? selected : null;
 
+  const [acceptTarget, setAcceptTarget] = useState<Booking | null>(null);
+  const [acceptLoading, setAcceptLoading] = useState(false);
+
+  const [refuseTarget, setRefuseTarget] = useState<Booking | null>(null);
+  const [refuseReason, setRefuseReason] = useState('');
+  const [refuseLoading, setRefuseLoading] = useState(false);
+
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
@@ -73,9 +76,10 @@ export default function AdminBookingsPage() {
       if (paymentFilter) params.set('paymentType', paymentFilter);
 
       const response = await get(`Booking/getAll?${params.toString()}`);
+      console.log('res', response.data)
       if (response.success) {
         const paged: PagedResponse<any> = response.data;
-        setBookings(paged.items.map(mapApiBooking));  // ← map each raw DTO
+        setBookings(paged.items.map(mapApiBooking));
         setTotalCount(paged.totalCount);
       }
     } catch (error) {
@@ -89,7 +93,6 @@ export default function AdminBookingsPage() {
     }
   }, [pageNr, debouncedSearch, statusFilter, paymentFilter, t]);
 
-  // Reset to page 1 when filters change
   useEffect(() => {
     setPageNr(1);
   }, [debouncedSearch, statusFilter, paymentFilter]);
@@ -98,23 +101,55 @@ export default function AdminBookingsPage() {
     fetchBookings();
   }, [fetchBookings]);
 
-  const updateBookingStatus = async (id: string, status: BookingStatus) => {
+
+  const acceptBooking = async () => {
+    if (!acceptTarget) return;
+    setAcceptLoading(true);
     try {
-      const response = await put(`Booking/updateStatus/${id}`, { status });
+      const response = await put(`Booking/accept/${acceptTarget.id}`, {});
       if (response.success) {
         setBookings((prev) =>
-          prev.map((b) => (b.id === id ? { ...b, status } : b))
+          prev.map((b) => (b.id === acceptTarget.id ? { ...b, status: 'accepted' as BookingStatus } : b))
         );
-        if (selected?.id === id) {
-          setSelected((prev) => prev ? { ...prev, status } : prev);
-        }
+        if (selected?.id === acceptTarget.id)
+          setSelected((prev) => (prev ? { ...prev, status: 'accepted' as BookingStatus } : prev));
+        notifications.show({ message: t('admin.bookingAccepted'), color: 'green' });
+        setAcceptTarget(null);
+      } else {
+
+        notifications.show({ message: response.errors, color: 'red' });
       }
-    } catch (error) {
-      console.error('Failed to update booking status:', error);
-      notifications.show({
-        message: t('admin.statusUpdateFailed'),
-        color: 'red',
+    } catch (err: any) {
+      notifications.show({ message: err, color: 'red' });
+    } finally {
+      setAcceptLoading(false);
+    }
+  };
+
+  const refuseBooking = async () => {
+    if (!refuseTarget) return;
+    setRefuseLoading(true);
+    try {
+      const response = await put(`Booking/refuse/${refuseTarget.id}`, {
+        bookingId: refuseTarget.id,
+        refusedReason: refuseReason,
       });
+      if (response.success) {
+        setBookings((prev) =>
+          prev.map((b) =>
+            b.id === refuseTarget.id ? { ...b, status: 'refused' as BookingStatus } : b
+          )
+        );
+        if (selected?.id === refuseTarget.id)
+          setSelected((prev) => (prev ? { ...prev, status: 'refused' as BookingStatus } : prev));
+        notifications.show({ message: t('admin.bookingRefused'), color: 'orange' });
+        setRefuseTarget(null);
+        setRefuseReason('');
+      }
+    } catch {
+      notifications.show({ message: t('admin.statusUpdateFailed'), color: 'red' });
+    } finally {
+      setRefuseLoading(false);
     }
   };
 
@@ -184,6 +219,7 @@ export default function AdminBookingsPage() {
                   <Table.Th>{t('admin.dates')}</Table.Th>
                   <Table.Th>{t('admin.total')}</Table.Th>
                   <Table.Th>{t('admin.status')}</Table.Th>
+                  <Table.Th>{t('admin.refusedBy')}</Table.Th>
                   <Table.Th>{t('admin.carActions')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -214,7 +250,7 @@ export default function AdminBookingsPage() {
                       </Badge>
                     </Table.Td>
                     <Table.Td>
-                      {/* <Text size="sm">{formatBookingPeriod(b, t)}</Text> */}
+                      <Text size="sm">{formatBookingPeriod(b, t)}</Text>
                     </Table.Td>
                     <Table.Td>
                       <Text size="sm" fw={600}>€{b.total.toLocaleString()}</Text>
@@ -225,15 +261,60 @@ export default function AdminBookingsPage() {
                       </Badge>
                     </Table.Td>
                     <Table.Td>
-                      <ActionIcon
-                        variant="subtle"
-                        color="teal"
-                        size="sm"
-                        aria-label={t('admin.viewBookingDetails')}
-                        onClick={() => setSelected(b)}
-                      >
-                        <IconEye size={16} />
-                      </ActionIcon>
+                      {b.refuzedBy ? (
+                        <Badge
+                          color={b.refuzedBy === 'Admin' ? 'red' : 'blue'}
+                          variant="light"
+                          size="md"
+                          radius="md"
+                          tt="uppercase"
+                          style={{ fontWeight: 700, letterSpacing: '0.04em' }}
+                        >
+                          {b.refuzedBy}
+                        </Badge>
+                      ) : (
+                        <Text size="sm" c="dimmed">—</Text>
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      <Group gap={4} wrap="nowrap">
+                        <Tooltip label={t('admin.viewBookingDetails')} withArrow position="top">
+                          <ActionIcon
+                            variant="subtle"
+                            color="teal"
+                            size="sm"
+                            onClick={() => setSelected(b)}
+                          >
+                            <IconEye size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+
+                        {b.status === 'accepted' && (
+                          <>
+                            <Tooltip label={t('admin.acceptBooking')} withArrow position="top">
+                              <ActionIcon
+                                variant="subtle"
+                                color="green"
+                                size="sm"
+                                onClick={() => setAcceptTarget(b)}
+                              >
+                                <IconCheck size={16} />
+                              </ActionIcon>
+                            </Tooltip>
+
+                            <Tooltip label={t('admin.refuseBooking')} withArrow position="top">
+                              <ActionIcon
+                                variant="subtle"
+                                color="red"
+                                size="sm"
+                                onClick={() => setRefuseTarget(b)}
+                              >
+                                <IconX size={16} />
+                              </ActionIcon>
+                            </Tooltip>
+                          </>
+                        )}
+                      </Group>
                     </Table.Td>
                   </Table.Tr>
                 ))}
@@ -254,6 +335,7 @@ export default function AdminBookingsPage() {
         </>
       )}
 
+      {/* Booking Detail Modal */}
       <Modal
         opened={!!liveBooking}
         onClose={() => setSelected(null)}
@@ -261,9 +343,11 @@ export default function AdminBookingsPage() {
         size="lg"
         radius="xl"
         padding={0}
-        overlayProps={{ backgroundOpacity: 0.6, blur: 4 }}
-        transitionProps={{ transition: 'pop', duration: 200 }}
-        classNames={{ content: 'booking-detail-modal glass-card' }}
+        lockScroll={false}
+        styles={{
+          body: { overflow: 'hidden' },
+          content: { overflow: 'hidden' },
+        }}
       >
         <AnimatePresence mode="wait">
           {liveBooking && (
@@ -276,29 +360,79 @@ export default function AdminBookingsPage() {
             >
               <BookingDetailContent
                 booking={liveBooking}
-                vehicleImageUrl={liveBooking.vehicleIamge}
-                headerStatusSlot={null}
-                footer={
-                  <Stack gap="md" mt="xl">
-                    <Select
-                      label={t('admin.status')}
-                      value={liveBooking.status}
-                      onChange={(v) => v && updateBookingStatus(liveBooking.id, v as BookingStatus)}
-                      data={[
-                        { value: 'accepted', label: t('account.accepted') },
-                        { value: 'refused', label: t('account.refused') },
-                        { value: 'finished', label: t('account.finished') },
-                      ]}
-                    />
-                    <Button variant="light" color="gray" onClick={() => setSelected(null)} radius="xl" fullWidth>
-                      {t('account.closeModal')}
-                    </Button>
-                  </Stack>
-                }
               />
             </motion.div>
           )}
         </AnimatePresence>
+      </Modal>
+
+      {/* Accept Confirmation Modal */}
+      <Modal
+        opened={!!acceptTarget}
+        onClose={() => setAcceptTarget(null)}
+        title={t('admin.acceptBookingTitle')}
+        radius="lg"
+        size="sm"
+        overlayProps={{ backgroundOpacity: 0.5, blur: 3 }}
+      >
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">
+            {t('admin.acceptBookingConfirmMessage', { ref: acceptTarget?.ref })}
+          </Text>
+          <Group justify="flex-end">
+            <Button
+              variant="subtle"
+              color="gray"
+              onClick={() => setAcceptTarget(null)}
+            >
+              {t('account.closeModal')}
+            </Button>
+            <Button
+              color="green"
+              loading={acceptLoading}
+              onClick={acceptBooking}
+            >
+              {t('admin.confirmAccept')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Refuse Booking Modal */}
+      <Modal
+        opened={!!refuseTarget}
+        onClose={() => { setRefuseTarget(null); setRefuseReason(''); }}
+        title={t('admin.refuseBookingTitle')}
+        radius="lg"
+        size="sm"
+        overlayProps={{ backgroundOpacity: 0.5, blur: 3 }}
+      >
+        <Stack gap="md">
+          <Textarea
+            label={t('admin.refuseReason')}
+            placeholder={t('admin.refuseReasonPlaceholder')}
+            value={refuseReason}
+            onChange={(e) => setRefuseReason(e.currentTarget.value)}
+            minRows={3}
+            autosize
+          />
+          <Group justify="flex-end">
+            <Button
+              variant="subtle"
+              color="gray"
+              onClick={() => { setRefuseTarget(null); setRefuseReason(''); }}
+            >
+              {t('account.closeModal')}
+            </Button>
+            <Button
+              color="red"
+              loading={refuseLoading}
+              onClick={refuseBooking}
+            >
+              {t('admin.confirmRefuse')}
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
     </Stack>
   );

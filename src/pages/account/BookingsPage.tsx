@@ -13,12 +13,15 @@ import {
   Modal,
   Button,
   TextInput,
+  Textarea,
   Select,
   Loader,
   Center,
   Pagination,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
-import { IconCalendar, IconCar, IconChevronRight, IconSearch } from '@tabler/icons-react';
+import { IconCalendar, IconCar, IconChevronRight, IconSearch, IconX, IconEye } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -31,7 +34,7 @@ import {
   bookingStatusColors,
   bookingStatusKeys,
 } from '../../components/booking/BookingDetailContent';
-import { get } from '../../utils/api.utils';
+import { get, put } from '../../utils/api.utils';
 
 
 const PAGE_SIZE = 10;
@@ -63,39 +66,136 @@ function VehicleThumb({ imageUrl }: { imageUrl?: string }) {
   );
 }
 
+// ─── Cancel Confirmation Modal ─────────────────────────────────────────────────
+
+interface CancelModalProps {
+  booking: Booking | null;
+  onClose: () => void;
+  onConfirm: (reason: string) => Promise<void>;
+  loading: boolean;
+}
+
+function CancelModal({ booking, onClose, onConfirm, loading }: CancelModalProps) {
+  const { t } = useTranslation();
+  const [reason, setReason] = useState('');
+
+  useEffect(() => {
+    if (booking) setReason('');
+  }, [booking?.id]);
+
+  const handleConfirm = async () => {
+    await onConfirm(reason);
+  };
+
+  return (
+    <Modal
+      opened={!!booking}
+      onClose={onClose}
+      title={
+        <Group gap={8}>
+          <ThemeIcon color="red" variant="light" size="sm" radius="xl">
+            <IconX size={14} />
+          </ThemeIcon>
+          <Text fw={700} size="md">
+            {t('account.cancelBookingTitle')}
+          </Text>
+        </Group>
+      }
+      size="sm"
+      radius="xl"
+      padding="xl"
+      overlayProps={{ backgroundOpacity: 0.6, blur: 4 }}
+      transitionProps={{ transition: 'pop', duration: 200 }}
+      classNames={{ content: 'glass-card' }}
+    >
+      <Stack gap="md">
+        <Text size="sm" c="dimmed">
+          {t('account.cancelBookingConfirmText')}
+        </Text>
+
+        {booking && (
+          <Box
+            p="sm"
+            style={{
+              borderRadius: 'var(--mantine-radius-md)',
+              background: 'color-mix(in srgb, var(--mantine-color-red-6) 6%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--mantine-color-red-6) 20%, transparent)',
+            }}
+          >
+            <Text size="sm" fw={600} ff="monospace" c="red">
+              {booking.ref}
+            </Text>
+            <Text size="xs" c="dimmed" mt={2}>
+              {booking.vehicleName}
+            </Text>
+          </Box>
+        )}
+
+        <Textarea
+          label={t('account.cancelReason') ?? 'Reason (optional)'}
+          placeholder={t('account.cancelReasonPlaceholder')}
+          value={reason}
+          onChange={(e) => setReason(e.currentTarget.value)}
+          minRows={3}
+          radius="md"
+          autosize
+        />
+
+        <Group grow mt="xs">
+          <Button
+            variant="light"
+            color="gray"
+            radius="xl"
+            onClick={onClose}
+            disabled={loading}
+          >
+            {t('account.closeModal')}
+          </Button>
+          <Button
+            color="red"
+            radius="xl"
+            loading={loading}
+            onClick={handleConfirm}
+            leftSection={<IconX size={16} />}
+          >
+            {t('account.confirmCancel')}
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
+  );
+}
+
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BookingsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  // ── Data state ──
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  // ── Filter / pagination state ──
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [paymentFilter, setPaymentFilter] = useState<string | null>(null);
 
-  // ── Modal ──
   const [selected, setSelected] = useState<Booking | null>(null);
 
-  // Debounce search
+  const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 400);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reset to page 1 when filters change
   useEffect(() => { setPage(1); }, [debouncedSearch, statusFilter, paymentFilter]);
 
-  // ── Fetch ──
   const fetchBookings = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
@@ -125,6 +225,30 @@ export default function BookingsPage() {
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
+  const openCancelModal = (booking: Booking, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCancelTarget(booking);
+  };
+
+  const handleCancelConfirm = async (reason: string) => {
+    if (!cancelTarget || !user?.id) return;
+    setCancelLoading(true);
+    try {
+      const res = await put(`Booking/cancel/${cancelTarget.id}`, {
+        bookingId: cancelTarget.id,
+        reason: reason.trim() || null,
+      });
+      if (!res.success) throw new Error(res.message || 'Failed to cancel booking');
+      setCancelTarget(null);
+      setSelected(null);
+      await fetchBookings();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   const handleReset = () => {
     setSearch('');
     setStatusFilter(null);
@@ -135,7 +259,6 @@ export default function BookingsPage() {
   const startItem = (page - 1) * PAGE_SIZE + 1;
   const endItem = Math.min(page * PAGE_SIZE, totalCount);
 
-  // ── Render ──
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -175,7 +298,7 @@ export default function BookingsPage() {
           </Stack>
         </AnimatedSection>
 
-        {/* Filters — always visible so user can reset even when empty */}
+        {/* Filters */}
         <AnimatedSection delay={0.08}>
           <Group wrap="wrap" align="end" mb="sm">
             <TextInput
@@ -226,16 +349,12 @@ export default function BookingsPage() {
         ) : bookings.length > 0 ? (
           <AnimatedSection delay={0.1}>
             <Stack gap="md">
-              <Text size="xs" c="dimmed" style={{ letterSpacing: '0.02em' }}>
-                {t('account.clickRowForDetails')}
-              </Text>
-
               <Box
                 className="glass-card card-gradient-border account-rentals-shell"
                 p={{ base: 'md', sm: 'xl' }}
                 style={{ borderRadius: 'var(--mantine-radius-xl)', overflow: 'hidden' }}
               >
-                <Table.ScrollContainer minWidth={720} type="native">
+                <Table.ScrollContainer minWidth={760} type="native">
                   <Table
                     striped
                     highlightOnHover
@@ -262,34 +381,28 @@ export default function BookingsPage() {
                         <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
                           {t('account.status')}
                         </Table.Th>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.refusedBy')}
+                        </Table.Th>
+                        <Table.Th style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+                          {t('account.actions')}
+                        </Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
                       {bookings.map((b, i) => {
                         const refused = b.status === 'refused';
+                        const isAccepted = b.status === 'accepted';
                         return (
                           <Table.Tr
                             key={b.id}
                             className="account-rental-row animate-stagger-up"
                             style={{ '--stagger-delay': `${i * 0.06}s` } as CSSProperties}
-                            onClick={() => setSelected(b)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                setSelected(b);
-                              }
-                            }}
-                            tabIndex={0}
-                            role="button"
-                            aria-label={`${t('account.bookingDetailsTitle')}: ${b.ref}`}
                           >
                             <Table.Td>
-                              <Group gap={4} wrap="nowrap">
-                                <Text size="sm" fw={600} ff="monospace">
-                                  {b.ref}
-                                </Text>
-                                <IconChevronRight size={14} style={{ opacity: 0.35, flexShrink: 0 }} />
-                              </Group>
+                              <Text size="sm" fw={600} ff="monospace">
+                                {b.ref}
+                              </Text>
                             </Table.Td>
                             <Table.Td>
                               <Group gap="sm" wrap="nowrap">
@@ -328,6 +441,48 @@ export default function BookingsPage() {
                               >
                                 {t(bookingStatusKeys[b.status])}
                               </Badge>
+                            </Table.Td>
+                            <Table.Td>
+                              {b.refuzedBy ? (
+                                <Badge
+                                  color={b.refuzedBy === 'Admin' ? 'red' : 'blue'}
+                                  variant="light"
+                                  size="md"
+                                  radius="md"
+                                  tt="uppercase"
+                                  style={{ fontWeight: 700, letterSpacing: '0.04em' }}
+                                >
+                                  {b.refuzedBy}
+                                </Badge>
+                              ) : (
+                                <Text size="sm" c="dimmed">—</Text>
+                              )}
+                            </Table.Td>
+                            <Table.Td>
+                              <Group gap={4} wrap="nowrap">
+                                <Tooltip label={t('account.viewDetails') ?? 'View details'} withArrow position="top">
+                                  <ActionIcon
+                                    variant="subtle"
+                                    color="teal"
+                                    size="sm"
+                                    onClick={() => setSelected(b)}
+                                  >
+                                    <IconEye size={16} />
+                                  </ActionIcon>
+                                </Tooltip>
+                                {isAccepted && (
+                                  <Tooltip label={t('account.cancel') ?? 'Cancel'} withArrow position="top">
+                                    <ActionIcon
+                                      variant="subtle"
+                                      color="red"
+                                      size="sm"
+                                      onClick={(e) => openCancelModal(b, e)}
+                                    >
+                                      <IconX size={16} />
+                                    </ActionIcon>
+                                  </Tooltip>
+                                )}
+                              </Group>
                             </Table.Td>
                           </Table.Tr>
                         );
@@ -384,9 +539,11 @@ export default function BookingsPage() {
         size="lg"
         radius="xl"
         padding={0}
-        overlayProps={{ backgroundOpacity: 0.6, blur: 4 }}
-        transitionProps={{ transition: 'pop', duration: 200 }}
-        classNames={{ content: 'booking-detail-modal glass-card' }}
+        lockScroll={false}
+        styles={{
+          body: { overflow: 'hidden' },
+          content: { overflow: 'hidden' },
+        }}
       >
         <AnimatePresence mode="wait">
           {selected && (
@@ -397,39 +554,19 @@ export default function BookingsPage() {
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
               transition={{ type: 'spring', stiffness: 380, damping: 28 }}
             >
-              <BookingDetailContent
-                booking={selected}
-                vehicleImageUrl={selected.vehicleIamge}
-                footer={
-                  <Group mt="xl" grow>
-                    <Button
-                      variant="light"
-                      color="gray"
-                      onClick={() => setSelected(null)}
-                      radius="xl"
-                    >
-                      {t('account.closeModal')}
-                    </Button>
-                    {selected.vehicleId && (
-                      <Button
-                        component={Link}
-                        to={`/fleet/${selected.vehicleId}`}
-                        variant="filled"
-                        color="teal"
-                        radius="xl"
-                        rightSection={<IconChevronRight size={18} />}
-                        onClick={() => setSelected(null)}
-                      >
-                        {t('account.viewCar')}
-                      </Button>
-                    )}
-                  </Group>
-                }
-              />
+              <BookingDetailContent booking={selected} />
             </motion.div>
           )}
         </AnimatePresence>
       </Modal>
+
+      {/* Cancel Confirmation Modal */}
+      <CancelModal
+        booking={cancelTarget}
+        onClose={() => setCancelTarget(null)}
+        onConfirm={handleCancelConfirm}
+        loading={cancelLoading}
+      />
     </motion.div>
   );
 }

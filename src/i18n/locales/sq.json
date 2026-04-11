@@ -162,6 +162,9 @@
     "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
+    "startDate": "Marrja",
+    "endDate": "Kthimi",
+    "inclServices": "Të gjitha shërbimet të përfshira",
     "title": "Rezervo Makinën",
     "step1": "Datat",
     "step2": "Opsionet & Përmbledhja",
@@ -192,6 +195,7 @@
     "backHome": "Kthehu në Faqen Kryesore"
   },
   "account": {
+    "phoneNumber": "Telefon",
     "profile": "Profili Im",
     "savedCars": "Makina me qira të ruajtura",
     "myBookings": "Rezervimet e mia",
@@ -245,9 +249,18 @@
     "dark": "E errët",
     "light": "E ndritshme",
     "save": "Ruaj",
-    "settingsSaved": "Cilësimet u ruajtën me sukses!"
+    "settingsSaved": "Cilësimet u ruajtën me sukses!",
+    "cancel": "Anulo",
+    "cancelBookingTitle": "Anulo Rezervimin",
+    "cancelBookingConfirmText": "Jeni i sigurt që dëshironi të anuloni këtë rezervim? Ky veprim nuk mund të kthehet.",
+    "cancelReason": "Arsyeja (opsionale)",
+    "cancelReasonPlaceholder": "Na tregoni pse po anuloni...",
+    "confirmCancel": "Anulo rezervimin",
+    "pending": "Në pritje"
   },
   "admin": {
+    "bookingDetails": "Detajet e Rezervimit",
+    "refusedBy": "Refuzuar nga",
     "promotions": "Promocionet",
     "aditionalServices": "Shërbime Shtesë",
     "managefeaturedCars": "Menaxho Makina të Rekomanduara",
@@ -402,7 +415,20 @@
     "preview": "Pamje paraprake",
     "edit": "Ndrysho",
     "delete": "Fshi",
-    "noCarsFound": "Nuk u gjet asnjë makinë"
+    "noCarsFound": "Nuk u gjet asnjë makinë",
+    "acceptBooking": "Prano Rezervimin",
+    "refuseBooking": "Refuzo Rezervimin",
+    "acceptBookingTitle": "Prano Rezervimin",
+    "acceptBookingConfirmMessage": "Jeni të sigurt që doni të pranoni rezervimin {{ref}}?",
+    "confirmAccept": "Konfirmo Pranimin",
+    "refuseBookingTitle": "Refuzo Rezervimin",
+    "refuseReason": "Arsyeja (opsionale)",
+    "refuseReasonPlaceholder": "Shkruani arsyen e refuzimit...",
+    "confirmRefuse": "Konfirmo Refuzimin",
+    "bookingAccepted": "Rezervimi u pranua me sukses",
+    "bookingRefused": "Rezervimi u refuzua me sukses",
+    "bookingsLoadFailed": "Dështoi ngarkimi i rezervimeve",
+    "statusUpdateFailed": "Dështoi përditësimi i statusit"
   },
   "login": {
     "title": "Mirë se Vini Përsëri",
