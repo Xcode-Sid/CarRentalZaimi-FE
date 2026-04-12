@@ -291,6 +291,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "privacies": "Informativa sulla Privacy",
     "terms": "Termini & Condizioni",
     "partners": "Partner",
     "stats": "Statistiche",
@@ -932,12 +933,12 @@
   "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
   "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata",
   "terms": {
-    "pageTitle": "Termini & Condizioni",
-    "pageSubtitle": "Gestisci i termini e le condizioni",
+    "title": "Termini e Condizioni",
+    "subtitle": "Gestisci le voci dei termini e condizioni",
     "addTerm": "Aggiungi Termine",
     "searchPlaceholder": "Cerca termini…",
     "refresh": "Aggiorna",
-    "columns": {
+    "table": {
       "title": "Titolo",
       "description": "Descrizione",
       "color": "Colore",
@@ -945,37 +946,119 @@
       "status": "Stato",
       "actions": "Azioni"
     },
-    "noTermsFound": "Nessun termine trovato",
-    "tryDifferentSearch": "Prova un termine di ricerca diverso",
-    "addFirstTerm": "Aggiungi il primo termine per iniziare",
-    "showing": "Visualizzazione",
-    "of": "di",
-    "terms": "termini",
-    "active": "Attivo",
-    "inactive": "Inattivo",
-    "editTerm": "Modifica Termine",
-    "createTerm": "Crea Termine",
-    "saveChanges": "Salva Modifiche",
-    "deleteTerm": "Elimina Termine",
-    "deleteConfirm": "Sei sicuro di voler eliminare",
-    "deleteWarning": "Questa azione non può essere annullata.",
-    "cancel": "Annulla",
-    "delete": "Elimina",
-    "editTooltip": "Modifica termine",
-    "deleteTooltip": "Elimina termine",
+    "empty": {
+      "title": "Nessun termine trovato",
+      "hint": "Aggiungi il tuo primo termine per iniziare",
+      "searchHint": "Prova con un termine di ricerca diverso"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo"
+    },
+    "actions": {
+      "edit": "Modifica termine",
+      "delete": "Elimina termine"
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "terms": "termini"
+    },
+    "modal": {
+      "editTitle": "Modifica Termine",
+      "addTitle": "Aggiungi Termine"
+    },
     "form": {
       "titleLabel": "Titolo",
       "titlePlaceholder": "es. Informativa sulla Privacy",
-      "titleRequired": "Il titolo è obbligatorio",
       "descriptionLabel": "Descrizione",
-      "descriptionPlaceholder": "Inserisci la descrizione completa del termine…",
-      "descriptionRequired": "La descrizione è obbligatoria",
+      "descriptionPlaceholder": "Inserisci la descrizione completa o il contenuto di questo termine…",
       "iconLabel": "Icona",
       "iconPlaceholder": "Seleziona un'icona (opzionale)",
       "colorLabel": "Colore",
-      "colorRequired": "Il colore è obbligatorio",
       "activeLabel": "Attivo",
-      "activeDescription": "I termini inattivi sono nascosti dalle aree pubbliche"
+      "activeDescription": "I termini inattivi sono nascosti dalle aree pubbliche",
+      "saveChanges": "Salva Modifiche",
+      "createTerm": "Crea Termine"
+    },
+    "validation": {
+      "titleRequired": "Il titolo è obbligatorio",
+      "descriptionRequired": "La descrizione è obbligatoria",
+      "colorRequired": "Il colore è obbligatorio"
+    },
+    "errors": {
+      "loadFailed": "Caricamento dei termini non riuscito",
+      "updateFailed": "Aggiornamento del termine non riuscito",
+      "createFailed": "Creazione del termine non riuscita",
+      "deleteFailed": "Eliminazione del termine non riuscita",
+      "unknown": "Errore sconosciuto"
     }
-  }
+  },
+  "delte": "Elimina",
+  "deleteUndone": "Questa azione non può essere annullata.",
+  "privacyPolicy": {
+    "title": "Informativa sulla Privacy",
+    "subtitle": "Gestisci le voci dell'informativa sulla privacy",
+    "addPolicy": "Aggiungi Politica",
+    "searchPlaceholder": "Cerca politiche…",
+    "refresh": "Aggiorna",
+    "table": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "color": "Colore",
+      "icon": "Icona",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "title": "Nessuna politica trovata",
+      "hint": "Aggiungi la tua prima politica per iniziare",
+      "searchHint": "Prova con un termine di ricerca diverso"
+    },
+    "status": {
+      "active": "Attiva",
+      "inactive": "Inattiva"
+    },
+    "actions": {
+      "edit": "Modifica politica",
+      "delete": "Elimina politica"
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "policies": "politiche"
+    },
+    "modal": {
+      "editTitle": "Modifica Politica",
+      "addTitle": "Aggiungi Politica"
+    },
+    "form": {
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "es. Raccolta Dati",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Inserisci la descrizione completa o il contenuto di questa politica…",
+      "iconLabel": "Icona",
+      "iconPlaceholder": "Seleziona un'icona (opzionale)",
+      "colorLabel": "Colore",
+      "activeLabel": "Attiva",
+      "activeDescription": "Le politiche inattive sono nascoste dalle aree pubbliche",
+      "saveChanges": "Salva Modifiche",
+      "createPolicy": "Crea Politica"
+    },
+    "deleteModal": {
+      "title": "Elimina Politica",
+      "confirm": "Sei sicuro di voler eliminare {{name}}?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    },
+    "validation": {
+      "titleRequired": "Il titolo è obbligatorio",
+      "descriptionRequired": "La descrizione è obbligatoria",
+      "colorRequired": "Il colore è obbligatorio"
+    }
+  },
+  "failedToUpdatePrivacyPolicies": "Aggiornamento della politica sulla privacy fallito. Per favore riprova.",
+  "failedToCreatePrivacyPolicies": "Creazione della politica sulla privacy fallita. Per favore riprova.",
+  "failedToDeletePrivacyPolicies": "Eliminazione della politica sulla privacy fallita. Per favore riprova."
 }

@@ -297,6 +297,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "privacies": "Privacy Policy",
     "terms": "Terms & Conditions",
     "bookingDetails": "Booking Details",
     "refusedBy": "Refused by",
@@ -938,12 +939,12 @@
   "carWasAddedToSaveSollection": "Car added to your saved collection",
   "carWasRemovedFromSavecollection": "Car removed from your saved collection",
   "terms": {
-    "pageTitle": "Terms & Conditions",
-    "pageSubtitle": "Manage terms and conditions entries",
+    "title": "Terms & Conditions",
+    "subtitle": "Manage terms and conditions entries",
     "addTerm": "Add Term",
     "searchPlaceholder": "Search terms…",
     "refresh": "Refresh",
-    "columns": {
+    "table": {
       "title": "Title",
       "description": "Description",
       "color": "Color",
@@ -951,37 +952,117 @@
       "status": "Status",
       "actions": "Actions"
     },
-    "noTermsFound": "No terms found",
-    "tryDifferentSearch": "Try a different search term",
-    "addFirstTerm": "Add your first term to get started",
-    "showing": "Showing",
-    "of": "of",
-    "terms": "terms",
-    "active": "Active",
-    "inactive": "Inactive",
-    "editTerm": "Edit Term",
-    "createTerm": "Create Term",
-    "saveChanges": "Save Changes",
-    "deleteTerm": "Delete Term",
-    "deleteConfirm": "Are you sure you want to delete",
-    "deleteWarning": "This action cannot be undone.",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "editTooltip": "Edit term",
-    "deleteTooltip": "Delete term",
+    "empty": {
+      "title": "No terms found",
+      "hint": "Add your first term to get started",
+      "searchHint": "Try a different search term"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit term",
+      "delete": "Delete term"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "terms": "terms"
+    },
+    "modal": {
+      "editTitle": "Edit Term",
+      "addTitle": "Add Term"
+    },
     "form": {
       "titleLabel": "Title",
       "titlePlaceholder": "e.g. Privacy Policy",
-      "titleRequired": "Title is required",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Enter the full description or content of this term…",
-      "descriptionRequired": "Description is required",
       "iconLabel": "Icon",
       "iconPlaceholder": "Select an icon (optional)",
       "colorLabel": "Color",
-      "colorRequired": "Color is required",
       "activeLabel": "Active",
-      "activeDescription": "Inactive terms are hidden from public-facing areas"
+      "activeDescription": "Inactive terms are hidden from public-facing areas",
+      "saveChanges": "Save Changes",
+      "createTerm": "Create Term"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "colorRequired": "Color is required"
+    },
+    "errors": {
+      "loadFailed": "Failed to load terms",
+      "updateFailed": "Failed to update term",
+      "createFailed": "Failed to create term",
+      "deleteFailed": "Failed to delete term",
+      "unknown": "Unknown error"
     }
-  }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "subtitle": "Manage privacy policy entries",
+    "addPolicy": "Add Policy",
+    "searchPlaceholder": "Search policies…",
+    "refresh": "Refresh",
+    "table": {
+      "title": "Title",
+      "description": "Description",
+      "color": "Color",
+      "icon": "Icon",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No policies found",
+      "hint": "Add your first policy to get started",
+      "searchHint": "Try a different search term"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit policy",
+      "delete": "Delete policy"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "policies": "policies"
+    },
+    "modal": {
+      "editTitle": "Edit Policy",
+      "addTitle": "Add Policy"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Data Collection",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter the full description or content of this policy…",
+      "iconLabel": "Icon",
+      "iconPlaceholder": "Select an icon (optional)",
+      "colorLabel": "Color",
+      "activeLabel": "Active",
+      "activeDescription": "Inactive policies are hidden from public-facing areas",
+      "saveChanges": "Save Changes",
+      "createPolicy": "Create Policy"
+    },
+    "deleteModal": {
+      "title": "Delete Policy",
+      "confirm": "Are you sure you want to delete {{name}}?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "colorRequired": "Color is required"
+    }
+  },
+  "failedToUpdatePrivacyPolicies": "Failed to update privacy policy. Please try again.",
+  "failedToCreatePrivacyPolicies": "Failed to create privacy policy. Please try again.",
+  "failedToDeletePrivacyPolicies": "Failed to delete privacy policy. Please try again."
 }

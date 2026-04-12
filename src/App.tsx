@@ -35,6 +35,7 @@ import AdminAdditionalServicesPage from './pages/account/AdditionalServicesPage 
 import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
 import PartnersPage from './pages/admin/PartnersPage';
 import TermsPage from './pages/admin/TermsPage';
+import PrivacyPolicyPage from './pages/admin/PrivacyPage';
 
 export default function App() {
   return (
@@ -94,6 +95,7 @@ export default function App() {
             <Route path="/admin/featured_cars" element={<RecomandedCarsPage />}  />
             <Route path="/admin/partners" element={<PartnersPage />} />
             <Route path="/admin/terms" element={<TermsPage />} />
+            <Route path="/admin/privacies" element={<PrivacyPolicyPage />} />
           </Route>
         </Route>
 

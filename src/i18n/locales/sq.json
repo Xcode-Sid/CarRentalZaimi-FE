@@ -297,6 +297,7 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "privacies": "Politika e Privatësisë",
     "terms": "Kushtet & Rregullat",
     "partners": "Partnerët",
     "stats": "Statistika",
@@ -937,12 +938,12 @@
   "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
   "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur",
   "terms": {
-    "pageTitle": "Kushtet & Rregullat",
-    "pageSubtitle": "Menaxhoni kushtet dhe rregullat",
+    "title": "Kushtet dhe Kushtet",
+    "subtitle": "Menaxho kushtet dhe konditat",
     "addTerm": "Shto Kusht",
     "searchPlaceholder": "Kërko kushte…",
     "refresh": "Rifresko",
-    "columns": {
+    "table": {
       "title": "Titulli",
       "description": "Përshkrimi",
       "color": "Ngjyra",
@@ -950,37 +951,119 @@
       "status": "Statusi",
       "actions": "Veprimet"
     },
-    "noTermsFound": "Nuk u gjetën kushte",
-    "tryDifferentSearch": "Provo një kërkesë tjetër",
-    "addFirstTerm": "Shto kushtin e parë për të filluar",
-    "showing": "Duke shfaqur",
-    "of": "nga",
-    "terms": "kushte",
-    "active": "Aktiv",
-    "inactive": "Joaktiv",
-    "editTerm": "Ndrysho Kushtin",
-    "createTerm": "Krijo Kusht",
-    "saveChanges": "Ruaj Ndryshimet",
-    "deleteTerm": "Fshi Kushtin",
-    "deleteConfirm": "A jeni i sigurt që doni të fshini",
-    "deleteWarning": "Ky veprim nuk mund të kthehet.",
-    "cancel": "Anulo",
-    "delete": "Fshi",
-    "editTooltip": "Ndrysho kushtin",
-    "deleteTooltip": "Fshi kushtin",
+    "empty": {
+      "title": "Asnjë kusht nuk u gjet",
+      "hint": "Shto kushtin tënd të parë për të filluar",
+      "searchHint": "Provo me një term kërkimi tjetër"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Joaktiv"
+    },
+    "actions": {
+      "edit": "Ndrysho kushtin",
+      "delete": "Fshi kushtin"
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "terms": "kushte"
+    },
+    "modal": {
+      "editTitle": "Ndrysho Kushtin",
+      "addTitle": "Shto Kusht"
+    },
     "form": {
       "titleLabel": "Titulli",
       "titlePlaceholder": "p.sh. Politika e Privatësisë",
-      "titleRequired": "Titulli është i detyrueshëm",
       "descriptionLabel": "Përshkrimi",
-      "descriptionPlaceholder": "Shkruani përshkrimin e plotë të kushtit…",
-      "descriptionRequired": "Përshkrimi është i detyrueshëm",
+      "descriptionPlaceholder": "Shkruaj përshkrimin e plotë ose përmbajtjen e këtij kushti…",
       "iconLabel": "Ikona",
-      "iconPlaceholder": "Zgjidhni një ikonë (opsionale)",
+      "iconPlaceholder": "Zgjidh një ikonë (opsionale)",
       "colorLabel": "Ngjyra",
-      "colorRequired": "Ngjyra është e detyrueshme",
       "activeLabel": "Aktiv",
-      "activeDescription": "Kushtet joaktive fshihen nga zonat publike"
+      "activeDescription": "Kushtet joaktive janë të fshehura nga zonat publike",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createTerm": "Krijo Kusht"
+    },
+    "validation": {
+      "titleRequired": "Titulli është i detyrueshëm",
+      "descriptionRequired": "Përshkrimi është i detyrueshëm",
+      "colorRequired": "Ngjyra është e detyrueshme"
+    },
+    "errors": {
+      "loadFailed": "Ngarkimi i kushteve dështoi",
+      "updateFailed": "Përditësimi i kushtit dështoi",
+      "createFailed": "Krijimi i kushtit dështoi",
+      "deleteFailed": "Fshirja e kushtit dështoi",
+      "unknown": "Gabim i panjohur"
     }
-  }
+  },
+  "delte": "Fshi",
+  "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
+  "privacyPolicy": {
+    "title": "Politika e Privatësisë",
+    "subtitle": "Menaxho politikat e privatësisë",
+    "addPolicy": "Shto Politikë",
+    "searchPlaceholder": "Kërko politika…",
+    "refresh": "Rifresko",
+    "table": {
+      "title": "Titulli",
+      "description": "Përshkrimi",
+      "color": "Ngjyra",
+      "icon": "Ikona",
+      "status": "Statusi",
+      "actions": "Veprimet"
+    },
+    "empty": {
+      "title": "Asnjë politikë nuk u gjet",
+      "hint": "Shto politikën tënde të parë për të filluar",
+      "searchHint": "Provo me një term kërkimi tjetër"
+    },
+    "status": {
+      "active": "Aktive",
+      "inactive": "Joaktive"
+    },
+    "actions": {
+      "edit": "Ndrysho politikën",
+      "delete": "Fshi politikën"
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "policies": "politika"
+    },
+    "modal": {
+      "editTitle": "Ndrysho Politikën",
+      "addTitle": "Shto Politikë"
+    },
+    "form": {
+      "titleLabel": "Titulli",
+      "titlePlaceholder": "p.sh. Mbledhja e të Dhënave",
+      "descriptionLabel": "Përshkrimi",
+      "descriptionPlaceholder": "Shkruaj përshkrimin e plotë ose përmbajtjen e kësaj politike…",
+      "iconLabel": "Ikona",
+      "iconPlaceholder": "Zgjidh një ikonë (opsionale)",
+      "colorLabel": "Ngjyra",
+      "activeLabel": "Aktive",
+      "activeDescription": "Politikat joaktive janë të fshehura nga zonat publike",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createPolicy": "Krijo Politikë"
+    },
+    "deleteModal": {
+      "title": "Fshi Politikën",
+      "confirm": "Jeni të sigurt që doni të fshini {{name}}?",
+      "warning": "Ky veprim nuk mund të zhbëhet.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    },
+    "validation": {
+      "titleRequired": "Titulli është i detyrueshëm",
+      "descriptionRequired": "Përshkrimi është i detyrueshëm",
+      "colorRequired": "Ngjyra është e detyrueshme"
+    }
+  },
+  "failedToUpdatePrivacyPolicies": "Përditësimi i politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
+  "failedToCreatePrivacyPolicies": "Krijimi i politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
+  "failedToDeletePrivacyPolicies": "Fshirja e politikës së privatësisë dështoi. Ju lutemi provoni përsëri."
 }

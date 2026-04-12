@@ -23,7 +23,7 @@ import {
   Box,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconEye, IconPencil, IconCalendar, IconSearch } from '@tabler/icons-react';
+import { IconEye, IconPencil, IconCalendar, IconSearch, IconUsers, IconCheck, IconBan } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ads } from '../../data/ads';
@@ -181,89 +181,192 @@ export default function CustomersPage() {
         <Center py="xl"><Text c="red" size="sm">{error}</Text></Center>
       ) : (
         <Stack gap="md">
-          <Table.ScrollContainer minWidth={700}>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('admin.customerId')}</Table.Th>
-                  <Table.Th>{t('admin.fullName')}</Table.Th>
-                  <Table.Th>{t('admin.email')}</Table.Th>
-                  <Table.Th>{t('admin.phone')}</Table.Th>
-                  <Table.Th>{t('admin.customerStatus')}</Table.Th>
-                  <Table.Th>{t('admin.carActions')}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {customers.length === 0 ? (
+          <Paper
+            radius="lg"
+            withBorder
+            style={{ overflow: "hidden", borderColor: "var(--mantine-color-default-border)" }}
+          >
+            <Table.ScrollContainer minWidth={700}>
+              <Table
+                highlightOnHover
+                verticalSpacing="sm"
+                horizontalSpacing="md"
+                styles={{
+                  thead: {
+                    background: "var(--mantine-color-default-hover)",
+                    borderBottom: "0.5px solid var(--mantine-color-default-border)",
+                  },
+                  th: {
+                    fontWeight: 500,
+                    fontSize: 12,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    color: "var(--mantine-color-dimmed)",
+                  },
+                }}
+              >
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={6}>
-                      <Text c="dimmed" size="sm" ta="center" py="md">
-                        {t('admin.noCustomersFound')}
-                      </Text>
-                    </Table.Td>
+                    <Table.Th w={60}>#</Table.Th>
+                    <Table.Th>{t('admin.fullName')}</Table.Th>
+                    <Table.Th>{t('admin.email')}</Table.Th>
+                    <Table.Th>{t('admin.phone')}</Table.Th>
+                    <Table.Th>{t('admin.customerStatus')}</Table.Th>
+                    <Table.Th w={90}>{t('admin.carActions')}</Table.Th>
                   </Table.Tr>
-                ) : (
-                  customers.map((c) => {
-                    const st = c.customerStatus ?? 'active';
-                    const initials = `${c.firstName?.[0] ?? ''}${c.lastName?.[0] ?? ''}`.toUpperCase();
-                    return (
-                      <Table.Tr key={c.id}>
-                        <Table.Td>
-                          <Text size="sm" fw={500}>{c.id}</Text>
-                        </Table.Td>
-                        <Table.Td>
-                          <Group gap="sm">
-                            <Avatar
-                              size="sm"
-                              radius="xl"
-                              color="teal"
-                              src={
-                                c.image?.imagePath
-                                  ? toImagePath(c.image.imagePath)
-                                  : undefined
-                              }
-                            >
-                              {initials}
-                            </Avatar>
-                            <Text size="sm">{c.firstName} {c.lastName}</Text>
-                          </Group>
-                        </Table.Td>
-                        <Table.Td><Text size="sm">{c.email}</Text></Table.Td>
-                        <Table.Td><Text size="sm">{c.phoneNumber ?? '—'}</Text></Table.Td>
-                        <Table.Td>
-                          <Badge color={st === 'active' ? 'green' : 'gray'} variant="light" size="sm">
-                            {st === 'active' ? t('admin.active') : t('admin.inactive')}
-                          </Badge>
-                        </Table.Td>
-                        <Table.Td>
-                          <Group gap={4}>
-                            <Tooltip label={t('admin.viewCustomer')}>
-                              <ActionIcon
-                                variant="subtle" color="teal" size="sm"
-                                onClick={() => setViewUser(c)}
-                                aria-label={t('admin.viewCustomer')}
-                              >
-                                <IconEye size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-                            <Tooltip label={t('admin.userBookings')}>
-                              <ActionIcon
-                                variant="subtle" color="grape" size="sm"
-                                onClick={() => openBookings(c)}
-                                aria-label={t('admin.userBookings')}
-                              >
-                                <IconCalendar size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-                          </Group>
-                        </Table.Td>
+                </Table.Thead>
+
+                <Table.Tbody>
+                  {/* Skeleton rows while loading */}
+                  {loading &&
+                    [1, 2, 3, 4].map((i) => (
+                      <Table.Tr key={i}>
+                        {[60, 20, 25 + i * 5, 30, 20, 15, 10].map((w, j) => (
+                          <Table.Td key={j}>
+                            <Box
+                              style={{
+                                height: 12,
+                                borderRadius: 6,
+                                background: "var(--mantine-color-default-border)",
+                                opacity: 0.5,
+                                width: `${w}%`,
+                                animation: "pulse 1.4s ease-in-out infinite",
+                              }}
+                            />
+                          </Table.Td>
+                        ))}
                       </Table.Tr>
-                    );
-                  })
-                )}
-              </Table.Tbody>
-            </Table>
-          </Table.ScrollContainer>
+                    ))}
+
+                  {/* Empty state */}
+                  {!loading && customers.length === 0 && (
+                    <Table.Tr>
+                      <Table.Td colSpan={7}>
+                        <Center py="xl">
+                          <Stack align="center" gap="xs">
+                            <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                              <IconUsers size={18} />
+                            </ThemeIcon>
+                            <Text size="sm" c="dimmed">
+                              {t('admin.noCustomersFound')}
+                            </Text>
+                          </Stack>
+                        </Center>
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+
+                  {/* Data rows */}
+                  {!loading &&
+                    customers.map((c, idx) => {
+                      const st = c.customerStatus ?? 'active';
+                      const initials = `${c.firstName?.[0] ?? ''}${c.lastName?.[0] ?? ''}`.toUpperCase();
+                      return (
+                        <motion.tr
+                          key={c.id}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
+                        >
+                          {/* Index */}
+                          <Table.Td>
+                            <Text size="xs" c="dimmed" fw={500}>
+                              #{String(idx + 1).padStart(3, "0")}
+                            </Text>
+                          </Table.Td>
+
+                          {/* Full Name */}
+                          <Table.Td>
+                            <Group gap="sm">
+                              <Avatar
+                                size="sm"
+                                radius="xl"
+                                color="teal"
+                                src={
+                                  c.image?.imagePath
+                                    ? toImagePath(c.image.imagePath)
+                                    : undefined
+                                }
+                              >
+                                {initials}
+                              </Avatar>
+                              <Text size="sm" fw={500}>
+                                {c.firstName} {c.lastName}
+                              </Text>
+                            </Group>
+                          </Table.Td>
+
+                          {/* Email */}
+                          <Table.Td>
+                            <Text size="sm" c="dimmed">{c.email}</Text>
+                          </Table.Td>
+
+                          {/* Phone */}
+                          <Table.Td>
+                            <Text size="sm" c="dimmed">{c.phoneNumber ?? '—'}</Text>
+                          </Table.Td>
+
+                          {/* Status */}
+                          <Table.Td>
+                            {st === 'active' ? (
+                              <Badge
+                                color="green"
+                                variant="light"
+                                size="sm"
+                                radius="md"
+                                leftSection={<IconCheck size={11} />}
+                              >
+                                {t('admin.active')}
+                              </Badge>
+                            ) : (
+                              <Badge
+                                color="gray"
+                                variant="light"
+                                size="sm"
+                                radius="md"
+                                leftSection={<IconBan size={11} />}
+                              >
+                                {t('admin.inactive')}
+                              </Badge>
+                            )}
+                          </Table.Td>
+
+                          {/* Actions */}
+                          <Table.Td>
+                            <Group gap={4}>
+                              <Tooltip label={t('admin.viewCustomer')} withArrow fz="xs">
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="teal"
+                                  size="sm"
+                                  radius="md"
+                                  onClick={() => setViewUser(c)}
+                                  aria-label={t('admin.viewCustomer')}
+                                >
+                                  <IconEye size={15} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label={t('admin.userBookings')} withArrow fz="xs">
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="grape"
+                                  size="sm"
+                                  radius="md"
+                                  onClick={() => openBookings(c)}
+                                  aria-label={t('admin.userBookings')}
+                                >
+                                  <IconCalendar size={15} />
+                                </ActionIcon>
+                              </Tooltip>
+                            </Group>
+                          </Table.Td>
+                        </motion.tr>
+                      );
+                    })}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          </Paper>
 
           {totalPages > 1 && (
             <Group justify="space-between" align="center" px={4}>

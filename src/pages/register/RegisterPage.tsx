@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Container,
@@ -17,6 +17,11 @@ import {
   Popover,
   Tooltip,
   ActionIcon,
+  Checkbox,
+  Modal,
+  ScrollArea,
+  Loader,
+  Alert,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -28,6 +33,10 @@ import {
   IconCalendar,
   IconId,
   IconTrash,
+  IconShieldCheck,
+  IconFileText,
+  IconAlertCircle,
+  IconX,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
@@ -54,6 +63,8 @@ interface FormValues {
   password: string;
   confirmPassword: string;
   image: { name: string; data: string };
+  acceptPrivacy: boolean;
+  acceptTerms: boolean;
 }
 
 interface PhonePrefix {
@@ -63,7 +74,215 @@ interface PhonePrefix {
   phoneRegex: string | null;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+interface PolicyItem {
+  id?: number | string;
+  title?: string;
+  name?: string;
+  description?: string;
+  content?: string;
+  text?: string;
+  [key: string]: any;
+}
+
+// ─── PolicyModal ──────────────────────────────────────────────────────────────
+
+interface PolicyModalProps {
+  opened: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  accent: string;
+  items: PolicyItem[];
+  loading: boolean;
+  error: string | null;
+}
+
+function PolicyModal({
+  opened,
+  onClose,
+  title,
+  subtitle,
+  icon,
+  accent,
+  items,
+  loading,
+  error,
+}: PolicyModalProps) {
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      withCloseButton={false}
+      size="lg"
+      radius="xl"
+      centered
+      padding={0}
+      styles={{
+        content: { overflow: 'hidden' },
+        body: { padding: 0 },
+      }}
+    >
+      {/* ── Header ── */}
+      <Box
+        style={{
+          background: `linear-gradient(135deg, ${accent}20 0%, ${accent}08 100%)`,
+          borderBottom: `1px solid ${accent}25`,
+          padding: '24px 28px 20px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Decorative blobs */}
+        <Box style={{
+          position: 'absolute', top: -48, right: -48,
+          width: 160, height: 160, borderRadius: '50%',
+          background: `${accent}12`, pointerEvents: 'none',
+        }} />
+        <Box style={{
+          position: 'absolute', bottom: -24, left: '45%',
+          width: 90, height: 90, borderRadius: '50%',
+          background: `${accent}08`, pointerEvents: 'none',
+        }} />
+
+        <Group justify="space-between" align="flex-start">
+          <Group gap="md" align="center">
+            {/* Icon badge */}
+            <Box style={{
+              width: 52, height: 52, borderRadius: 16,
+              background: `${accent}18`,
+              border: `1.5px solid ${accent}35`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: `0 4px 16px ${accent}20`,
+            }}>
+              {icon}
+            </Box>
+            <Box>
+              <Text fw={800} size="lg" lh={1.2} style={{ letterSpacing: '-0.3px' }}>
+                {title}
+              </Text>
+              <Text size="xs" c="dimmed" mt={3}>{subtitle}</Text>
+            </Box>
+          </Group>
+
+          {/* Close button */}
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            radius="xl"
+            size="md"
+            onClick={onClose}
+            style={{ marginTop: 2, flexShrink: 0 }}
+          >
+            <IconX size={16} />
+          </ActionIcon>
+        </Group>
+      </Box>
+
+      {/* ── Content ── */}
+      <ScrollArea h={420}>
+        <Box px={28} py={24}>
+          {loading && (
+            <Stack align="center" py={56} gap="xs">
+              <Loader color="teal" size="md" type="dots" />
+              <Text size="sm" c="dimmed" fw={500}>Loading content…</Text>
+            </Stack>
+          )}
+
+          {error && !loading && (
+            <Alert icon={<IconAlertCircle size={16} />} color="red" radius="lg" variant="light">
+              {error}
+            </Alert>
+          )}
+
+          {!loading && !error && items.length === 0 && (
+            <Text c="dimmed" ta="center" py={56} size="sm">
+              No content available at this time.
+            </Text>
+          )}
+
+          {!loading && !error && items.length > 0 && (
+            <Stack gap={0}>
+              {items.map((item, index) => {
+                const itemTitle = item.title ?? item.name;
+                const itemBody = item.description ?? item.content ?? item.text;
+                const fallback = !itemTitle && !itemBody
+                  ? Object.values(item)
+                      .filter((v) => typeof v === 'string' && v.length > 0)
+                      .join(' — ')
+                  : null;
+
+                return (
+                  <Box
+                    key={item.id ?? index}
+                    style={{
+                      paddingBottom: index < items.length - 1 ? 20 : 0,
+                      marginBottom: index < items.length - 1 ? 20 : 0,
+                      borderBottom:
+                        index < items.length - 1
+                          ? '1px solid var(--mantine-color-default-border)'
+                          : 'none',
+                    }}
+                  >
+                    <Group gap="sm" align="flex-start" wrap="nowrap">
+                      {/* Numbered badge */}
+                      <Box style={{
+                        minWidth: 28, height: 28, borderRadius: 9,
+                        background: `${accent}14`,
+                        border: `1px solid ${accent}25`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        marginTop: 1, flexShrink: 0,
+                      }}>
+                        <Text size="xs" fw={700} style={{ color: accent, lineHeight: 1 }}>
+                          {index + 1}
+                        </Text>
+                      </Box>
+
+                      <Box style={{ flex: 1 }}>
+                        {itemTitle && (
+                          <Text fw={700} size="sm" mb={5} style={{ color: accent }}>
+                            {itemTitle}
+                          </Text>
+                        )}
+                        {(itemBody || fallback) && (
+                          <Text size="sm" c="dimmed" style={{ lineHeight: 1.8 }}>
+                            {itemBody ?? fallback}
+                          </Text>
+                        )}
+                      </Box>
+                    </Group>
+                  </Box>
+                );
+              })}
+            </Stack>
+          )}
+        </Box>
+      </ScrollArea>
+
+      {/* ── Footer ── */}
+      <Box style={{
+        borderTop: '1px solid var(--mantine-color-default-border)',
+        padding: '14px 28px',
+        background: 'var(--mantine-color-default-hover)',
+      }}>
+        <Group justify="space-between" align="center">
+          <Text size="xs" c="dimmed">Please read carefully before accepting.</Text>
+          <Button
+            size="sm"
+            radius="xl"
+            style={{ background: accent, border: 'none', paddingInline: 22 }}
+            onClick={onClose}
+          >
+            I understand
+          </Button>
+        </Group>
+      </Box>
+    </Modal>
+  );
+}
+
+// ─── RegisterPage ─────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
   const { t } = useTranslation();
@@ -75,6 +294,17 @@ export default function RegisterPage() {
   const [passwordPopoverOpened, setPasswordPopoverOpened] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+
+  const [privacyItems, setPrivacyItems] = useState<PolicyItem[]>([]);
+  const [privacyLoading, setPrivacyLoading] = useState(false);
+  const [privacyError, setPrivacyError] = useState<string | null>(null);
+
+  const [termsItems, setTermsItems] = useState<PolicyItem[]>([]);
+  const [termsLoading, setTermsLoading] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
 
   const loc = useLocation();
 
@@ -94,6 +324,40 @@ export default function RegisterPage() {
     fetchPrefixes();
   }, []);
 
+  // ── Open Privacy modal (lazy fetch) ───────────────────────────────────────
+  const openPrivacyModal = async () => {
+    setPrivacyModalOpen(true);
+    if (privacyItems.length > 0) return;
+    setPrivacyLoading(true);
+    setPrivacyError(null);
+    try {
+      const response = await get('Privacy/getAll');
+      if (response.success) setPrivacyItems(response.data as PolicyItem[]);
+      else setPrivacyError('Failed to load privacy policy.');
+    } catch {
+      setPrivacyError('Failed to load privacy policy.');
+    } finally {
+      setPrivacyLoading(false);
+    }
+  };
+
+  // ── Open Terms modal (lazy fetch) ─────────────────────────────────────────
+  const openTermsModal = async () => {
+    setTermsModalOpen(true);
+    if (termsItems.length > 0) return;
+    setTermsLoading(true);
+    setTermsError(null);
+    try {
+      const response = await get('Terms/getAll');
+      if (response.success) setTermsItems(response.data as PolicyItem[]);
+      else setTermsError('Failed to load terms and conditions.');
+    } catch {
+      setTermsError('Failed to load terms and conditions.');
+    } finally {
+      setTermsLoading(false);
+    }
+  };
+
   // ── Form ───────────────────────────────────────────────────────────────────
   const form = useForm<FormValues>({
     initialValues: {
@@ -106,6 +370,8 @@ export default function RegisterPage() {
       password: '',
       confirmPassword: '',
       image: { name: '', data: '' },
+      acceptPrivacy: false,
+      acceptTerms: false,
     },
     validate: {
       firstname: (v) => v.trim().length < 2 ? t('register.firstNameMin') : null,
@@ -138,6 +404,8 @@ export default function RegisterPage() {
         if (date > minAge) return t('youMustBeAtLeast18YearsOld');
         return null;
       },
+      acceptPrivacy: (v) => !v ? t('register.mustAcceptPrivacy', 'You must accept the Privacy Policy.') : null,
+      acceptTerms: (v) => !v ? t('register.mustAcceptTerms', 'You must accept the Terms and Conditions.') : null,
     },
   });
 
@@ -195,21 +463,11 @@ export default function RegisterPage() {
     try {
       const userRes = await get(`User/user/email/${email}`);
       const id = userRes.data.id;
-
       if (userRes.success && id) {
-        const smsResponse = await post('Phone/send-verification-code', {
-          userId: id,
-        });
-
+        const smsResponse = await post('Phone/send-verification-code', { userId: id });
         if (smsResponse.success) {
-          notifications.show({
-            color: 'green',
-            title: t('success'),
-            message: t('verificationCodeSent'),
-          });
-          navigate("/verify-phone", {
-            state: { userId: id },
-          });
+          notifications.show({ color: 'green', title: t('success'), message: t('verificationCodeSent') });
+          navigate('/verify-phone', { state: { userId: id } });
         }
       }
     } catch (err) {
@@ -221,6 +479,33 @@ export default function RegisterPage() {
   return (
     <>
       {loading && <Spinner visible={loading} />}
+
+      {/* Privacy Policy Modal */}
+      <PolicyModal
+        opened={privacyModalOpen}
+        onClose={() => setPrivacyModalOpen(false)}
+        title={t('register.privacyPolicy', 'Privacy Policy')}
+        subtitle={`Last updated · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+        icon={<IconShieldCheck size={22} color="#12b886" />}
+        accent="#12b886"
+        items={privacyItems}
+        loading={privacyLoading}
+        error={privacyError}
+      />
+
+      {/* Terms & Conditions Modal */}
+      <PolicyModal
+        opened={termsModalOpen}
+        onClose={() => setTermsModalOpen(false)}
+        title={t('register.termsAndConditions', 'Terms & Conditions')}
+        subtitle={`Last updated · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+        icon={<IconFileText size={22} color="#228be6" />}
+        accent="#228be6"
+        items={termsItems}
+        loading={termsLoading}
+        error={termsError}
+      />
+
       <Box w="100%" py={{ base: 'md', sm: 'xl' }}>
         <Container size={560} w="100%">
 
@@ -370,6 +655,53 @@ export default function RegisterPage() {
 
                   {/* Confirm password */}
                   <PasswordInput label={t('register.confirmPassword')} placeholder="••••••••" leftSection={<IconLock size={16} />} withAsterisk {...form.getInputProps('confirmPassword')} />
+
+                  {/* ── Privacy & Terms checkboxes ─────────────────────── */}
+                  <Box
+                    style={{
+                      background: 'var(--mantine-color-default-hover)',
+                      border: '1px solid var(--mantine-color-default-border)',
+                      borderRadius: 12,
+                      padding: '14px 16px',
+                    }}
+                  >
+                    <Stack gap={10}>
+                      <Checkbox
+                        color="teal"
+                        label={
+                          <Text size="sm">
+                            {t('register.iAgreeToThe', 'I agree to the ')}{' '}
+                            <Anchor
+                              size="sm"
+                              fw={600}
+                              style={{ color: '#12b886', cursor: 'pointer' }}
+                              onClick={(e) => { e.preventDefault(); openPrivacyModal(); }}
+                            >
+                              {t('register.privacyPolicy', 'Privacy Policy')}
+                            </Anchor>
+                          </Text>
+                        }
+                        {...form.getInputProps('acceptPrivacy', { type: 'checkbox' })}
+                      />
+                      <Checkbox
+                        color="blue"
+                        label={
+                          <Text size="sm">
+                            {t('register.iAgreeToThe', 'I agree to the ')}{' '}
+                            <Anchor
+                              size="sm"
+                              fw={600}
+                              style={{ color: '#228be6', cursor: 'pointer' }}
+                              onClick={(e) => { e.preventDefault(); openTermsModal(); }}
+                            >
+                              {t('register.termsAndConditions', 'Terms & Conditions')}
+                            </Anchor>
+                          </Text>
+                        }
+                        {...form.getInputProps('acceptTerms', { type: 'checkbox' })}
+                      />
+                    </Stack>
+                  </Box>
 
                   {/* Submit */}
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
