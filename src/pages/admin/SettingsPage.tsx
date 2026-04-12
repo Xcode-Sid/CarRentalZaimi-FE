@@ -16,12 +16,14 @@ import {
   ThemeIcon,
   Progress,
   Grid,
+  Tooltip,
+  NumberInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   IconPlus,
   IconTrash,
@@ -40,10 +42,17 @@ import {
   IconBrandTwitter,
   IconBrandYoutube,
   IconBrandWhatsapp,
+  IconChartBar,
+  IconCalendar,
+  IconCar,
+  IconMapPin,
+  IconUser,
+  IconUsers,
 } from '@tabler/icons-react';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
 import { get, post } from '../../utils/api.utils';
 import Spinner from '../../components/spinner/Spinner';
+import { toImagePath } from '../../utils/general';
 
 interface PhonePrefix {
   phonePrefix: string | null;
@@ -79,6 +88,10 @@ interface FormValues {
   twiterUrl: string;
   youtubeUrl: string;
   whatsAppNumber: string;
+  years: number;
+  cars: number;
+  cities: number;
+  clients: number;
 }
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -115,6 +128,10 @@ const INITIAL_VALUES: FormValues = {
   twiterUrl: '',
   youtubeUrl: '',
   whatsAppNumber: '',
+  years: 0,
+  cars: 0,
+  cities: 0,
+  clients: 0,
 };
 
 const STEPS = [
@@ -148,6 +165,8 @@ export default function AdminSettingsPage() {
   const [phonePrefixes, setPhonePrefixes] = useState<PhonePrefix[]>([]);
   const [phonePrefix, setPhonePrefix] = useState('+355');
   const [whatsAppPrefix, setWhatsAppPrefix] = useState('+355');
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     initialValues: INITIAL_VALUES,
@@ -165,36 +184,43 @@ export default function AdminSettingsPage() {
   });
 
   useEffect(() => {
-    const fetchPrefixes = async () => {
-      try {
-        const response = await get('StatePrefix/getAll');
-        if (response.success) {
-          setPhonePrefixes(response.data as PhonePrefix[]);
-          if (response.data.length > 0) {
-            setPhonePrefix(response.data[0].phonePrefix ?? '+355');
-            setWhatsAppPrefix(response.data[0].phonePrefix ?? '+355');
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch phone prefixes:', error);
-      }
-    };
-    fetchPrefixes();
-  }, []);
-
-  useEffect(() => {
     setLoading(true);
     const fetchProfile = async () => {
       try {
+        const prefixRes = await get('StatePrefix/getAll');
+        let prefixes: PhonePrefix[] = [];
+        if (prefixRes.success) {
+          prefixes = prefixRes.data as PhonePrefix[];
+          setPhonePrefixes(prefixes);
+        }
+
         const res = await get('CompanyProfile/get');
         if (res.success) {
           const data = res.data;
+
+          const matchPhone = (phone: string) => {
+            if (!phone) return { prefix: prefixes[0]?.phonePrefix ?? '', number: '' };
+            const cleaned = phone.replace(/\s+/g, '');
+            const sorted = [...prefixes].sort((a, b) =>
+              (b.phonePrefix?.length ?? 0) - (a.phonePrefix?.length ?? 0)
+            );
+            const matched = sorted.find(p => p.phonePrefix && cleaned.startsWith(p.phonePrefix));
+            if (matched?.phonePrefix) {
+              return { prefix: matched.phonePrefix, number: cleaned.slice(matched.phonePrefix.length) };
+            }
+            return { prefix: prefixes[0]?.phonePrefix ?? '', number: cleaned };
+          };
+
+          const phoneData = matchPhone(data.phone ?? '');
+          const whatsAppData = matchPhone(data.whatsAppNumber ?? '');
+          setPhonePrefix(phoneData.prefix);
+          setWhatsAppPrefix(whatsAppData.prefix);
           form.setValues({
             name: data.name ?? '',
             tagline: data.tagline ?? '',
             logoUrl: data.logoUrl ?? '',
             email: data.email ?? '',
-            phone: data.phone ?? '',
+            phone: phoneData.number,
             address: data.address ?? '',
             aboutText: data.aboutText ?? '',
             missionTitle: data.missionTitle ?? '',
@@ -225,8 +251,13 @@ export default function AdminSettingsPage() {
             instagramUrl: data.instagramUrl ?? '',
             twiterUrl: data.twiterUrl ?? '',
             youtubeUrl: data.youtubeUrl ?? '',
-            whatsAppNumber: data.whatsAppNumber ?? '',
+            whatsAppNumber: whatsAppData.number,
+            years: data.years ?? 0,
+            cars: data.cars ?? 0,
+            cities: data.cities ?? 0,
+            clients: data.clients ?? 0,
           });
+          if (data.logoUrl) setLogoPreview(toImagePath(data.logoUrl));
           form.resetDirty();
           setCompletedSteps(new Set([0, 1, 2, 3, 4]));
         }
@@ -235,7 +266,7 @@ export default function AdminSettingsPage() {
       }
     };
     fetchProfile();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const goToStep = (step: number) => {
@@ -283,9 +314,14 @@ export default function AdminSettingsPage() {
     setLoading(true);
     setCompletedSteps((prev) => new Set([...prev, currentStep]));
 
+    console.log('alues.logoUrl', values.logoUrl)
     const payload = {
       name: values.name || null,
-      logoUrl: values.logoUrl || null,
+      logoUrl: values.logoUrl?.startsWith('images/')
+        ? null
+        : values.logoUrl?.includes(',')
+          ? values.logoUrl.split(',')[1] ?? null
+          : values.logoUrl ?? null,
       tagline: values.tagline || null,
       aboutText: values.aboutText || null,
       missionTitle: values.missionTitle || null,
@@ -304,6 +340,10 @@ export default function AdminSettingsPage() {
       twiterUrl: values.twiterUrl || null,
       youtubeUrl: values.youtubeUrl || null,
       whatsAppNumber: values.whatsAppNumber ? `${whatsAppPrefix}${values.whatsAppNumber}` : null,
+      years: values.years,
+      cars: values.cars,
+      cities: values.cities,
+      clients: values.clients,
     };
 
     try {
@@ -335,6 +375,18 @@ export default function AdminSettingsPage() {
     value: p.phonePrefix ?? '',
     label: `${p.flag ?? ''} ${p.phonePrefix ?? ''}`.trim(),
   }));
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      form.setFieldValue('logoUrl', dataUrl);
+      setLogoPreview(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const { values } = form;
   const progress = (completedSteps.size / STEPS.length) * 100;
@@ -443,11 +495,72 @@ export default function AdminSettingsPage() {
                                 />
                               </Grid.Col>
                               <Grid.Col span={12}>
-                                <TextInput
-                                  label={t('admin.logoUrl')}
-                                  placeholder={t('admin.logoUrlPlaceholder')}
-                                  {...form.getInputProps('logoUrl')}
-                                />
+                                <Box>
+                                  <Text size="sm" fw={500} mb={6}>{t('admin.logoUrl')}</Text>
+                                  <Group gap="md" align="center">
+                                    <Box
+                                      onClick={() => logoInputRef.current?.click()}
+                                      style={{
+                                        width: 72,
+                                        height: 72,
+                                        borderRadius: 'var(--mantine-radius-md)',
+                                        border: '2px dashed var(--mantine-color-teal-5)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        overflow: 'hidden',
+                                        flexShrink: 0,
+                                        background: logoPreview ? 'transparent' : 'var(--mantine-color-body)',
+                                      }}
+                                    >
+                                      {logoPreview ? (
+                                        <img
+                                          src={logoPreview}
+                                          alt="logo preview"
+                                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                        />
+                                      ) : (
+                                        <IconBuildingStore size={28} style={{ opacity: 0.4 }} />
+                                      )}
+                                    </Box>
+                                    <Stack gap={4} style={{ flex: 1 }}>
+                                      <Button
+                                        variant="light"
+                                        color="teal"
+                                        size="xs"
+                                        leftSection={<IconBuildingStore size={14} />}
+                                        onClick={() => logoInputRef.current?.click()}
+                                      >
+                                        {logoPreview ? t('admin.changeLogo') : t('admin.uploadLogo')}
+                                      </Button>
+                                      {logoPreview && (
+                                        <Tooltip label={t('admin.removeLogo')} withArrow position="right">
+                                          <ActionIcon
+                                            variant="light"
+                                            color="red"
+                                            size="sm"
+                                            radius="xl"
+                                            onClick={() => {
+                                              form.setFieldValue('logoUrl', '');
+                                              setLogoPreview(null);
+                                              if (logoInputRef.current) logoInputRef.current.value = '';
+                                            }}
+                                          >
+                                            <IconTrash size={14} />
+                                          </ActionIcon>
+                                        </Tooltip>
+                                      )}
+                                    </Stack>
+                                    <input
+                                      ref={logoInputRef}
+                                      type="file"
+                                      accept="image/*"
+                                      style={{ display: 'none' }}
+                                      onChange={handleLogoChange}
+                                    />
+                                  </Group>
+                                </Box>
                               </Grid.Col>
                               <Grid.Col span={{ base: 12, sm: 6 }}>
                                 <TextInput
@@ -494,6 +607,79 @@ export default function AdminSettingsPage() {
                                   {...form.getInputProps('aboutText')}
                                 />
                               </Grid.Col>
+
+                              <Grid.Col span={12}>
+                                <Box
+                                  p="md"
+                                  style={{
+                                    background: 'var(--mantine-color-default-hover)',
+                                    borderRadius: 'var(--mantine-radius-md)',
+                                    border: '1px solid var(--mantine-color-default-border)',
+                                  }}
+                                >
+                                  <Group mb="md" gap="xs">
+                                    <ThemeIcon size="sm" variant="light" color="blue" radius="xl">
+                                      <IconChartBar size={12} />
+                                    </ThemeIcon>
+                                    <Text size="sm" fw={700} c="blue">
+                                      {t('admin.stats')}
+                                    </Text>
+                                  </Group>
+
+                                  <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="sm">
+                                    {[
+                                      { field: 'years', label: t('about.stats.yearsTitle'), icon: IconCalendar, color: 'blue' },
+                                      { field: 'cars', label: t('about.stats.carsTitle'), icon: IconCar, color: 'teal' },
+                                      { field: 'cities', label: t('about.stats.citiesTitle'), icon: IconMapPin, color: 'violet' },
+                                      { field: 'clients', label: t('about.stats.clientsTitle'), icon: IconUsers, color: 'orange' },
+                                    ].map(({ field, label, icon: Icon, color }) => (
+                                      <Paper
+                                        key={field}
+                                        p="sm"
+                                        radius="md"
+                                        withBorder
+                                        style={{
+                                          borderColor: 'var(--mantine-color-default-border)',
+                                          background: 'var(--mantine-color-body)',
+                                          transition: 'box-shadow 0.2s ease',
+                                        }}
+                                        onMouseEnter={e => {
+                                          (e.currentTarget as HTMLElement).style.boxShadow =
+                                            `0 4px 12px var(--mantine-color-dark-4)`;
+                                        }}
+                                        onMouseLeave={e => {
+                                          (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                                        }}
+                                      >
+                                        <Group gap={6} mb={6}>
+                                          <ThemeIcon size="xs" variant="light" color={color} radius="xl">
+                                            <Icon size={10} />
+                                          </ThemeIcon>
+                                          <Text size="xs" fw={600} c={color}>
+                                            {label}
+                                          </Text>
+                                        </Group>
+                                        <NumberInput
+                                          placeholder="0"
+                                          min={0}
+                                          size="sm"
+                                          variant="unstyled"
+                                          styles={{
+                                            input: {
+                                              fontWeight: 700,
+                                              fontSize: '1.25rem',
+                                              color: `var(--mantine-color-${color}-filled)`,
+                                              paddingLeft: 0,
+                                            },
+                                          }}
+                                          {...form.getInputProps(field)}
+                                        />
+                                      </Paper>
+                                    ))}
+                                  </SimpleGrid>
+                                </Box>
+                              </Grid.Col>
+
                             </Grid>
                           </StaggerItem>
                         </Stack>

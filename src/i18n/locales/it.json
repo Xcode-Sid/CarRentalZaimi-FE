@@ -260,6 +260,11 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "stats": "Statistiche",
+    "changeLogo": "Cambia Logo",
+    "uploadLogo": "Carica Logo",
+    "removeLogo": "Rimuovi Logo",
+    "viewCustomer": "Visualizza Cliente",
     "bookingDetails": "Dettagli Prenotazione",
     "promotions": "Promozioni",
     "aditionalServices": "Servizi Aggiuntivi",
@@ -572,7 +577,7 @@
     "saveAll": "Salva Tutto"
   },
   "about": {
-    "title": "Chi è AutoZaimi",
+    "title": "Chi è ",
     "subtitle": "La tua piattaforma di noleggio auto di fiducia in Albania",
     "description": "AutoZaimi è stata fondata con una missione semplice: offrire a ogni viaggiatore in Albania l'opportunità di viaggiare con stile, sicurezza e a prezzi ragionevoli. Con un'ampia flotta di auto di lusso, SUV, elettriche ed economiche, copriamo ogni esigenza — dalle vacanze in famiglia ai viaggi d'affari.",
     "mission": "La Nostra Missione",

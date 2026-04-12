@@ -511,7 +511,12 @@
     "notifications": {
       "saveFailed": "Failed to save settings.",
       "networkError": "Network error. Please try again."
-    }
+    },
+    "stats": "Statistics",
+    "changeLogo": "Change Logo",
+    "uploadLogo": "Upload Logo",
+    "removeLogo": "Remove Logo",
+    "viewCustomer": "View Customer"
   },
   "login": {
     "title": "Welcome Back",
@@ -578,7 +583,7 @@
     "perDay": "/day"
   },
   "about": {
-    "title": "About AutoZaimi",
+    "title": "About",
     "subtitle": "Your trusted car rental platform in Albania",
     "description": "AutoZaimi was founded with a simple mission: to offer every traveler in Albania the opportunity to travel in style, safety, and at reasonable prices. With a wide fleet of luxury, SUV, electric, and economy cars, we cover every need — from family vacations to business trips.",
     "mission": "Our Mission",

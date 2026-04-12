@@ -266,6 +266,11 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "stats": "Statistika",
+    "changeLogo": "Ndrysho Logon",
+    "uploadLogo": "Ngarko Logon",
+    "removeLogo": "Fshi Logon",
+    "viewCustomer": "Shiko Klientin",
     "bookingDetails": "Detajet e Rezervimit",
     "refusedBy": "Refuzuar nga",
     "promotions": "Promocionet",
@@ -578,7 +583,7 @@
     "saveAll": "Ruaj Të Gjitha"
   },
   "about": {
-    "title": "Rreth AutoZaimi",
+    "title": "Rreth",
     "subtitle": "Platforma juaj e besuar për qira makinash në Shqipëri",
     "description": "AutoZaimi u themelua me një mision të thjeshtë: t'i ofrojë çdo udhëtari në Shqipëri mundësinë për të udhëtuar me stil, siguri dhe çmime të arsyeshme. Me një flotë të gjerë makinash luksoze, SUV, elektrike dhe ekonomike, ne mbulojmë çdo nevojë — nga pushimet familjare deri te udhëtimet e biznesit.",
     "mission": "Misioni Ynë",

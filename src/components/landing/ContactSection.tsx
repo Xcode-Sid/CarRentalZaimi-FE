@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Title,
@@ -13,6 +13,7 @@ import {
   Group,
   Box,
   useMantineColorScheme,
+  Skeleton,
 } from '@mantine/core';
 import {
   IconMapPin,
@@ -25,24 +26,108 @@ import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
+import { get } from '../../utils/api.utils';
 
-const contactInfo = [
-  { icon: IconMapPin, titleKey: 'contact.officeTitle', valueKey: 'contact.officeAddress', color: 'teal' },
-  { icon: IconPhone, titleKey: 'contact.phoneTitle', valueKey: 'contact.phoneValue', color: 'teal' },
-  { icon: IconMail, titleKey: 'contact.emailTitle', valueKey: 'contact.emailValue', color: 'blue' },
-  { icon: IconClock, titleKey: 'contact.hoursTitle', valueKey: 'contact.hoursValue', color: 'orange' },
-];
+
+interface WorkingHoursEntry {
+  day: string;
+  openTime: string;
+  closeTime: string;
+}
+
+function parseWorkingHours(raw?: string): WorkingHoursEntry[] {
+  if (!raw) return [];
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+interface CompanyProfileDto {
+  email?: string;
+  phone?: string;
+  address?: string;
+  workingHours?: string;
+}
 
 export function ContactSection() {
   const { t } = useTranslation();
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
 
+  const [profile, setProfile] = useState<CompanyProfileDto | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await get('CompanyProfile/get');
+        if (res.success) {
+          setProfile(res.data as CompanyProfileDto);
+        }
+      } catch {
+        // silently fail — cards will show '—'
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const contactInfo = [
+    {
+      icon: IconMapPin,
+      titleKey: 'contact.officeTitle',
+      value: profile?.address,
+      color: 'teal',
+      renderValue: null,
+    },
+    {
+      icon: IconPhone,
+      titleKey: 'contact.phoneTitle',
+      value: profile?.phone,
+      color: 'teal',
+      renderValue: null,
+    },
+    {
+      icon: IconMail,
+      titleKey: 'contact.emailTitle',
+      value: profile?.email,
+      color: 'blue',
+      renderValue: null,
+    },
+    {
+      icon: IconClock,
+      titleKey: 'contact.hoursTitle',
+      value: profile?.workingHours,
+      color: 'orange',
+      renderValue: () => {
+        const hours = parseWorkingHours(profile?.workingHours);
+        if (!hours.length) return <Text size="sm" c={isDark ? 'dimmed' : undefined} style={!isDark ? { color: '#868e96' } : undefined}>—</Text>;
+        return (
+          <Stack gap={2}>
+            {hours.map((h) => (
+              <Text key={h.day} size="sm" c={isDark ? 'dimmed' : undefined} style={!isDark ? { color: '#868e96' } : undefined}>
+                <Text component="span" fw={600} size="sm" style={!isDark ? { color: '#495057' } : undefined}>
+                  {h.day}:
+                </Text>{' '}
+                {h.openTime} – {h.closeTime}
+              </Text>
+            ))}
+          </Stack>
+        );
+      },
+    },
+  ];
 
   const handleSubmit = () => {
     if (name && email && message) {
@@ -198,13 +283,19 @@ export function ContactSection() {
                           <Text fw={700} size="sm" style={!isDark ? { color: '#1a1b1e' } : undefined}>
                             {t(item.titleKey)}
                           </Text>
-                          <Text
-                            size="sm"
-                            c={isDark ? 'dimmed' : undefined}
-                            style={!isDark ? { color: '#868e96' } : undefined}
-                          >
-                            {t(item.valueKey)}
-                          </Text>
+                          {loadingProfile ? (
+                            <Skeleton height={16} width="70%" radius="sm" />
+                          ) : item.renderValue ? (
+                            item.renderValue()
+                          ) : (
+                            <Text
+                              size="sm"
+                              c={isDark ? 'dimmed' : undefined}
+                              style={!isDark ? { color: '#868e96' } : undefined}
+                            >
+                              {item.value ?? '—'}
+                            </Text>
+                          )}
                         </Stack>
                       </Group>
                     </Paper>

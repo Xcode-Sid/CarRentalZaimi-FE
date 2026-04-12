@@ -1,3 +1,5 @@
+import { toImagePath } from "../utils/general";
+
 export type BookingStatus = 'accepted' | 'refused' | 'finished';
 
 export type AdditionalService = {
@@ -56,21 +58,21 @@ export function mapApiBooking(dto: any): Booking {
     ref: dto.reference ?? dto.id,
     userId: dto.user?.id ?? '',
     vehicleId: dto.car?.id ?? '',
-    vehicleName: dto.car?.title ?? '—',          // was `name` (always null)
-    vehicleIamge: dto.car?.carImages?.[0] ?? '',  // was `image` (doesn't exist)
+    vehicleName: dto.car?.title ?? '—',     
+    vehicleIamge: toImagePath(dto.car?.carImages?.[0].imagePath )?? '',  
     startDate: dto.startDate,
     endDate: dto.endDate,
     total: Number(dto.totalPrice ?? 0),
     phoneNumber: dto.phoneNumber ?? '',
-    paymentMethod: PAYMENT_MAP[dto.paymentMethod] ?? 'cash',  // was `.toLowerCase()` on "0"
-    status: STATUS_MAP[dto.status] ?? 'accepted',              // was `.toLowerCase()` on 1
+    paymentMethod: PAYMENT_MAP[dto.paymentMethod] ?? 'cash',  
+    status: STATUS_MAP[dto.status] ?? 'accepted',          
     refuzedBy: REFUSED_MAP[dto.refuzedBy] ?? '-',
     user: {
       firstName: dto.user?.firstName ?? '',
       lastName: dto.user?.lastName ?? '',
       image: dto.user?.image ?? undefined,
     },
-    services: (dto.bookingServices ?? []).map((bs: any) => ({  // was passing raw nested objects
+    services: (dto.bookingServices ?? []).map((bs: any) => ({  
       id: bs.additionalService?.id ?? bs.id,
       name: bs.additionalService?.name ?? '',
       pricePerDay: bs.additionalService?.pricePerDay ?? 0,

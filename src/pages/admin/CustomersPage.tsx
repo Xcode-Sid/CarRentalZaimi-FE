@@ -20,6 +20,7 @@ import {
   Center,
   Pagination,
   ThemeIcon,
+  Box,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconEye, IconPencil, IconCalendar, IconSearch } from '@tabler/icons-react';
@@ -96,8 +97,7 @@ export default function CustomersPage() {
   const endItem = Math.min(page * PAGE_SIZE, totalCount);
 
   // ── Modal / bookings state ─────────────────────────────────────────────────
-  const [adsOpen, setAdsOpen] = useState(false);
-  const [editUser, setEditUser] = useState<User | null>(null);
+  const [viewUser, setViewUser] = useState<User | null>(null);
   const [bookingsFor, setBookingsFor] = useState<User | null>(null);
   const [userBookings, setUserBookings] = useState<Booking[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
@@ -137,23 +137,7 @@ export default function CustomersPage() {
     },
   });
 
-  const openEdit = (u: User) => {
-    editForm.setValues({
-      firstName: u.firstName,
-      lastName: u.lastName,
-      email: u.email,
-      phone: u.phoneNumber ?? '',
-      customerStatus: u.customerStatus ?? 'active',
-    });
-    setEditUser(u);
-  };
 
-  const handleSaveEdit = () => {
-    // TODO: call PUT/PATCH API endpoint here
-    setEditUser(null);
-    editForm.reset();
-    fetchCustomers();
-  };
 
   return (
     <Stack gap="xl" className="animate-fade-in">
@@ -253,22 +237,13 @@ export default function CustomersPage() {
                         </Table.Td>
                         <Table.Td>
                           <Group gap={4}>
-                            <Tooltip label={t('admin.viewAds')}>
-                              <ActionIcon
-                                variant="subtle" color="blue" size="sm"
-                                onClick={() => setAdsOpen(true)}
-                                aria-label={t('admin.viewAds')}
-                              >
-                                <IconEye size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-                            <Tooltip label={t('admin.editCustomer')}>
+                            <Tooltip label={t('admin.viewCustomer')}>
                               <ActionIcon
                                 variant="subtle" color="teal" size="sm"
-                                onClick={() => openEdit(c)}
-                                aria-label={t('admin.editCustomer')}
+                                onClick={() => setViewUser(c)}
+                                aria-label={t('admin.viewCustomer')}
                               >
-                                <IconPencil size={16} />
+                                <IconEye size={16} />
                               </ActionIcon>
                             </Tooltip>
                             <Tooltip label={t('admin.userBookings')}>
@@ -313,41 +288,151 @@ export default function CustomersPage() {
         </Stack>
       )}
 
-      {/* ── Ads Modal ── */}
-      <Modal opened={adsOpen} onClose={() => setAdsOpen(false)} title={t('admin.userAdsModalTitle')} size="lg" radius="md">
-        <Text size="sm" c="dimmed" mb="md">{t('admin.userAdsModalSubtitle')}</Text>
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-          {ads.map((ad) => (
-            <Paper key={ad.id} p="sm" radius="md" withBorder>
-              <Image src={ad.imageUrl} h={120} radius="sm" fit="cover" alt="" />
-              <Text fw={600} mt="sm" size="sm">{ad.title}</Text>
-              <Badge size="xs" mt={4} color={ad.isActive ? 'teal' : 'gray'}>
-                {ad.isActive ? t('admin.adActive') : t('admin.unavailable')}
-              </Badge>
-            </Paper>
-          ))}
-        </SimpleGrid>
-      </Modal>
+      {/* ── User Detail Modal ── */}
+      <Modal
+        opened={!!viewUser}
+        onClose={() => setViewUser(null)}
+        title={null}
+        size="md"
+        radius="xl"
+        padding={0}
+        withCloseButton={false}
+        overlayProps={{ backgroundOpacity: 0.45, blur: 2 }}
+      >
+        {viewUser && (() => {
+          const u = viewUser;
+          const st = u.customerStatus ?? 'active';
+          const initials = `${u.firstName?.[0] ?? ''}${u.lastName?.[0] ?? ''}`.toUpperCase();
+          const fullName = `${u.firstName} ${u.lastName}`;
 
-      {/* ── Edit Modal ── */}
-      <Modal opened={!!editUser} onClose={() => setEditUser(null)} title={t('admin.editCustomer')} radius="md">
-        <form onSubmit={editForm.onSubmit(() => handleSaveEdit())}>
-          <Stack gap="sm">
-            <TextInput label={t('account.firstName')} {...editForm.getInputProps('firstName')} />
-            <TextInput label={t('account.lastName')} {...editForm.getInputProps('lastName')} />
-            <TextInput label={t('admin.email')} {...editForm.getInputProps('email')} />
-            <TextInput label={t('admin.phone')} {...editForm.getInputProps('phone')} />
-            <Select
-              label={t('admin.customerStatus')}
-              data={[
-                { value: 'active', label: t('admin.active') },
-                { value: 'inactive', label: t('admin.inactive') },
-              ]}
-              {...editForm.getInputProps('customerStatus')}
-            />
-            <Button type="submit" color="teal">{t('common.save')}</Button>
-          </Stack>
-        </form>
+          return (
+            <Stack gap={0}>
+              {/* Hero header */}
+              <Box
+                px="xl"
+                pt="xl"
+                pb="lg"
+                style={{
+                  background: 'linear-gradient(135deg, var(--mantine-color-teal-0) 0%, var(--mantine-color-teal-1) 100%)',
+                  borderRadius: 'var(--mantine-radius-xl) var(--mantine-radius-xl) 0 0',
+                  position: 'relative',
+                }}
+              >
+                {/* Close button */}
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  size="sm"
+                  onClick={() => setViewUser(null)}
+                  style={{ position: 'absolute', top: 12, right: 12 }}
+                >
+                  ✕
+                </ActionIcon>
+
+                <Group gap="md" align="flex-start">
+                  <Avatar
+                    size={64}
+                    radius="xl"
+                    color="teal"
+                    src={u.image?.imagePath ? toImagePath(u.image.imagePath) : undefined}
+                    style={{
+                      border: '3px solid white',
+                      boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
+                    }}
+                  >
+                    <Text fw={600} size="lg">{initials}</Text>
+                  </Avatar>
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Group gap="xs" align="center" mb={4}>
+                      <Text fw={700} size="lg" lh={1.2} c={"black"}>{fullName}</Text>
+                      <Badge
+                        color={st === 'active' ? 'teal' : 'gray'}
+                        variant="filled"
+                        size="xs"
+                        radius="xl"
+                      >
+                        {st === 'active' ? t('admin.active') : t('admin.inactive')}
+                      </Badge>
+                    </Group>
+                  </div>
+                </Group>
+              </Box>
+
+              {/* Details grid */}
+              <Stack gap={0} px="xl" py="md">
+                {[
+                  {
+                    label: t('admin.email'),
+                    value: u.email,
+                    icon: '✉',
+                  },
+                  {
+                    label: t('admin.phone'),
+                    value: u.phoneNumber ?? '—',
+                    icon: '☎',
+                  },
+                ].map(({ label, value, icon }) => (
+                  <Group
+                    key={label}
+                    justify="space-between"
+                    align="center"
+                    py="xs"
+                    style={{ borderBottom: '0.5px solid var(--mantine-color-default-border)' }}
+                  >
+                    <Group gap="xs">
+                      <Text size="sm" c="dimmed">{icon}</Text>
+                      <Text size="sm" c="dimmed">{label}</Text>
+                    </Group>
+                    <Text size="sm" fw={500}>{value}</Text>
+                  </Group>
+                ))}
+
+                {/* Booking summary row */}
+                <Group
+                  justify="space-between"
+                  align="center"
+                  py="xs"
+                >
+                  <Group gap="xs">
+                    <Text size="sm" c="dimmed">📅</Text>
+                    <Text size="sm" c="dimmed">{t('admin.userBookings')}</Text>
+                  </Group>
+                  <Button
+                    variant="light"
+                    color="grape"
+                    size="xs"
+                    radius="md"
+                    leftSection={<IconCalendar size={13} />}
+                    onClick={() => {
+                      setViewUser(null);
+                      openBookings(u);
+                    }}
+                  >
+                    {t('admin.viewBookings')}
+                  </Button>
+                </Group>
+              </Stack>
+
+              {/* Footer */}
+              <Group
+                px="xl"
+                py="md"
+                justify="flex-end"
+                style={{ borderTop: '0.5px solid var(--mantine-color-default-border)' }}
+              >
+                <Button
+                  variant="subtle"
+                  color="gray"
+                  size="sm"
+                  onClick={() => setViewUser(null)}
+                >
+                  {t('account.closeModal')}
+                </Button>
+              </Group>
+            </Stack>
+          );
+        })()}
       </Modal>
 
       {/* ── Bookings Modal ── */}
@@ -423,8 +508,8 @@ export default function CustomersPage() {
                           variant="light"
                           color={
                             b.status === 'accepted' ? 'teal'
-                            : b.status === 'refused' ? 'red'
-                            : 'gray'
+                              : b.status === 'refused' ? 'red'
+                                : 'gray'
                           }
                         >
                           <IconCalendar size={18} />
