@@ -256,7 +256,8 @@
     "cancelReason": "Motivo (opzionale)",
     "cancelReasonPlaceholder": "Dicci perché stai annullando...",
     "confirmCancel": "Annulla prenotazione",
-    "pending": "In attesa"
+    "pending": "In attesa",
+    "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
     "bookingDetails": "Dettagli Prenotazione",
@@ -429,7 +430,82 @@
     "bookingRefused": "Prenotazione rifiutata con successo",
     "bookingsLoadFailed": "Caricamento delle prenotazioni fallito",
     "statusUpdateFailed": "Aggiornamento dello stato fallito",
-    "refusedBy": "Rifiutato da"
+    "refusedBy": "Rifiutato da",
+    "noCustomersFound": "Nessun cliente trovato",
+    "failedToLoadUsers": "Caricamento utenti fallito",
+    "failedToLoadBookings": "Caricamento prenotazioni fallito",
+    "settingsSubtitle": "Configura il profilo e le preferenze della piattaforma",
+    "stepsCompleted": "{{done}}/{{total}} completati",
+    "platformSettings": "Impostazioni Piattaforma",
+    "siteName": "Nome del Sito",
+    "siteNamePlaceholder": "Inserisci il nome del sito",
+    "tagline": "Slogan",
+    "taglinePlaceholder": "Noleggio auto premium in Albania",
+    "logoUrl": "URL Logo",
+    "logoUrlPlaceholder": "https://...",
+    "emailPlaceholder": "info@autozaimi.al",
+    "phonePlaceholder": "6X XXX XXXX",
+    "addressPlaceholder": "Tirana, Albania",
+    "aboutText": "Testo About",
+    "aboutTextPlaceholder": "Piattaforma premium per il noleggio e l'acquisto di auto in Albania.",
+    "mission": "Missione",
+    "missionTitle": "Titolo della Missione",
+    "missionTitlePlaceholder": "La Nostra Missione",
+    "missionDescription": "Descrizione della Missione",
+    "missionDescriptionPlaceholder": "Descrivi la missione e i valori della tua azienda...",
+    "whyChooseUs": "Perché Sceglierci",
+    "addItem": "Aggiungi Elemento",
+    "item": "Elemento",
+    "icon": "Icona",
+    "title": "Titolo",
+    "whyChooseTitlePlaceholder": "es. Flotta Premium",
+    "whyChooseDescriptionPlaceholder": "Descrivi questo vantaggio...",
+    "workingHours": "Orari di Lavoro",
+    "weekend": "Weekend",
+    "closed": "Chiuso",
+    "days": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    },
+    "socialLinks": "Link Social",
+    "facebookUrl": "URL Facebook",
+    "facebookUrlPlaceholder": "https://facebook.com/...",
+    "instagramUrl": "URL Instagram",
+    "instagramUrlPlaceholder": "https://instagram.com/...",
+    "twitterUrl": "URL Twitter / X",
+    "twitterUrlPlaceholder": "https://twitter.com/...",
+    "youtubeUrl": "URL YouTube",
+    "youtubeUrlPlaceholder": "https://youtube.com/...",
+    "whatsAppNumber": "Numero WhatsApp",
+    "lastStepHint": "Sei all'ultimo passaggio. Controlla le informazioni e salva tutto.",
+    "steps": {
+      "platform": "Piattaforma",
+      "platformDesc": "Info base e contatti",
+      "mission": "Missione",
+      "missionDesc": "La missione aziendale",
+      "whyUs": "Perché Noi",
+      "whyUsDesc": "Punti di forza",
+      "hours": "Orari",
+      "hoursDesc": "Orario di lavoro",
+      "social": "Social",
+      "socialDesc": "Presenza online"
+    },
+    "validation": {
+      "nameRequired": "Il nome del sito è obbligatorio",
+      "emailRequired": "L'email è obbligatoria",
+      "emailInvalid": "Indirizzo email non valido",
+      "phoneRequired": "Il numero di telefono è obbligatorio",
+      "addressRequired": "L'indirizzo è obbligatorio"
+    },
+    "notifications": {
+      "saveFailed": "Salvataggio delle impostazioni fallito.",
+      "networkError": "Errore di rete. Riprova."
+    }
   },
   "login": {
     "title": "Bentornato",
@@ -492,7 +568,8 @@
     "next": "Continua",
     "yes": "Sì",
     "no": "No",
-    "perDay": "/giorno"
+    "perDay": "/giorno",
+    "saveAll": "Salva Tutto"
   },
   "about": {
     "title": "Chi è AutoZaimi",
