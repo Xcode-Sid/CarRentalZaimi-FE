@@ -291,6 +291,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "terms": "Termini & Condizioni",
     "partners": "Partner",
     "stats": "Statistiche",
     "changeLogo": "Cambia Logo",
@@ -929,5 +930,52 @@
   "failedToUpdateFaturedStatus": "Impossibile aggiornare lo stato in evidenza",
   "failedToUpdateSavedCar": "Impossibile aggiornare l'auto salvata",
   "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
-  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata"
+  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata",
+  "terms": {
+    "pageTitle": "Termini & Condizioni",
+    "pageSubtitle": "Gestisci i termini e le condizioni",
+    "addTerm": "Aggiungi Termine",
+    "searchPlaceholder": "Cerca termini…",
+    "refresh": "Aggiorna",
+    "columns": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "color": "Colore",
+      "icon": "Icona",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "noTermsFound": "Nessun termine trovato",
+    "tryDifferentSearch": "Prova un termine di ricerca diverso",
+    "addFirstTerm": "Aggiungi il primo termine per iniziare",
+    "showing": "Visualizzazione",
+    "of": "di",
+    "terms": "termini",
+    "active": "Attivo",
+    "inactive": "Inattivo",
+    "editTerm": "Modifica Termine",
+    "createTerm": "Crea Termine",
+    "saveChanges": "Salva Modifiche",
+    "deleteTerm": "Elimina Termine",
+    "deleteConfirm": "Sei sicuro di voler eliminare",
+    "deleteWarning": "Questa azione non può essere annullata.",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "editTooltip": "Modifica termine",
+    "deleteTooltip": "Elimina termine",
+    "form": {
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "es. Informativa sulla Privacy",
+      "titleRequired": "Il titolo è obbligatorio",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Inserisci la descrizione completa del termine…",
+      "descriptionRequired": "La descrizione è obbligatoria",
+      "iconLabel": "Icona",
+      "iconPlaceholder": "Seleziona un'icona (opzionale)",
+      "colorLabel": "Colore",
+      "colorRequired": "Il colore è obbligatorio",
+      "activeLabel": "Attivo",
+      "activeDescription": "I termini inattivi sono nascosti dalle aree pubbliche"
+    }
+  }
 }

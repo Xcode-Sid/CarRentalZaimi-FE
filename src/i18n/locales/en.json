@@ -53,7 +53,7 @@
   },
   "partners": {
     "title": "Our Partners",
-     "pageTitle": "Partners",
+    "pageTitle": "Partners",
     "pageSubtitle": "Manage partner organisations and their branding",
     "addPartner": "Add Partner",
     "searchPlaceholder": "Search partners…",
@@ -297,6 +297,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "terms": "Terms & Conditions",
     "bookingDetails": "Booking Details",
     "refusedBy": "Refused by",
     "promotions": "Promotions",
@@ -935,6 +936,52 @@
   "failedToUpdateFaturedStatus": "Failed to update featured status",
   "failedToUpdateSavedCar": "Failed to update saved car",
   "carWasAddedToSaveSollection": "Car added to your saved collection",
-  "carWasRemovedFromSavecollection": "Car removed from your saved collection"
-  
+  "carWasRemovedFromSavecollection": "Car removed from your saved collection",
+  "terms": {
+    "pageTitle": "Terms & Conditions",
+    "pageSubtitle": "Manage terms and conditions entries",
+    "addTerm": "Add Term",
+    "searchPlaceholder": "Search terms…",
+    "refresh": "Refresh",
+    "columns": {
+      "title": "Title",
+      "description": "Description",
+      "color": "Color",
+      "icon": "Icon",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noTermsFound": "No terms found",
+    "tryDifferentSearch": "Try a different search term",
+    "addFirstTerm": "Add your first term to get started",
+    "showing": "Showing",
+    "of": "of",
+    "terms": "terms",
+    "active": "Active",
+    "inactive": "Inactive",
+    "editTerm": "Edit Term",
+    "createTerm": "Create Term",
+    "saveChanges": "Save Changes",
+    "deleteTerm": "Delete Term",
+    "deleteConfirm": "Are you sure you want to delete",
+    "deleteWarning": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "editTooltip": "Edit term",
+    "deleteTooltip": "Delete term",
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Privacy Policy",
+      "titleRequired": "Title is required",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter the full description or content of this term…",
+      "descriptionRequired": "Description is required",
+      "iconLabel": "Icon",
+      "iconPlaceholder": "Select an icon (optional)",
+      "colorLabel": "Color",
+      "colorRequired": "Color is required",
+      "activeLabel": "Active",
+      "activeDescription": "Inactive terms are hidden from public-facing areas"
+    }
+  }
 }

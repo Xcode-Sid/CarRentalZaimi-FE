@@ -297,6 +297,7 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "terms": "Kushtet & Rregullat",
     "partners": "Partnerët",
     "stats": "Statistika",
     "changeLogo": "Ndrysho Logon",
@@ -934,5 +935,52 @@
   "removedFromFeatured": "u hoq nga të rekomanduarat",
   "failedToUpdateSavedCar": "Dështoi përditësimi i makinës së ruajtur",
   "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
-  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur"
+  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur",
+  "terms": {
+    "pageTitle": "Kushtet & Rregullat",
+    "pageSubtitle": "Menaxhoni kushtet dhe rregullat",
+    "addTerm": "Shto Kusht",
+    "searchPlaceholder": "Kërko kushte…",
+    "refresh": "Rifresko",
+    "columns": {
+      "title": "Titulli",
+      "description": "Përshkrimi",
+      "color": "Ngjyra",
+      "icon": "Ikona",
+      "status": "Statusi",
+      "actions": "Veprimet"
+    },
+    "noTermsFound": "Nuk u gjetën kushte",
+    "tryDifferentSearch": "Provo një kërkesë tjetër",
+    "addFirstTerm": "Shto kushtin e parë për të filluar",
+    "showing": "Duke shfaqur",
+    "of": "nga",
+    "terms": "kushte",
+    "active": "Aktiv",
+    "inactive": "Joaktiv",
+    "editTerm": "Ndrysho Kushtin",
+    "createTerm": "Krijo Kusht",
+    "saveChanges": "Ruaj Ndryshimet",
+    "deleteTerm": "Fshi Kushtin",
+    "deleteConfirm": "A jeni i sigurt që doni të fshini",
+    "deleteWarning": "Ky veprim nuk mund të kthehet.",
+    "cancel": "Anulo",
+    "delete": "Fshi",
+    "editTooltip": "Ndrysho kushtin",
+    "deleteTooltip": "Fshi kushtin",
+    "form": {
+      "titleLabel": "Titulli",
+      "titlePlaceholder": "p.sh. Politika e Privatësisë",
+      "titleRequired": "Titulli është i detyrueshëm",
+      "descriptionLabel": "Përshkrimi",
+      "descriptionPlaceholder": "Shkruani përshkrimin e plotë të kushtit…",
+      "descriptionRequired": "Përshkrimi është i detyrueshëm",
+      "iconLabel": "Ikona",
+      "iconPlaceholder": "Zgjidhni një ikonë (opsionale)",
+      "colorLabel": "Ngjyra",
+      "colorRequired": "Ngjyra është e detyrueshme",
+      "activeLabel": "Aktiv",
+      "activeDescription": "Kushtet joaktive fshihen nga zonat publike"
+    }
+  }
 }
