@@ -52,7 +52,38 @@
     "step3Desc": "Show up at the pickup point and start your journey"
   },
   "partners": {
-    "title": "Our Partners"
+    "title": "Our Partners",
+     "pageTitle": "Partners",
+    "pageSubtitle": "Manage partner organisations and their branding",
+    "addPartner": "Add Partner",
+    "searchPlaceholder": "Search partners…",
+    "editTitle": "Edit Partner",
+    "addTitle": "Add Partner",
+    "saveChanges": "Save Changes",
+    "createPartner": "Create Partner",
+    "deleteTitle": "Delete Partner",
+    "deleteWarning": "Are you sure you want to delete <strong>{{name}}</strong>?",
+    "deleteUndone": "This action cannot be undone.",
+    "noPartnersFound": "No partners found",
+    "noPartnersSearchHint": "Try a different search term",
+    "noPartnersEmptyHint": "Add your first partner to get started",
+    "showing": "Showing",
+    "of": "of",
+    "partners": "partners",
+    "preview": "Preview",
+    "partnerName": "Partner name",
+    "fieldName": "Name",
+    "fieldNamePlaceholder": "e.g. Acme Corporation",
+    "fieldInitials": "Initials",
+    "fieldInitialsPlaceholder": "e.g. AC",
+    "fieldInitialsDescription": "2–4 characters shown in the avatar",
+    "fieldColor": "Brand Color",
+    "fieldColorPlaceholder": "#2dd4a8",
+    "fieldActive": "Active",
+    "fieldActiveDesc": "Inactive partners are hidden from public-facing areas",
+    "tooltipEdit": "Edit partner",
+    "tooltipDelete": "Delete partner",
+    "tooltipRefresh": "Refresh"
   },
   "testimonials": {
     "title": "What Our Clients Say",
@@ -286,6 +317,7 @@
     "bookings": "Bookings",
     "customers": "Users",
     "settings": "Settings",
+    "partners": "Partners",
     "analytics": "Analytics",
     "reports": "Reports",
     "carDatas": "Car Datas",
@@ -904,4 +936,5 @@
   "failedToUpdateSavedCar": "Failed to update saved car",
   "carWasAddedToSaveSollection": "Car added to your saved collection",
   "carWasRemovedFromSavecollection": "Car removed from your saved collection"
+  
 }

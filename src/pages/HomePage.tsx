@@ -5,20 +5,25 @@ import { FeaturedVehicles } from '../components/landing/FeaturedVehicles';
 import { HowItWorks } from '../components/landing/HowItWorks';
 import { TestimonialsCarousel } from '../components/landing/TestimonialsCarousel';
 import { AnimatedDivider } from '../components/common/AnimatedDivider';
+import { useEffect, useState } from 'react';
+import { get } from '../utils/api.utils';
 
-const partnerLogos = [
-  { name: 'Mercedes-Benz', letter: 'MB', color: '#C0C0C0' },
-  { name: 'BMW', letter: 'BMW', color: '#1C69D3' },
-  { name: 'Audi', letter: 'Audi', color: '#BB0A30' },
-  { name: 'Tesla', letter: 'T', color: '#E31937' },
-  { name: 'Volkswagen', letter: 'VW', color: '#003399' },
-  { name: 'Toyota', letter: 'TY', color: '#EB0A1E' },
-  { name: 'Range Rover', letter: 'RR', color: '#005A2B' },
-];
 
 function PartnersLogos() {
   const { t } = useTranslation();
-  const allLogos = [...partnerLogos, ...partnerLogos];
+  const [partners, setPartners] = useState<{ id: string; name: string; initials: string; color: string; isActive: boolean }[]>([]);
+
+  useEffect(() => {
+    get('Partner/getAll')
+      .then((res) => {
+        if (res.success) setPartners(res.data.filter((p: any) => p.isActive));
+      })
+      .catch(console.error);
+  }, []);
+
+  const allLogos = [...partners, ...partners];
+
+  if (!allLogos.length) return null;
 
   return (
     <Box py={60}>
@@ -31,9 +36,9 @@ function PartnersLogos() {
       </Container>
       <div className="marquee-container">
         <div className="marquee-track">
-          {allLogos.map((logo, i) => (
+          {allLogos.map((partner, i) => (
             <Paper
-              key={`${logo.name}-${i}`}
+              key={`${partner.id}-${i}`}
               className="glass-card"
               px="xl"
               py="md"
@@ -44,16 +49,16 @@ function PartnersLogos() {
                 size={40}
                 radius="xl"
                 variant="light"
-                style={{ backgroundColor: `${logo.color}20`, color: logo.color }}
+                style={{ backgroundColor: `${partner.color}20`, color: partner.color }}
               >
-                <Text fw={800} size="xs">{logo.letter}</Text>
+                <Text fw={800} size="xs">{partner.initials}</Text>
               </ThemeIcon>
               <Text
                 fw={700}
                 size="sm"
                 style={{ whiteSpace: 'nowrap', letterSpacing: '0.05em', textTransform: 'uppercase' }}
               >
-                {logo.name}
+                {partner.name}
               </Text>
             </Paper>
           ))}
@@ -62,7 +67,6 @@ function PartnersLogos() {
     </Box>
   );
 }
-
 export default function HomePage() {
   return (
     <>

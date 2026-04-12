@@ -52,7 +52,38 @@
     "step3Desc": "Paraqitu në pikën e marrjes dhe nis udhëtimin"
   },
   "partners": {
-    "title": "Partnerët Tanë"
+    "title": "Partnerët Tanë",
+    "pageTitle": "Partnerët",
+    "pageSubtitle": "Menaxhoni organizatat partnere dhe identitetin e tyre vizual",
+    "addPartner": "Shto Partner",
+    "searchPlaceholder": "Kërko partnerë…",
+    "editTitle": "Modifiko Partnerin",
+    "addTitle": "Shto Partner",
+    "saveChanges": "Ruaj Ndryshimet",
+    "createPartner": "Krijo Partner",
+    "deleteTitle": "Fshi Partnerin",
+    "deleteWarning": "Jeni të sigurt që doni të fshini <strong>{{name}}</strong>?",
+    "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
+    "noPartnersFound": "Nuk u gjet asnjë partner",
+    "noPartnersSearchHint": "Provoni me një term tjetër kërkimi",
+    "noPartnersEmptyHint": "Shtoni partnerin tuaj të parë për të filluar",
+    "showing": "Duke shfaqur",
+    "of": "nga",
+    "partners": "partnerë",
+    "preview": "Pamje paraprake",
+    "partnerName": "Emri i partnerit",
+    "fieldName": "Emri",
+    "fieldNamePlaceholder": "p.sh. Acme Corporation",
+    "fieldInitials": "Inicialet",
+    "fieldInitialsPlaceholder": "p.sh. AC",
+    "fieldInitialsDescription": "2–4 karaktere të shfaqura në avatar",
+    "fieldColor": "Ngjyra e Brandit",
+    "fieldColorPlaceholder": "#2dd4a8",
+    "fieldActive": "Aktiv",
+    "fieldActiveDesc": "Partnerët joaktivë fshihen nga zonat publike",
+    "tooltipEdit": "Modifiko partnerin",
+    "tooltipDelete": "Fshi partnerin",
+    "tooltipRefresh": "Rifresko"
   },
   "testimonials": {
     "title": "Çfarë Thonë Klientët Tanë",
@@ -266,6 +297,7 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "partners": "Partnerët",
     "stats": "Statistika",
     "changeLogo": "Ndrysho Logon",
     "uploadLogo": "Ngarko Logon",

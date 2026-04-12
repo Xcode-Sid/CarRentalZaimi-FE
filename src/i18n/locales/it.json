@@ -52,7 +52,38 @@
     "step3Desc": "Presentati al punto di ritiro e inizia il viaggio"
   },
   "partners": {
-    "title": "I Nostri Partner"
+    "title": "I Nostri Partner",
+    "pageTitle": "Partner",
+    "pageSubtitle": "Gestisci le organizzazioni partner e il loro branding",
+    "addPartner": "Aggiungi Partner",
+    "searchPlaceholder": "Cerca partner…",
+    "editTitle": "Modifica Partner",
+    "addTitle": "Aggiungi Partner",
+    "saveChanges": "Salva Modifiche",
+    "createPartner": "Crea Partner",
+    "deleteTitle": "Elimina Partner",
+    "deleteWarning": "Sei sicuro di voler eliminare <strong>{{name}}</strong>?",
+    "deleteUndone": "Questa azione non può essere annullata.",
+    "noPartnersFound": "Nessun partner trovato",
+    "noPartnersSearchHint": "Prova con un termine di ricerca diverso",
+    "noPartnersEmptyHint": "Aggiungi il tuo primo partner per iniziare",
+    "showing": "Visualizzando",
+    "of": "di",
+    "partners": "partner",
+    "preview": "Anteprima",
+    "partnerName": "Nome partner",
+    "fieldName": "Nome",
+    "fieldNamePlaceholder": "es. Acme Corporation",
+    "fieldInitials": "Iniziali",
+    "fieldInitialsPlaceholder": "es. AC",
+    "fieldInitialsDescription": "2–4 caratteri mostrati nell'avatar",
+    "fieldColor": "Colore del Brand",
+    "fieldColorPlaceholder": "#2dd4a8",
+    "fieldActive": "Attivo",
+    "fieldActiveDesc": "I partner inattivi sono nascosti nelle aree pubbliche",
+    "tooltipEdit": "Modifica partner",
+    "tooltipDelete": "Elimina partner",
+    "tooltipRefresh": "Aggiorna"
   },
   "testimonials": {
     "title": "Cosa Dicono i Nostri Clienti",
@@ -260,6 +291,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "partners": "Partner",
     "stats": "Statistiche",
     "changeLogo": "Cambia Logo",
     "uploadLogo": "Carica Logo",

@@ -23,7 +23,8 @@ import {
   IconTagsOff,
   IconRosetteDiscount,
   IconLayoutGrid,
-  IconStar
+  IconStar,
+  IconBriefcase 
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -40,6 +41,7 @@ const navItems = [
   { path: '/admin/promotion', icon: IconRosetteDiscount, labelKey: 'admin.promotions', badge: null },
   { path: '/admin/additional-services', icon: IconLayoutGrid, labelKey: 'admin.aditionalServices', badge: null },
   { path: '/admin/customers', icon: IconUsers, labelKey: 'admin.customers', badge: null },
+  { path: '/admin/partners', icon: IconBriefcase , labelKey: 'admin.partners', badge: null },
   { path: '/admin/settings', icon: IconSettings, labelKey: 'admin.settings', badge: null },
   { path: '/admin/analytics', icon: IconChartBar, labelKey: 'admin.analytics', badge: null },
   { path: '/admin/ads', icon: IconAd, labelKey: 'admin.ads', badge: null },

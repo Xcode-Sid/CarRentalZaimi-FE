@@ -33,6 +33,7 @@ import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage ';
 import PromotionsPage from './pages/account/PromotionsPage';
 import AdminAdditionalServicesPage from './pages/account/AdditionalServicesPage ';
 import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
+import PartnersPage from './pages/admin/PartnersPage';
 
 export default function App() {
   return (
@@ -90,6 +91,7 @@ export default function App() {
             <Route path="/admin/promotion" element={<PromotionsPage />}  />
             <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />}  />
             <Route path="/admin/featured_cars" element={<RecomandedCarsPage />}  />
+            <Route path="/admin/partners" element={<PartnersPage />} />
           </Route>
         </Route>
 
