@@ -297,6 +297,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "subscriptions": "Subscriptions",
     "privacies": "Privacy Policy",
     "terms": "Terms & Conditions",
     "bookingDetails": "Booking Details",
@@ -1064,5 +1065,42 @@
   },
   "failedToUpdatePrivacyPolicies": "Failed to update privacy policy. Please try again.",
   "failedToCreatePrivacyPolicies": "Failed to create privacy policy. Please try again.",
-  "failedToDeletePrivacyPolicies": "Failed to delete privacy policy. Please try again."
+  "failedToDeletePrivacyPolicies": "Failed to delete privacy policy. Please try again.",
+   "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Manage all newsletter and email subscribers",
+      "totalLabel": "total",
+      "searchPlaceholder": "Search by email...",
+      "refresh": "Refresh",
+      "failedToLoad": "Failed to load subscriptions",
+      "failedToDelete": "Failed to delete subscription",
+      "table": {
+        "email": "Email",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "subscribed": "Subscribed",
+        "unsubscribed": "Unsubscribed"
+      },
+      "actions": {
+        "delete": "Delete"
+      },
+      "empty": {
+        "hint": "No subscriptions found",
+        "searchHint": "No results match your search"
+      },
+      "pagination": {
+        "showing": "Showing",
+        "of": "of",
+        "subscribers": "subscribers"
+      },
+      "deleteModal": {
+        "title": "Delete Subscription",
+        "confirm": "Are you sure you want to delete {{email}}?",
+        "warning": "This action cannot be undone.",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      }
+    }
 }

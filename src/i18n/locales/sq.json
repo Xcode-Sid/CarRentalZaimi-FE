@@ -297,6 +297,7 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "subscriptions": "Abonimet",
     "privacies": "Politika e Privatësisë",
     "terms": "Kushtet & Rregullat",
     "partners": "Partnerët",
@@ -1065,5 +1066,42 @@
   },
   "failedToUpdatePrivacyPolicies": "Përditësimi i politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
   "failedToCreatePrivacyPolicies": "Krijimi i politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
-  "failedToDeletePrivacyPolicies": "Fshirja e politikës së privatësisë dështoi. Ju lutemi provoni përsëri."
+  "failedToDeletePrivacyPolicies": "Fshirja e politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
+   "subscriptions": {
+      "title": "Abonimet",
+      "subtitle": "Menaxhoni të gjithë abonentët e buletin-it dhe emailit",
+      "totalLabel": "gjithsej",
+      "searchPlaceholder": "Kërko me email...",
+      "refresh": "Rifresko",
+      "failedToLoad": "Dështoi ngarkimi i abonimeve",
+      "failedToDelete": "Dështoi fshirja e abonimit",
+      "table": {
+        "email": "Email",
+        "status": "Statusi",
+        "actions": "Veprimet"
+      },
+      "status": {
+        "subscribed": "I abonuar",
+        "unsubscribed": "I çabonuar"
+      },
+      "actions": {
+        "delete": "Fshi"
+      },
+      "empty": {
+        "hint": "Nuk u gjetën abonime",
+        "searchHint": "Asnjë rezultat nuk përputhet me kërkimin tuaj"
+      },
+      "pagination": {
+        "showing": "Duke shfaqur",
+        "of": "nga",
+        "subscribers": "abonentë"
+      },
+      "deleteModal": {
+        "title": "Fshi Abonimin",
+        "confirm": "Jeni të sigurt që doni të fshini {{email}}?",
+        "warning": "Ky veprim nuk mund të zhbëhet.",
+        "cancel": "Anulo",
+        "delete": "Fshi"
+      }
+    }
 }

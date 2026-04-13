@@ -26,7 +26,8 @@ import {
   IconStar,
   IconBriefcase,
   IconFileCheck,
-  IconShieldCheck 
+  IconShieldCheck,
+  IconMailbox
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -47,6 +48,7 @@ const navItems = [
   { path: '/admin/terms', icon: IconFileCheck  , labelKey: 'admin.terms', badge: null },
   { path: '/admin/privacies', icon: IconShieldCheck   , labelKey: 'admin.privacies', badge: null },
   { path: '/admin/settings', icon: IconSettings, labelKey: 'admin.settings', badge: null },
+  { path: '/admin/subscriptions', icon: IconMailbox   , labelKey: 'admin.subscriptions', badge: null },
   { path: '/admin/analytics', icon: IconChartBar, labelKey: 'admin.analytics', badge: null },
   { path: '/admin/ads', icon: IconAd, labelKey: 'admin.ads', badge: null },
   { path: '/admin/reports', icon: IconFileText, labelKey: 'admin.reports', badge: null },

@@ -36,6 +36,8 @@ import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
 import PartnersPage from './pages/admin/PartnersPage';
 import TermsPage from './pages/admin/TermsPage';
 import PrivacyPolicyPage from './pages/admin/PrivacyPage';
+import { SubscriptionManager } from 'framer-motion';
+import SubscriptionsPage from './pages/admin/SubscriptionsPage';
 
 export default function App() {
   return (
@@ -96,6 +98,7 @@ export default function App() {
             <Route path="/admin/partners" element={<PartnersPage />} />
             <Route path="/admin/terms" element={<TermsPage />} />
             <Route path="/admin/privacies" element={<PrivacyPolicyPage />} />
+            <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
           </Route>
         </Route>
 

@@ -291,6 +291,7 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "subscriptions": "Iscrizioni",
     "privacies": "Informativa sulla Privacy",
     "terms": "Termini & Condizioni",
     "partners": "Partner",
@@ -1060,5 +1061,42 @@
   },
   "failedToUpdatePrivacyPolicies": "Aggiornamento della politica sulla privacy fallito. Per favore riprova.",
   "failedToCreatePrivacyPolicies": "Creazione della politica sulla privacy fallita. Per favore riprova.",
-  "failedToDeletePrivacyPolicies": "Eliminazione della politica sulla privacy fallita. Per favore riprova."
+  "failedToDeletePrivacyPolicies": "Eliminazione della politica sulla privacy fallita. Per favore riprova.",
+  "subscriptions": {
+      "title": "Iscrizioni",
+      "subtitle": "Gestisci tutti gli iscritti alla newsletter e via email",
+      "totalLabel": "totale",
+      "searchPlaceholder": "Cerca per email...",
+      "refresh": "Aggiorna",
+      "failedToLoad": "Caricamento delle iscrizioni non riuscito",
+      "failedToDelete": "Eliminazione dell'iscrizione non riuscita",
+      "table": {
+        "email": "Email",
+        "status": "Stato",
+        "actions": "Azioni"
+      },
+      "status": {
+        "subscribed": "Iscritto",
+        "unsubscribed": "Disiscritto"
+      },
+      "actions": {
+        "delete": "Elimina"
+      },
+      "empty": {
+        "hint": "Nessuna iscrizione trovata",
+        "searchHint": "Nessun risultato corrisponde alla tua ricerca"
+      },
+      "pagination": {
+        "showing": "Visualizzazione",
+        "of": "di",
+        "subscribers": "iscritti"
+      },
+      "deleteModal": {
+        "title": "Elimina Iscrizione",
+        "confirm": "Sei sicuro di voler eliminare {{email}}?",
+        "warning": "Questa azione non può essere annullata.",
+        "cancel": "Annulla",
+        "delete": "Elimina"
+      }
+    }
 }

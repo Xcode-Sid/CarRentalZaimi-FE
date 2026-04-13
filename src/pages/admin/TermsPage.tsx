@@ -1,744 +1,743 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  Container,
-  Paper,
-  TextInput,
-  PasswordInput,
-  Button,
-  Text,
-  Stack,
-  Group,
-  Box,
-  Anchor,
-  SimpleGrid,
-  Divider,
-  Select,
-  Popover,
-  Tooltip,
-  ActionIcon,
-  Checkbox,
-  Modal,
-  ScrollArea,
-  Loader,
-  Alert,
+    Title, Stack, Box, Text, Group, TextInput, Button,
+    Loader, Center, Pagination, Modal, ThemeIcon, Switch, ColorInput,
+    Paper, Badge, ActionIcon, Tooltip, Table, Textarea, Select,
 } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import {
-  IconMail,
-  IconLock,
-  IconUser,
-  IconPhone,
-  IconCalendar,
-  IconId,
-  IconTrash,
-  IconShieldCheck,
-  IconFileText,
-  IconAlertCircle,
-  IconX,
+    IconSearch, IconPlus, IconEdit, IconTrash, IconDeviceFloppy,
+    IconFileText, IconRefresh, IconShieldCheck, IconLock, IconKey,
+    IconScale, IconBuildingBank, IconUserCheck, IconAlertCircle,
+    IconCookie, IconMail, IconPhone, IconGlobe, IconInfoCircle,
+    IconClipboardList, IconNotes, IconStarFilled, IconBell,
+    IconCheck,
+    IconBan,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
-import { Logo } from '../../components/common/Logo';
-import { AnimatedSection, StaggerContainer } from '../../components/common/AnimatedSection';
-import { get, post } from '../../utils/api.utils';
-import GoogleOAuth from '../oauth/GoogleOAuth';
-import Spinner from '../../components/spinner/Spinner';
-import MicrosoftOAuth from '../oauth/MicrosoftOAuth';
-import FacebookOAuth from '../oauth/FacebookOAuth';
-import YahooOAuth from '../oauth/YahooOAuth';
-import { LocationField, useLocation } from '../../components/location/Location';
+import { AnimatedSection } from '../../components/common/AnimatedSection';
+import { get, post, put, del } from '../../utils/api.utils';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const PAGE_SIZE = 10;
+
+// ── Icon registry ─────────────────────────────────────────────────────────────
+const ICON_MAP: Record<string, React.FC<{ size?: number; color?: string }>> = {
+    'file-text': IconFileText,
+    'shield-check': IconShieldCheck,
+    'lock': IconLock,
+    'key': IconKey,
+    'scale': IconScale,
+    'building-bank': IconBuildingBank,
+    'user-check': IconUserCheck,
+    'alert-circle': IconAlertCircle,
+    'cookie': IconCookie,
+    'mail': IconMail,
+    'phone': IconPhone,
+    'globe': IconGlobe,
+    'info-circle': IconInfoCircle,
+    'clipboard-list': IconClipboardList,
+    'notes': IconNotes,
+    'star': IconStarFilled,
+    'bell': IconBell,
+};
+
+const ICON_OPTIONS = Object.keys(ICON_MAP).map((value) => ({ value, label: value }));
+
+function TermIcon({ icon, size = 14, color = 'white' }: { icon: string | null; size?: number; color?: string }) {
+    const Comp = icon ? ICON_MAP[icon] : null;
+    return Comp ? <Comp size={size} color={color} /> : <IconLock size={size} color={color} />;
+}
+
+interface Term {
+    id: string;
+    title: string;
+    description: string;
+    icon: string | null;
+    color: string;
+    isActive: boolean;
+}
 
 interface FormValues {
-  firstname: string;
-  lastname: string;
-  username: string;
-  email: string;
-  phone: string;
-  dateOfBirth: Date | null;
-  password: string;
-  confirmPassword: string;
-  image: { name: string; data: string };
-  acceptPrivacy: boolean;
-  acceptTerms: boolean;
+    title: string;
+    description: string;
+    icon: string;
+    color: string;
+    isActive: boolean;
 }
 
-interface PhonePrefix {
-  countryName: string | null;
-  phonePrefix: string | null;
-  flag: string | null;
-  phoneRegex: string | null;
-}
-
-interface PolicyItem {
-  id: string;
-  title: string;
-  description: string;
-  icon: string | null;
-  color: string;
-  isActive: boolean;
-}
-
-// ─── PolicyModal ──────────────────────────────────────────────────────────────
-
-interface PolicyModalProps {
-  opened: boolean;
-  onClose: () => void;
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  accent: string;
-  items: PolicyItem[];
-  loading: boolean;
-  error: string | null;
-}
-
-function PolicyModal({
-  opened,
-  onClose,
-  title,
-  subtitle,
-  icon,
-  accent,
-  items,
-  loading,
-  error,
-}: PolicyModalProps) {
-  return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      withCloseButton={false}
-      size="lg"
-      radius="xl"
-      centered
-      padding={0}
-      styles={{
-        content: { overflow: 'hidden' },
-        body: { padding: 0 },
-      }}
-    >
-      {/* ── Header ── */}
-      <Box
-        style={{
-          background: `linear-gradient(135deg, ${accent}20 0%, ${accent}08 100%)`,
-          borderBottom: `1px solid ${accent}25`,
-          padding: '24px 28px 20px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Decorative blobs */}
-        <Box style={{
-          position: 'absolute', top: -48, right: -48,
-          width: 160, height: 160, borderRadius: '50%',
-          background: `${accent}12`, pointerEvents: 'none',
-        }} />
-        <Box style={{
-          position: 'absolute', bottom: -24, left: '45%',
-          width: 90, height: 90, borderRadius: '50%',
-          background: `${accent}08`, pointerEvents: 'none',
-        }} />
-
-        <Group justify="space-between" align="flex-start">
-          <Group gap="md" align="center">
-            {/* Icon badge */}
-            <Box style={{
-              width: 52, height: 52, borderRadius: 16,
-              background: `${accent}18`,
-              border: `1.5px solid ${accent}35`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-              boxShadow: `0 4px 16px ${accent}20`,
-            }}>
-              {icon}
-            </Box>
-            <Box>
-              <Text fw={800} size="lg" lh={1.2} style={{ letterSpacing: '-0.3px' }}>
-                {title}
-              </Text>
-              <Text size="xs" c="dimmed" mt={3}>{subtitle}</Text>
-            </Box>
-          </Group>
-
-          {/* Close button */}
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            radius="xl"
-            size="md"
-            onClick={onClose}
-            style={{ marginTop: 2, flexShrink: 0 }}
-          >
-            <IconX size={16} />
-          </ActionIcon>
-        </Group>
-      </Box>
-
-      {/* ── Content ── */}
-      <ScrollArea h={420}>
-        <Box px={28} py={24}>
-          {loading && (
-            <Stack align="center" py={56} gap="xs">
-              <Loader color="teal" size="md" type="dots" />
-              <Text size="sm" c="dimmed" fw={500}>Loading content…</Text>
-            </Stack>
-          )}
-
-          {error && !loading && (
-            <Alert icon={<IconAlertCircle size={16} />} color="red" radius="lg" variant="light">
-              {error}
-            </Alert>
-          )}
-
-          {!loading && !error && items.length === 0 && (
-            <Text c="dimmed" ta="center" py={56} size="sm">
-              No content available at this time.
-            </Text>
-          )}
-
-          {!loading && !error && items.length > 0 && (
-            <Stack gap={12}>
-              {items
-                .filter((item) => item.isActive)
-                .map((item, index, arr) => {
-                  const itemColor = item.color || accent;
-                  const hasIcon = item.icon && item.icon.trim().length > 0;
-
-                  return (
-                    <Box
-                      key={item.id}
-                      style={{
-                        borderRadius: 14,
-                        border: `1.5px solid ${itemColor}22`,
-                        background: `${itemColor}08`,
-                        padding: '14px 16px',
-                        transition: 'box-shadow 0.15s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 18px ${itemColor}20`;
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                      }}
-                    >
-                      <Group gap="md" align="flex-start" wrap="nowrap">
-                        {/* Icon badge */}
-                        <Box style={{
-                          minWidth: 40, height: 40, borderRadius: 12,
-                          background: `${itemColor}18`,
-                          border: `1.5px solid ${itemColor}30`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0,
-                          fontSize: hasIcon ? 20 : 13,
-                          fontWeight: 700,
-                          color: itemColor,
-                          boxShadow: `0 2px 8px ${itemColor}18`,
-                        }}>
-                          {hasIcon ? item.icon : index + 1}
-                        </Box>
-
-                        <Box style={{ flex: 1, minWidth: 0 }}>
-                          <Group gap={8} mb={4} align="center">
-                            <Text fw={700} size="sm" style={{ color: itemColor, lineHeight: 1.3 }}>
-                              {item.title}
-                            </Text>
-                          </Group>
-                          <Text size="sm" c="dimmed" style={{ lineHeight: 1.75 }}>
-                            {item.description}
-                          </Text>
-                        </Box>
-                      </Group>
-                    </Box>
-                  );
-                })}
-            </Stack>
-          )}
-        </Box>
-      </ScrollArea>
-
-      {/* ── Footer ── */}
-      <Box style={{
-        borderTop: '1px solid var(--mantine-color-default-border)',
-        padding: '14px 28px',
-        background: 'var(--mantine-color-default-hover)',
-      }}>
-        <Group justify="space-between" align="center">
-          <Text size="xs" c="dimmed">Please read carefully before accepting.</Text>
-          <Button
-            size="sm"
-            radius="xl"
-            style={{ background: accent, border: 'none', paddingInline: 22 }}
-            onClick={onClose}
-          >
-            I understand
-          </Button>
-        </Group>
-      </Box>
-    </Modal>
-  );
-}
-
-// ─── RegisterPage ─────────────────────────────────────────────────────────────
-
-export default function RegisterPage() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const [loading, setLoading] = useState(false);
-  const [phonePrefix, setPhonePrefix] = useState('+355');
-  const [phonePrefixes, setPhonePrefixes] = useState<PhonePrefix[]>([]);
-  const [passwordPopoverOpened, setPasswordPopoverOpened] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
-  const [termsModalOpen, setTermsModalOpen] = useState(false);
-
-  const [privacyItems, setPrivacyItems] = useState<PolicyItem[]>([]);
-  const [privacyLoading, setPrivacyLoading] = useState(false);
-  const [privacyError, setPrivacyError] = useState<string | null>(null);
-
-  const [termsItems, setTermsItems] = useState<PolicyItem[]>([]);
-  const [termsLoading, setTermsLoading] = useState(false);
-  const [termsError, setTermsError] = useState<string | null>(null);
-
-  const loc = useLocation();
-
-  // ── Fetch phone prefixes ───────────────────────────────────────────────────
-  useEffect(() => {
-    const fetchPrefixes = async () => {
-      try {
-        const response = await get('StatePrefix/getAll');
-        if (response.success) {
-          setPhonePrefixes(response.data as PhonePrefix[]);
-          if (response.data.length > 0) setPhonePrefix(response.data[0].phonePrefix ?? '+355');
-        }
-      } catch (error) {
-        console.error('Failed to fetch phone prefixes:', error);
-      }
-    };
-    fetchPrefixes();
-  }, []);
-
-  // ── Open Privacy modal (lazy fetch) ───────────────────────────────────────
-  const openPrivacyModal = async () => {
-    setPrivacyModalOpen(true);
-    if (privacyItems.length > 0) return;
-    setPrivacyLoading(true);
-    setPrivacyError(null);
-    try {
-      const response = await get('Privacy/getAll');
-      if (response.success) setPrivacyItems(response.data as PolicyItem[]);
-      else setPrivacyError('Failed to load privacy policy.');
-    } catch {
-      setPrivacyError('Failed to load privacy policy.');
-    } finally {
-      setPrivacyLoading(false);
-    }
-  };
-
-  // ── Open Terms modal (lazy fetch) ─────────────────────────────────────────
-  const openTermsModal = async () => {
-    setTermsModalOpen(true);
-    if (termsItems.length > 0) return;
-    setTermsLoading(true);
-    setTermsError(null);
-    try {
-      const response = await get('Terms/getAll');
-      if (response.success) setTermsItems(response.data as PolicyItem[]);
-      else setTermsError('Failed to load terms and conditions.');
-    } catch {
-      setTermsError('Failed to load terms and conditions.');
-    } finally {
-      setTermsLoading(false);
-    }
-  };
-
-  // ── Form ───────────────────────────────────────────────────────────────────
-  const form = useForm<FormValues>({
-    initialValues: {
-      firstname: '',
-      lastname: '',
-      username: '',
-      email: '',
-      phone: '',
-      dateOfBirth: null,
-      password: '',
-      confirmPassword: '',
-      image: { name: '', data: '' },
-      acceptPrivacy: false,
-      acceptTerms: false,
+const inputStyles = {
+    input: {
+        background: 'rgba(255,255,255,0.04)',
+        border: '0.5px solid var(--mantine-color-default-border)',
+        '&:focus': { borderColor: 'var(--az-teal)' },
     },
-    validate: {
-      firstname: (v) => v.trim().length < 2 ? t('register.firstNameMin') : null,
-      lastname: (v) => v.trim().length < 2 ? t('register.lastNameMin') : null,
-      username: (v) => v.trim().length < 2 ? t('usernameMustBeAtLeastTwoCharacters') : null,
-      email: (v) => /^\S+@\S+\.\S+$/.test(v) ? null : t('enterAValidEmail'),
-      phone: (value) => {
-        if (!value || value.trim() === '') return t('phoneIsRequired');
-        const selected = phonePrefixes.find((p) => p.phonePrefix === phonePrefix);
-        if (!selected?.phoneRegex) return null;
-        return new RegExp(selected.phoneRegex).test(`${phonePrefix}${value}`)
-          ? null
-          : t('enterAValidPhoneNumber');
-      },
-      password: (v) => {
-        if (v.length < 8) return t('passwordMustBeAtLeast8Characters');
-        if (!/[a-z]/.test(v)) return t('passwordMustContainAtLeastOneLowercaseLetter');
-        if (!/[A-Z]/.test(v)) return t('passwordMustContainAtLeastOneUppercaseLetter');
-        if (!/\d/.test(v)) return t('passwordMustContainAtLeastOneNumber');
-        if (!/[^a-zA-Z0-9]/.test(v)) return t('passwordMustContainAtLeastOneSpecialCharacter');
-        return null;
-      },
-      confirmPassword: (v, values) => v !== values.password ? t('passwordsDoNotMatch') : null,
-      dateOfBirth: (value) => {
-        if (!value) return null;
-        const date = new Date(value);
-        if (date > new Date()) return t('dateOfBirthCannotBeInFuture');
-        const minAge = new Date();
-        minAge.setFullYear(minAge.getFullYear() - 18);
-        if (date > minAge) return t('youMustBeAtLeast18YearsOld');
-        return null;
-      },
-      acceptPrivacy: (v) => !v ? t('register.mustAcceptPrivacy', 'You must accept the Privacy Policy.') : null,
-      acceptTerms: (v) => !v ? t('register.mustAcceptTerms', 'You must accept the Terms and Conditions.') : null,
-    },
-  });
+};
 
-  const allRulesPassed =
-    form.values.password.length >= 8 &&
-    /[a-z]/.test(form.values.password) &&
-    /[A-Z]/.test(form.values.password) &&
-    /\d/.test(form.values.password) &&
-    /[^a-zA-Z0-9]/.test(form.values.password);
+// ── Main Page ─────────────────────────────────────────────────────────────────
+export default function TermsPage() {
+    const { t } = useTranslation();
 
-  // ── Image upload ───────────────────────────────────────────────────────────
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = (reader.result as string).split(',')[1];
-      form.setFieldValue('image', { name: file.name, data: base64 });
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
+    const [terms, setTerms] = useState<Term[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
-  const handleSubmit = async (values: FormValues) => {
-    setLoading(true);
-    try {
-      const response = await post('Authentication/register', {
-        firstname: values.firstname,
-        lastname: values.lastname,
-        username: values.username,
-        email: values.email,
-        phone: values.phone ? `${phonePrefix}${values.phone}` : undefined,
-        dateOfBirth: values.dateOfBirth?.toISOString() ?? null,
-        name: values.image.name || null,
-        data: values.image.data || null,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-        role: 'User',
-        location: loc.location,
-      });
+    // Modal state
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editTarget, setEditTarget] = useState<Term | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<Term | null>(null);
 
-      if (response.success) {
-        notifications.show({ color: 'teal', title: t('success'), message: t('register.success') });
-        await sendVerificationCode(values.email);
-      }
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      setTimeout(() => setLoading(false), 400);
-    }
-  };
+    const form = useForm<FormValues>({
+        initialValues: { title: '', description: '', icon: '', color: '#2dd4a8', isActive: true },
+        validate: {
+            title: (v) => (!v.trim() ? t('terms.validation.titleRequired') : null),
+            description: (v) => (!v.trim() ? t('terms.validation.descriptionRequired') : null),
+            color: (v) => (!v ? t('terms.validation.colorRequired') : null),
+        },
+    });
 
-  const sendVerificationCode = async (email: string) => {
-    try {
-      const userRes = await get(`User/user/email/${email}`);
-      const id = userRes.data.id;
-      if (userRes.success && id) {
-        const smsResponse = await post('Phone/send-verification-code', { userId: id });
-        if (smsResponse.success) {
-          notifications.show({ color: 'green', title: t('success'), message: t('verificationCodeSent') });
-          navigate('/verify-phone', { state: { userId: id } });
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 400);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => { setPage(1); }, [debouncedSearch]);
+
+    const startItem = (page - 1) * PAGE_SIZE + 1;
+    const endItem = Math.min(page * PAGE_SIZE, totalCount);
+
+    // ── Fetch ──────────────────────────────────────────────────────────────────
+    const fetchTerms = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const params = new URLSearchParams({
+                PageNr: String(page),
+                PageSize: String(PAGE_SIZE),
+            });
+            if (debouncedSearch.trim()) params.set('Search', debouncedSearch.trim());
+
+            const res = await get(`Terms/getPagedTerms?${params.toString()}`);
+            if (!res.success) throw new Error(res.message || t('terms.errors.loadFailed'));
+
+            setTerms(res.data.items ?? []);
+            setTotalPages(res.data.totalPages ?? 1);
+            setTotalCount(res.data.totalCount ?? 0);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : t('terms.errors.unknown'));
+            setTerms([]);
+        } finally {
+            setLoading(false);
         }
-      }
-    } catch (err) {
-      console.error('Something went wrong:', err);
-    }
-  };
+    }, [page, debouncedSearch]);
 
-  // ─── Render ────────────────────────────────────────────────────────────────
-  return (
-    <>
-      {loading && <Spinner visible={loading} />}
+    useEffect(() => { fetchTerms(); }, [fetchTerms]);
 
-      {/* Privacy Policy Modal */}
-      <PolicyModal
-        opened={privacyModalOpen}
-        onClose={() => setPrivacyModalOpen(false)}
-        title={t('register.privacyPolicy', 'Privacy Policy')}
-        subtitle={`Last updated · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
-        icon={<IconShieldCheck size={22} color="#12b886" />}
-        accent="#12b886"
-        items={privacyItems}
-        loading={privacyLoading}
-        error={privacyError}
-      />
+    // ── Open create modal ──────────────────────────────────────────────────────
+    const openCreate = () => {
+        setEditTarget(null);
+        form.reset();
+        setModalOpen(true);
+    };
 
-      {/* Terms & Conditions Modal */}
-      <PolicyModal
-        opened={termsModalOpen}
-        onClose={() => setTermsModalOpen(false)}
-        title={t('register.termsAndConditions', 'Terms & Conditions')}
-        subtitle={`Last updated · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
-        icon={<IconFileText size={22} color="#228be6" />}
-        accent="#228be6"
-        items={termsItems}
-        loading={termsLoading}
-        error={termsError}
-      />
+    // ── Open edit modal ────────────────────────────────────────────────────────
+    const openEdit = (term: Term) => {
+        setEditTarget(term);
+        form.setValues({
+            title: term.title,
+            description: term.description,
+            icon: term.icon ?? '',
+            color: term.color,
+            isActive: term.isActive,
+        });
+        setModalOpen(true);
+    };
 
-      <Box w="100%" py={{ base: 'md', sm: 'xl' }}>
-        <Container size={560} w="100%">
+    const closeModal = () => {
+        setModalOpen(false);
+        setEditTarget(null);
+        form.reset();
+    };
 
-          {/* Header */}
-          <AnimatedSection>
-            <Stack align="center" mb="xl">
-              <motion.div whileHover={{ scale: 1.05 }} style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
-                <Logo height={44} />
-              </motion.div>
-              <Text size="xl" fw={700}>{t('register.title')}</Text>
-              <Text c="dimmed" size="sm">{t('register.subtitle')}</Text>
-            </Stack>
-          </AnimatedSection>
+    // ── Save (create or update) ────────────────────────────────────────────────
+    const handleSave = async () => {
+        const validation = form.validate();
+        if (validation.hasErrors) return;
 
-          {/* Card */}
-          <AnimatedSection delay={0.15} scale>
-            <Paper className="glass-card" radius="lg" p="xl">
-              <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="md">
+        setActionLoading(true);
+        try {
+            if (editTarget) {
+                const res = await put(`Terms/${editTarget.id}`, {
+                    id: editTarget.id,
+                    ...form.values,
+                });
+                if (!res.success) throw new Error(res.message || t('terms.errors.updateFailed'));
+            } else {
+                const res = await post('Terms', form.values);
+                if (!res.success) throw new Error(res.message || t('terms.errors.createFailed'));
+            }
+            closeModal();
+            fetchTerms();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
-                  {/* Name */}
-                  <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                    <TextInput label={t('register.firstName')} placeholder={t('register.firstName')} leftSection={<IconUser size={16} />} withAsterisk {...form.getInputProps('firstname')} />
-                    <TextInput label={t('register.lastName')} placeholder={t('register.lastName')} leftSection={<IconUser size={16} />} withAsterisk {...form.getInputProps('lastname')} />
-                  </SimpleGrid>
+    // ── Delete ─────────────────────────────────────────────────────────────────
+    const handleDelete = async () => {
+        if (!deleteTarget) return;
+        setActionLoading(true);
+        try {
+            const res = await del(`Terms/${deleteTarget.id}`);
+            if (!res.success) throw new Error(res.message || t('terms.errors.deleteFailed'));
+            setDeleteTarget(null);
+            fetchTerms();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
-                  {/* Username */}
-                  <TextInput label={t('username')} placeholder={t('usernamePlaceholder')} leftSection={<IconId size={16} />} withAsterisk {...form.getInputProps('username')} />
+    // ── Render ─────────────────────────────────────────────────────────────────
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+            <Stack gap="lg">
 
-                  {/* Avatar */}
-                  <Box>
-                    <Text size="xs" mb={6} fw={500}>{t('register.profilePhoto')}</Text>
-                    <Group gap="md" align="center">
-                      <Box
-                        onClick={() => fileInputRef.current?.click()}
-                        style={{
-                          width: 72, height: 72, borderRadius: '50%',
-                          border: '2px dashed var(--mantine-color-teal-5)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer', overflow: 'hidden', flexShrink: 0,
-                          background: imagePreview ? 'transparent' : 'var(--mantine-color-body)',
-                        }}
-                      >
-                        {imagePreview
-                          ? <img src={imagePreview} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : <IconUser size={28} style={{ opacity: 0.4 }} />
-                        }
-                      </Box>
-                      <Stack gap={4} style={{ flex: 1 }}>
-                        <Button variant="light" color="teal" size="xs" leftSection={<IconUser size={14} />} onClick={() => fileInputRef.current?.click()}>
-                          {imagePreview ? t('register.changePhoto') : t('register.uploadPhoto')}
+                {/* Header */}
+                <AnimatedSection>
+                    <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
+                        <Group gap={10} align="flex-start">
+                            <Box
+                                style={{
+                                    width: 4,
+                                    height: 28,
+                                    borderRadius: 4,
+                                    background: 'var(--az-teal)',
+                                    boxShadow: '0 0 12px rgba(45, 212, 168, 0.35)',
+                                    flexShrink: 0,
+                                    marginTop: 4,
+                                }}
+                            />
+                            <div>
+                                <Title order={2} fw={800}>{t('terms.title')}</Title>
+                                <Text c="dimmed" size="sm" mt={4}>
+                                    {t('terms.subtitle')}
+                                </Text>
+                            </div>
+                        </Group>
+                        <Button
+                            leftSection={<IconPlus size={16} />}
+                            color="teal"
+                            radius="md"
+                            onClick={openCreate}
+                        >
+                            {t('terms.addTerm')}
                         </Button>
-                        {form.values.image.name && <Text size="xs" c="dimmed" truncate>{form.values.image.name}</Text>}
-                        {imagePreview && (
-                          <Tooltip label={t('register.removePhoto')} withArrow position="right">
-                            <ActionIcon variant="light" color="red" size="sm" radius="xl"
-                              onClick={() => {
-                                form.setFieldValue('image', { name: '', data: '' });
-                                setImagePreview(null);
-                                if (fileInputRef.current) fileInputRef.current.value = '';
-                              }}
-                            >
-                              <IconTrash size={14} />
-                            </ActionIcon>
-                          </Tooltip>
-                        )}
-                      </Stack>
-                      <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageChange} />
                     </Group>
-                  </Box>
+                </AnimatedSection>
 
-                  {/* Email */}
-                  <TextInput label={t('register.email')} placeholder="email@example.com" leftSection={<IconMail size={16} />} withAsterisk {...form.getInputProps('email')} />
-
-                  {/* Phone */}
-                  <Box>
-                    <Text size="xs" mb={4}>{t('register.phone')} <span style={{ color: 'red' }}>*</span></Text>
-                    <Group gap="xs" align="flex-start">
-                      <Select
-                        data={phonePrefixes.map((p) => ({ value: p.phonePrefix ?? '', label: `${p.flag ?? ''} ${p.phonePrefix ?? ''}`.trim() }))}
-                        value={phonePrefix}
-                        onChange={(v) => setPhonePrefix(v ?? '+355')}
-                        radius="md"
-                        w={130}
-                        comboboxProps={{ withinPortal: true }}
-                      />
-                      <TextInput placeholder="6X XXX XXXX" leftSection={<IconPhone size={16} />} style={{ flex: 1 }} {...form.getInputProps('phone')} />
-                    </Group>
-                  </Box>
-
-                  {/* Date of birth */}
-                  <DateInput label={t('register.dateOfBirth')} placeholder="DD/MM/YYYY" leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
-
-                  {/* Location */}
-                  <LocationField
-                    location={loc.location}
-                    locationSearchQuery={loc.locationSearchQuery}
-                    locationSuggestions={loc.locationSuggestions}
-                    locationSearchLoading={loc.locationSearchLoading}
-                    gpsLoading={loc.gpsLoading}
-                    onSearchChange={loc.handleLocationSearchChange}
-                    onSelect={loc.handleLocationSelect}
-                    onGPS={loc.handleGPS}
-                    onClear={loc.handleClearLocation}
-                  />
-
-                  {/* Password */}
-                  <Popover
-                    position="bottom"
-                    withArrow
-                    shadow="md"
-                    opened={(passwordPopoverOpened || form.values.password.length > 0) && !allRulesPassed}
-                    width={260}
-                    withinPortal={false}
-                    trapFocus={false}
-                  >
-                    <Popover.Target>
-                      <div style={{ width: '100%' }}>
-                        <PasswordInput
-                          label={t('register.password')}
-                          placeholder="••••••••"
-                          leftSection={<IconLock size={16} />}
-                          withAsterisk
-                          onFocus={() => setPasswordPopoverOpened(true)}
-                          {...form.getInputProps('password')}
+                {/* Filters */}
+                <AnimatedSection delay={0.08}>
+                    <Group wrap="wrap" align="end" gap="sm" mb="sm">
+                        <TextInput
+                            placeholder={t('terms.searchPlaceholder')}
+                            leftSection={<IconSearch size={16} />}
+                            value={search}
+                            onChange={(e) => setSearch(e.currentTarget.value)}
+                            style={{ flex: 1, minWidth: 240, maxWidth: 420 }}
                         />
-                      </div>
-                    </Popover.Target>
-                    <Popover.Dropdown>
-                      <Text fw={600} size="xs" mb={6}>{t('register.passwordRules')}</Text>
-                      <Stack gap={4}>
-                        {[
-                          { ok: form.values.password.length >= 8, label: t('passwordRules.minLength') },
-                          { ok: /[a-z]/.test(form.values.password), label: t('passwordRules.lowercase') },
-                          { ok: /[A-Z]/.test(form.values.password), label: t('passwordRules.uppercase') },
-                          { ok: /\d/.test(form.values.password), label: t('passwordRules.number') },
-                          { ok: /[^a-zA-Z0-9]/.test(form.values.password), label: t('passwordRules.special') },
-                        ].map((rule, i) => (
-                          <Group key={i} gap={6}>
-                            <Text size="xs" c={rule.ok ? 'teal' : 'dimmed'}>{rule.ok ? '✓' : '○'}</Text>
-                            <Text size="xs" c={rule.ok ? 'teal' : 'dimmed'}>{rule.label}</Text>
-                          </Group>
-                        ))}
-                      </Stack>
-                    </Popover.Dropdown>
-                  </Popover>
+                        <Tooltip label={t('terms.refresh')} withArrow>
+                            <ActionIcon
+                                variant="light"
+                                color="teal"
+                                size="lg"
+                                radius="md"
+                                onClick={fetchTerms}
+                                loading={loading}
+                            >
+                                <IconRefresh size={16} />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
+                </AnimatedSection>
 
-                  {/* Confirm password */}
-                  <PasswordInput label={t('register.confirmPassword')} placeholder="••••••••" leftSection={<IconLock size={16} />} withAsterisk {...form.getInputProps('confirmPassword')} />
+                {/* Content */}
+                {loading ? (
+                    <Center py="xl">
+                        <Loader color="var(--az-teal)" size="md" />
+                    </Center>
+                ) : error ? (
+                    <Center py="xl">
+                        <Text c="red" size="sm">{error}</Text>
+                    </Center>
+                ) : (
+                    <AnimatedSection delay={0.1}>
+                        <Stack gap="md">
+                            <Paper
+                                radius="lg"
+                                withBorder
+                                style={{ overflow: "hidden", borderColor: "var(--mantine-color-default-border)" }}
+                            >
+                                <Table.ScrollContainer minWidth={600}>
+                                    <Table
+                                        highlightOnHover
+                                        verticalSpacing="sm"
+                                        horizontalSpacing="md"
+                                        styles={{
+                                            thead: {
+                                                background: "var(--mantine-color-default-hover)",
+                                                borderBottom: "0.5px solid var(--mantine-color-default-border)",
+                                            },
+                                            th: {
+                                                fontWeight: 500,
+                                                fontSize: 12,
+                                                textTransform: "uppercase",
+                                                letterSpacing: "0.05em",
+                                                color: "var(--mantine-color-dimmed)",
+                                            },
+                                        }}
+                                    >
+                                        <Table.Thead>
+                                            <Table.Tr>
+                                                <Table.Th w={60}>#</Table.Th>
+                                                <Table.Th>{t('terms.table.title')}</Table.Th>
+                                                <Table.Th>{t('terms.table.description')}</Table.Th>
+                                                <Table.Th>{t('terms.table.color')}</Table.Th>
+                                                <Table.Th>{t('terms.table.icon')}</Table.Th>
+                                                <Table.Th>{t('terms.table.status')}</Table.Th>
+                                                <Table.Th w={90}>{t('terms.table.actions')}</Table.Th>
+                                            </Table.Tr>
+                                        </Table.Thead>
 
-                  {/* ── Privacy & Terms checkboxes ─────────────────────── */}
-                  <Box
-                    style={{
-                      background: 'var(--mantine-color-default-hover)',
-                      border: '1px solid var(--mantine-color-default-border)',
-                      borderRadius: 12,
-                      padding: '14px 16px',
-                    }}
-                  >
-                    <Stack gap={10}>
-                      <Checkbox
+                                        <Table.Tbody>
+                                            {/* Skeleton rows while loading */}
+                                            {loading &&
+                                                [1, 2, 3, 4].map((i) => (
+                                                    <Table.Tr key={i}>
+                                                        {[60, 20 + i * 8, 30, 10, 10, 10, 10].map((w, j) => (
+                                                            <Table.Td key={j}>
+                                                                <Box
+                                                                    style={{
+                                                                        height: 12,
+                                                                        borderRadius: 6,
+                                                                        background: "var(--mantine-color-default-border)",
+                                                                        opacity: 0.5,
+                                                                        width: `${w}%`,
+                                                                        animation: "pulse 1.4s ease-in-out infinite",
+                                                                    }}
+                                                                />
+                                                            </Table.Td>
+                                                        ))}
+                                                    </Table.Tr>
+                                                ))}
+
+                                            {/* Empty state */}
+                                            {!loading && terms.length === 0 && (
+                                                <Table.Tr>
+                                                    <Table.Td colSpan={7}>
+                                                        <Center py="xl">
+                                                            <Stack align="center" gap="xs">
+                                                                <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                                                                    <IconLock size={18} />
+                                                                </ThemeIcon>
+                                                                <Text size="sm" c="dimmed">
+                                                                    {search
+                                                                        ? t('terms.empty.searchHint')
+                                                                        : t('terms.empty.hint')}
+                                                                </Text>
+                                                                {!search && (
+                                                                    <Button
+                                                                        leftSection={<IconPlus size={15} />}
+                                                                        color="teal"
+                                                                        variant="light"
+                                                                        radius="md"
+                                                                        size="xs"
+                                                                        mt={4}
+                                                                        onClick={openCreate}
+                                                                    >
+                                                                        {t('terms.addTerm')}
+                                                                    </Button>
+                                                                )}
+                                                            </Stack>
+                                                        </Center>
+                                                    </Table.Td>
+                                                </Table.Tr>
+                                            )}
+
+                                            {/* Data rows */}
+                                            {!loading &&
+                                                terms.map((term, idx) => (
+                                                    <motion.tr
+                                                        key={term.id}
+                                                        initial={{ opacity: 0, y: 6 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
+                                                    >
+                                                        {/* Index */}
+                                                        <Table.Td>
+                                                            <Text size="xs" c="dimmed" fw={500}>
+                                                                #{String(idx + 1).padStart(3, "0")}
+                                                            </Text>
+                                                        </Table.Td>
+
+                                                        {/* Title */}
+                                                        <Table.Td>
+                                                            <Group gap={8} align="center">
+                                                                <Box
+                                                                    style={{
+                                                                        width: 28,
+                                                                        height: 28,
+                                                                        borderRadius: 8,
+                                                                        background: term.color || 'var(--az-teal)',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        flexShrink: 0,
+                                                                        boxShadow: `0 2px 8px ${term.color}55`,
+                                                                    }}
+                                                                >
+                                                                    <IconLock size={13} color="white" />
+                                                                </Box>
+                                                                <Text size="sm" fw={500}>{term.title}</Text>
+                                                            </Group>
+                                                        </Table.Td>
+
+                                                        {/* Description */}
+                                                        <Table.Td style={{ maxWidth: 260 }}>
+                                                            <Text size="sm" c="dimmed" lineClamp={2}>
+                                                                {term.description}
+                                                            </Text>
+                                                        </Table.Td>
+
+                                                        {/* Color */}
+                                                        <Table.Td>
+                                                            <Group gap={6} align="center">
+                                                                <Box
+                                                                    style={{
+                                                                        width: 14,
+                                                                        height: 14,
+                                                                        borderRadius: 4,
+                                                                        background: term.color || '#2dd4a8',
+                                                                        border: '1px solid rgba(255,255,255,0.15)',
+                                                                        flexShrink: 0,
+                                                                    }}
+                                                                />
+                                                                <Text size="xs" c="dimmed" style={{ fontFamily: 'monospace' }}>
+                                                                    {term.color}
+                                                                </Text>
+                                                            </Group>
+                                                        </Table.Td>
+
+                                                        {/* Icon */}
+                                                        <Table.Td>
+                                                            {term.icon ? (
+                                                                <Group gap={6} align="center">
+                                                                    <Box
+                                                                        style={{
+                                                                            width: 24,
+                                                                            height: 24,
+                                                                            borderRadius: 6,
+                                                                            background: term.color || 'var(--az-teal)',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                        }}
+                                                                    >
+                                                                        <TermIcon icon={term.icon} size={12} color="white" />
+                                                                    </Box>
+                                                                    <Text size="xs" c="dimmed">{term.icon}</Text>
+                                                                </Group>
+                                                            ) : (
+                                                                <Text size="sm" c="dimmed">—</Text>
+                                                            )}
+                                                        </Table.Td>
+
+                                                        {/* Status */}
+                                                        <Table.Td>
+                                                            {term.isActive ? (
+                                                                <Badge
+                                                                    color="green"
+                                                                    variant="light"
+                                                                    size="sm"
+                                                                    radius="md"
+                                                                    leftSection={<IconCheck size={11} />}
+                                                                >
+                                                                    {t('terms.status.active')}
+                                                                </Badge>
+                                                            ) : (
+                                                                <Badge
+                                                                    color="gray"
+                                                                    variant="light"
+                                                                    size="sm"
+                                                                    radius="md"
+                                                                    leftSection={<IconBan size={11} />}
+                                                                >
+                                                                    {t('terms.status.inactive')}
+                                                                </Badge>
+                                                            )}
+                                                        </Table.Td>
+
+                                                        {/* Actions */}
+                                                        <Table.Td>
+                                                            <Group gap={4}>
+                                                                <Tooltip label={t('terms.actions.edit')} withArrow fz="xs">
+                                                                    <ActionIcon
+                                                                        variant="subtle"
+                                                                        color="yellow"
+                                                                        size="sm"
+                                                                        radius="md"
+                                                                        onClick={() => openEdit(term)}
+                                                                    >
+                                                                        <IconEdit size={15} />
+                                                                    </ActionIcon>
+                                                                </Tooltip>
+                                                                <Tooltip label={t('terms.actions.delete')} withArrow fz="xs">
+                                                                    <ActionIcon
+                                                                        variant="subtle"
+                                                                        color="red"
+                                                                        size="sm"
+                                                                        radius="md"
+                                                                        onClick={() => setDeleteTarget(term)}
+                                                                    >
+                                                                        <IconTrash size={15} />
+                                                                    </ActionIcon>
+                                                                </Tooltip>
+                                                            </Group>
+                                                        </Table.Td>
+                                                    </motion.tr>
+                                                ))}
+                                        </Table.Tbody>
+                                    </Table>
+                                </Table.ScrollContainer>
+                            </Paper>
+
+                            {totalPages > 1 && (
+                                <Group justify="space-between" align="center" px={4}>
+                                    <Text size="xs" c="dimmed">
+                                        {t('terms.pagination.showing')}{' '}
+                                        <Text component="span" size="xs" fw={500}>{startItem}–{endItem}</Text>
+                                        {' '}{t('terms.pagination.of')}{' '}
+                                        <Text component="span" size="xs" fw={500}>{totalCount}</Text>
+                                        {' '}{t('terms.pagination.terms')}
+                                    </Text>
+                                    <Pagination
+                                        value={page}
+                                        onChange={setPage}
+                                        total={totalPages}
+                                        color="var(--az-teal)"
+                                        radius="md"
+                                        size="sm"
+                                        withEdges
+                                    />
+                                </Group>
+                            )}
+                        </Stack>
+                    </AnimatedSection>
+                )}
+            </Stack>
+
+            {/* ── Create / Edit Modal ─────────────────────────────────────────────── */}
+            <Modal
+                opened={modalOpen}
+                onClose={closeModal}
+                title={
+                    <Group gap={10}>
+                        <ThemeIcon color="teal" variant="light" size={32} radius="md">
+                            {editTarget ? <IconEdit size={16} /> : <IconPlus size={16} />}
+                        </ThemeIcon>
+                        <Text fw={500} size="md">
+                            {editTarget ? t('terms.modal.editTitle') : t('terms.modal.addTitle')}
+                        </Text>
+                    </Group>
+                }
+                size="md"
+                centered
+                radius="lg"
+                styles={{
+                    header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+                    body: { padding: '20px 24px 24px' },
+                }}
+            >
+                <Stack gap="md">
+                    <TextInput
+                        label={t('terms.form.titleLabel')}
+                        placeholder={t('terms.form.titlePlaceholder')}
+                        required
+                        radius="md"
+                        {...form.getInputProps('title')}
+                        styles={inputStyles}
+                    />
+
+                    <Textarea
+                        label={t('terms.form.descriptionLabel')}
+                        placeholder={t('terms.form.descriptionPlaceholder')}
+                        required
+                        radius="md"
+                        minRows={4}
+                        autosize
+                        maxRows={8}
+                        {...form.getInputProps('description')}
+                        styles={inputStyles}
+                    />
+
+                    <Select
+                        label={t('terms.form.iconLabel')}
+                        placeholder={t('terms.form.iconPlaceholder')}
+                        radius="md"
+                        clearable
+                        data={ICON_OPTIONS}
+                        renderOption={({ option }) => (
+                            <Group gap={8}>
+                                <TermIcon icon={option.value} size={14} color="currentColor" />
+                                <Text size="sm">{option.label}</Text>
+                            </Group>
+                        )}
+                        leftSection={
+                            form.values.icon
+                                ? <TermIcon icon={form.values.icon} size={14} color="currentColor" />
+                                : <IconLock size={14} />
+                        }
+                        {...form.getInputProps('icon')}
+                        styles={inputStyles}
+                    />
+
+                    <ColorInput
+                        label={t('terms.form.colorLabel')}
+                        placeholder="#2dd4a8"
+                        required
+                        radius="md"
+                        format="hex"
+                        swatches={[
+                            '#2dd4a8', '#3b82f6', '#f59e0b', '#ef4444',
+                            '#8b5cf6', '#ec4899', '#14b8a6', '#f97316',
+                        ]}
+                        {...form.getInputProps('color')}
+                        styles={inputStyles}
+                    />
+
+                    <Switch
+                        label={t('terms.form.activeLabel')}
+                        description={t('terms.form.activeDescription')}
                         color="teal"
-                        label={
-                          <Text size="sm">
-                            {t('register.iAgreeToThe', 'I agree to the ')}{' '}
-                            <Anchor
-                              size="sm"
-                              fw={600}
-                              style={{ color: '#12b886', cursor: 'pointer' }}
-                              onClick={(e) => { e.preventDefault(); openPrivacyModal(); }}
-                            >
-                              {t('register.privacyPolicy', 'Privacy Policy')}
-                            </Anchor>
-                          </Text>
-                        }
-                        {...form.getInputProps('acceptPrivacy', { type: 'checkbox' })}
-                      />
-                      <Checkbox
-                        color="blue"
-                        label={
-                          <Text size="sm">
-                            {t('register.iAgreeToThe', 'I agree to the ')}{' '}
-                            <Anchor
-                              size="sm"
-                              fw={600}
-                              style={{ color: '#228be6', cursor: 'pointer' }}
-                              onClick={(e) => { e.preventDefault(); openTermsModal(); }}
-                            >
-                              {t('register.termsAndConditions', 'Terms & Conditions')}
-                            </Anchor>
-                          </Text>
-                        }
-                        {...form.getInputProps('acceptTerms', { type: 'checkbox' })}
-                      />
-                    </Stack>
-                  </Box>
+                        radius="md"
+                        {...form.getInputProps('isActive', { type: 'checkbox' })}
+                    />
 
-                  {/* Submit */}
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                    <Button type="submit" fullWidth variant="filled" color="teal" size="md" className="ripple-btn">
-                      {t('register.submit')}
+                    <Button
+                        variant="filled"
+                        color="teal"
+                        fullWidth
+                        radius="md"
+                        size="md"
+                        loading={actionLoading}
+                        leftSection={editTarget ? <IconDeviceFloppy size={16} /> : <IconPlus size={16} />}
+                        onClick={handleSave}
+                    >
+                        {editTarget ? t('terms.form.saveChanges') : t('terms.form.createTerm')}
                     </Button>
-                  </motion.div>
-
                 </Stack>
-              </form>
+            </Modal>
 
-              <Divider label={t('register.orSocial')} labelPosition="center" my="lg" />
+            {/* ── Delete Confirm Modal ────────────────────────────────────────────── */}
+            <Modal
+                opened={!!deleteTarget}
+                onClose={() => setDeleteTarget(null)}
+                title={
+                    <Group gap={10}>
+                        <ThemeIcon color="red" variant="light" size={32} radius="md">
+                            <IconTrash size={16} />
+                        </ThemeIcon>
+                        <Text fw={500} size="md">{t('terms.deleteModal.title')}</Text>
+                    </Group>
+                }
+                size="sm"
+                centered
+                radius="lg"
+                styles={{
+                    header: { paddingBottom: 12, borderBottom: '0.5px solid var(--mantine-color-default-border)' },
+                    body: { padding: '20px 24px 24px' },
+                }}
+            >
+                <Stack gap="lg" align="center">
+                    {deleteTarget && (
+                        <Group gap={12} w="100%">
+                            <Box
+                                style={{
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: 12,
+                                    background: deleteTarget.color,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <IconLock size={20} color="white" />
+                            </Box>
+                            <div>
+                                <Text fw={600} size="sm">{deleteTarget.title}</Text>
+                                <Text c="dimmed" size="xs" lineClamp={1}>{deleteTarget.description}</Text>
+                            </div>
+                        </Group>
+                    )}
 
-              <StaggerContainer stagger={0.06}>
-                <Box mb="lg">
-                  <Stack gap="sm">
-                    <GoogleOAuth />
-                    <FacebookOAuth />
-                    <MicrosoftOAuth />
-                    <YahooOAuth />
-                  </Stack>
-                </Box>
-              </StaggerContainer>
-            </Paper>
-          </AnimatedSection>
+                    <Paper
+                        radius="md"
+                        p="md"
+                        w="100%"
+                        style={{
+                            background: 'var(--mantine-color-red-light)',
+                            border: '0.5px solid var(--mantine-color-red-light-hover)',
+                        }}
+                    >
+                        <Stack gap={4} align="center">
+                            <Text size="sm" ta="center" fw={500} c="red.8">
+                                {t('terms.deleteModal.confirm', { name: deleteTarget?.title })}
+                            </Text>
+                            <Text size="xs" ta="center" c="dimmed">
+                                {t('terms.deleteModal.warning')}
+                            </Text>
+                        </Stack>
+                    </Paper>
 
-          {/* Footer */}
-          <AnimatedSection delay={0.3}>
-            <Text ta="center" mt="md" size="sm">
-              {t('register.hasAccount')}{' '}
-              <Anchor component={Link} to="/login" fw={600}>{t('register.login')}</Anchor>
-            </Text>
-          </AnimatedSection>
-
-        </Container>
-      </Box>
-    </>
-  );
+                    <Group w="100%" gap="sm">
+                        <Button
+                            variant="default"
+                            flex={1}
+                            radius="md"
+                            onClick={() => setDeleteTarget(null)}
+                            disabled={actionLoading}
+                        >
+                            {t('terms.deleteModal.cancel')}
+                        </Button>
+                        <Button
+                            color="red"
+                            flex={1}
+                            radius="md"
+                            loading={actionLoading}
+                            leftSection={<IconTrash size={15} />}
+                            onClick={handleDelete}
+                        >
+                            {t('terms.deleteModal.delete')}
+                        </Button>
+                    </Group>
+                </Stack>
+            </Modal>
+        </motion.div>
+    );
 }
