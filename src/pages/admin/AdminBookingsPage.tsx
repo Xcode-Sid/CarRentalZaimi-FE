@@ -17,8 +17,12 @@ import {
   Loader,
   Center,
   Tooltip,
+  Alert,
+  Box,
+  ThemeIcon,
+  Paper,
 } from '@mantine/core';
-import { IconEye, IconCheck, IconX } from '@tabler/icons-react';
+import { IconEye, IconCheck, IconX, IconLock, IconInfoCircle, IconCircleCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notifications } from '@mantine/notifications';
@@ -30,9 +34,9 @@ import { toImagePath } from '../../utils/general';
 import { mapApiBooking, type Booking, type BookingStatus } from '../../data/bookings';
 
 const statusColors: Record<string, string> = {
-  accepted: 'green',
+  accepted: 'orange',
   refused: 'red',
-  finished: 'gray',
+  done: 'teal',
 };
 
 interface PagedResponse<T> {
@@ -64,6 +68,9 @@ export default function AdminBookingsPage() {
   const [refuseTarget, setRefuseTarget] = useState<Booking | null>(null);
   const [refuseReason, setRefuseReason] = useState('');
   const [refuseLoading, setRefuseLoading] = useState(false);
+
+  const [closeTarget, setCloseTarget] = useState<Booking | null>(null);
+  const [closeLoading, setCloseLoading] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -153,6 +160,29 @@ export default function AdminBookingsPage() {
     }
   };
 
+  const closeBooking = async () => {
+    if (!closeTarget) return;
+    setCloseLoading(true);
+    try {
+      const response = await put(`Booking/close/${closeTarget.id}`, {});
+      if (response.success) {
+        setBookings((prev) =>
+          prev.map((b) => (b.id === closeTarget.id ? { ...b, status: 'done' as BookingStatus } : b))
+        );
+        if (selected?.id === closeTarget.id)
+          setSelected((prev) => (prev ? { ...prev, status: 'done' as BookingStatus } : prev));
+        notifications.show({ message: t('admin.bookingClosed'), color: 'teal' });
+        setCloseTarget(null);
+      } else {
+        notifications.show({ message: response.errors, color: 'red' });
+      }
+    } catch (err: any) {
+      notifications.show({ message: err, color: 'red' });
+    } finally {
+      setCloseLoading(false);
+    }
+  };
+
   const handleReset = () => {
     setSearch('');
     setStatusFilter(null);
@@ -179,7 +209,7 @@ export default function AdminBookingsPage() {
           data={[
             { value: 'accepted', label: t('account.accepted') },
             { value: 'refused', label: t('account.refused') },
-            { value: 'finished', label: t('account.finished') },
+            { value: 'done', label: t('account.finished') },
           ]}
           value={statusFilter}
           onChange={(v) => setStatusFilter((v as BookingStatus | null) ?? null)}
@@ -208,119 +238,127 @@ export default function AdminBookingsPage() {
         </Center>
       ) : (
         <>
-          <Table.ScrollContainer minWidth={1000}>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('admin.bookingIdColumn')}</Table.Th>
-                  <Table.Th>{t('admin.customer')}</Table.Th>
-                  <Table.Th>{t('admin.vehicle')}</Table.Th>
-                  <Table.Th>{t('admin.paymentMethod')}</Table.Th>
-                  <Table.Th>{t('admin.dates')}</Table.Th>
-                  <Table.Th>{t('admin.total')}</Table.Th>
-                  <Table.Th>{t('admin.status')}</Table.Th>
-                  <Table.Th>{t('admin.refusedBy')}</Table.Th>
-                  <Table.Th>{t('admin.carActions')}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {bookings.map((b) => (
-                  <Table.Tr key={b.id}>
-                    <Table.Td>
-                      <Text size="sm" fw={500}>{b.ref}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap="sm">
-                        <Avatar
-                          color="teal"
-                          radius="xl"
-                          size="sm"
-                          src={b.user.image ? toImagePath(b.user.image.imageData) : undefined}
-                        >
-                          {!b.user.image?.imageData &&
-                            `${b.user.firstName?.[0] ?? ''}${b.user.lastName?.[0] ?? ''}`}
-                        </Avatar>
-                        <Text size="sm">{`${b.user.firstName} ${b.user.lastName}`}</Text>
-                      </Group>
-                    </Table.Td>
-                    <Table.Td>{b.vehicleName}</Table.Td>
-                    <Table.Td>
-                      <Badge variant="outline" size="sm">
-                        {b.paymentMethod === 'cash' ? t('admin.paymentCash') : t('admin.paymentCard')}
-                      </Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">{formatBookingPeriod(b, t)}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm" fw={600}>€{b.total.toLocaleString()}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge color={statusColors[b.status]} variant="light" size="sm">
-                        {t(bookingStatusKeys[b.status])}
-                      </Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      {b.refuzedBy ? (
-                        <Badge
-                          color={b.refuzedBy === 'Admin' ? 'red' : 'blue'}
-                          variant="light"
-                          size="md"
-                          radius="md"
-                          tt="uppercase"
-                          style={{ fontWeight: 700, letterSpacing: '0.04em' }}
-                        >
-                          {b.refuzedBy}
-                        </Badge>
-                      ) : (
-                        <Text size="sm" c="dimmed">—</Text>
-                      )}
-                    </Table.Td>
-                    <Table.Td>
-                      <Group gap={4} wrap="nowrap">
-                        <Tooltip label={t('admin.viewBookingDetails')} withArrow position="top">
-                          <ActionIcon
-                            variant="subtle"
-                            color="teal"
-                            size="sm"
-                            onClick={() => setSelected(b)}
-                          >
-                            <IconEye size={16} />
-                          </ActionIcon>
-                        </Tooltip>
-
-                        {b.status === 'accepted' && (
-                          <>
-                            <Tooltip label={t('admin.acceptBooking')} withArrow position="top">
-                              <ActionIcon
-                                variant="subtle"
-                                color="green"
-                                size="sm"
-                                onClick={() => setAcceptTarget(b)}
-                              >
-                                <IconCheck size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-
-                            <Tooltip label={t('admin.refuseBooking')} withArrow position="top">
-                              <ActionIcon
-                                variant="subtle"
-                                color="red"
-                                size="sm"
-                                onClick={() => setRefuseTarget(b)}
-                              >
-                                <IconX size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-                          </>
-                        )}
-                      </Group>
-                    </Table.Td>
+          <Paper radius="lg" withBorder style={{ overflow: 'hidden', borderColor: 'var(--mantine-color-default-border)' }}>
+            <Table.ScrollContainer minWidth={1000}>
+              <Table
+                highlightOnHover
+                styles={{
+                  thead: {
+                    background: 'var(--mantine-color-default-hover)',
+                    borderBottom: '0.5px solid var(--mantine-color-default-border)',
+                  },
+                  th: { fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--mantine-color-dimmed)', padding: '8px 12px' },
+                  td: { padding: '8px 12px' },
+                }}
+              >
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th w={36}>#</Table.Th>
+                    <Table.Th>{t('admin.bookingIdColumn')}</Table.Th>
+                    <Table.Th>{t('admin.customer')}</Table.Th>
+                    <Table.Th>{t('admin.vehicle')}</Table.Th>
+                    <Table.Th>{t('admin.paymentMethod')}</Table.Th>
+                    <Table.Th>{t('admin.dates')}</Table.Th>
+                    <Table.Th>{t('admin.total')}</Table.Th>
+                    <Table.Th>{t('admin.status')}</Table.Th>
+                    <Table.Th>{t('admin.refusedBy')}</Table.Th>
+                    <Table.Th w={100}>{t('admin.carActions')}</Table.Th>
                   </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </Table.ScrollContainer>
+                </Table.Thead>
+
+                <Table.Tbody>
+                  {bookings.map((b, idx) => (
+                    <Table.Tr key={b.id}>
+
+                      <Table.Td>
+                        <Text size="xs" c="dimmed" fw={500} ff="monospace">
+                          {String(idx + 1).padStart(3, '0')}
+                        </Text>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Text size="xs" fw={500} ff="monospace" c="dimmed">{b.ref}</Text>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Group gap={7} wrap="nowrap">
+                          <Avatar color="teal" radius="xl" size={26} src={b.user.image ? toImagePath(b.user.image.imageData) : undefined}>
+                            {!b.user.image?.imageData && `${b.user.firstName?.[0] ?? ''}${b.user.lastName?.[0] ?? ''}`}
+                          </Avatar>
+                          <Text size="sm">{`${b.user.firstName} ${b.user.lastName}`}</Text>
+                        </Group>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Text size="xs" c="dimmed">{b.vehicleName}</Text>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Badge variant={b.paymentMethod === 'cash' ? 'outline' : 'light'} color={b.paymentMethod === 'cash' ? 'gray' : 'blue'} size="sm" radius="sm">
+                          {b.paymentMethod === 'cash' ? t('admin.paymentCash') : t('admin.paymentCard')}
+                        </Badge>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Text size="xs" c="dimmed">{formatBookingPeriod(b, t)}</Text>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Text size="sm" fw={600}>€{b.total.toLocaleString()}</Text>
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Badge color={statusColors[b.status]} variant="light" size="sm" radius="sm">
+                          {t(bookingStatusKeys[b.status])}
+                        </Badge>
+                      </Table.Td>
+
+                      <Table.Td>
+                        {b.refuzedBy ? (
+                          <Badge color={b.refuzedBy === 'Admin' ? 'red' : 'blue'} variant="light" size="sm" radius="sm"
+                            style={{ fontSize: 10, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                            {b.refuzedBy}
+                          </Badge>
+                        ) : (
+                          <Text size="xs" c="dimmed">—</Text>
+                        )}
+                      </Table.Td>
+
+                      <Table.Td>
+                        <Group gap={3} wrap="nowrap">
+                          <Tooltip label={t('admin.viewBookingDetails')} withArrow position="top" fz="xs">
+                            <ActionIcon variant="subtle" color="teal" size="sm" radius="md" onClick={() => setSelected(b)}>
+                              <IconEye size={13} />
+                            </ActionIcon>
+                          </Tooltip>
+                          {b.status === 'accepted' && (
+                            <>
+                              <Tooltip label={t('admin.acceptBooking')} withArrow position="top" fz="xs">
+                                <ActionIcon variant="subtle" color="green" size="sm" radius="md" onClick={() => setAcceptTarget(b)}>
+                                  <IconCheck size={13} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label={t('admin.refuseBooking')} withArrow position="top" fz="xs">
+                                <ActionIcon variant="subtle" color="red" size="sm" radius="md" onClick={() => setRefuseTarget(b)}>
+                                  <IconX size={13} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label={t('admin.closeBooking')} withArrow position="top" fz="xs">
+                                <ActionIcon variant="subtle" color="gray" size="sm" radius="md" onClick={() => setCloseTarget(b)}>
+                                  <IconLock size={13} />
+                                </ActionIcon>
+                              </Tooltip>
+                            </>
+                          )}
+                        </Group>
+                      </Table.Td>
+
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          </Paper>
 
           {totalPages > 1 && (
             <Group justify="center">
@@ -370,32 +408,62 @@ export default function AdminBookingsPage() {
       <Modal
         opened={!!acceptTarget}
         onClose={() => setAcceptTarget(null)}
-        title={t('admin.acceptBookingTitle')}
-        radius="lg"
+        withCloseButton={false}
+        radius="xl"
         size="sm"
-        overlayProps={{ backgroundOpacity: 0.5, blur: 3 }}
+        padding={0}
+        overlayProps={{ backgroundOpacity: 0.45, blur: 3 }}
       >
-        <Stack gap="md">
-          <Text size="sm" c="dimmed">
+        {/* Header */}
+        <Box
+          px="xl" pt="xl" pb="md"
+          style={{ borderBottom: '0.5px solid var(--mantine-color-default-border)' }}
+        >
+          <Group justify="space-between" align="center">
+            <Group gap="sm">
+              <ThemeIcon size={32} radius="xl" color="orange" variant="light">
+                <IconCircleCheck size={16} stroke={2.5} />
+              </ThemeIcon>
+              <Text fw={500} size="sm">{t('admin.acceptBookingTitle')}</Text>
+            </Group>
+            <ActionIcon variant="subtle" color="gray" size="sm" onClick={() => setAcceptTarget(null)}>
+              <IconX size={13} stroke={2.5} />
+            </ActionIcon>
+          </Group>
+        </Box>
+
+        {/* Body */}
+        <Box px="xl" pt="md" pb="sm">
+          <Text size="sm" c="dimmed" lh={1.6} mb="md">
             {t('admin.acceptBookingConfirmMessage', { ref: acceptTarget?.ref })}
           </Text>
-          <Group justify="flex-end">
-            <Button
-              variant="subtle"
-              color="gray"
-              onClick={() => setAcceptTarget(null)}
-            >
-              {t('account.closeModal')}
-            </Button>
-            <Button
-              color="green"
-              loading={acceptLoading}
-              onClick={acceptBooking}
-            >
-              {t('admin.confirmAccept')}
-            </Button>
-          </Group>
-        </Stack>
+          <Alert
+            icon={<IconInfoCircle size={14} />}
+            color="orange"
+            variant="light"
+            radius="md"
+            styles={{ message: { fontSize: 12.5 } }}
+          >
+            {t('admin.acceptBookingSlotNotice')}
+          </Alert>
+        </Box>
+
+        {/* Footer */}
+        <Group px="xl" pb="xl" pt="sm" justify="flex-end" gap="xs">
+          <Button variant="subtle" color="gray" size="sm" onClick={() => setAcceptTarget(null)}>
+            {t('account.closeModal')}
+          </Button>
+          <Button
+            color="orange"
+            variant="light"
+            size="sm"
+            loading={acceptLoading}
+            leftSection={<IconCircleCheck size={13} stroke={2.5} />}
+            onClick={acceptBooking}
+          >
+            {t('admin.confirmAccept')}
+          </Button>
+        </Group>
       </Modal>
 
       {/* Refuse Booking Modal */}
@@ -433,6 +501,67 @@ export default function AdminBookingsPage() {
             </Button>
           </Group>
         </Stack>
+      </Modal>
+
+      <Modal
+        opened={!!closeTarget}
+        onClose={() => setCloseTarget(null)}
+        withCloseButton={false}
+        radius="xl"
+        size="sm"
+        padding={0}
+        overlayProps={{ backgroundOpacity: 0.45, blur: 3 }}
+      >
+        {/* Header */}
+        <Box
+          px="xl" pt="xl" pb="md"
+          style={{ borderBottom: '0.5px solid var(--mantine-color-default-border)' }}
+        >
+          <Group justify="space-between" align="center">
+            <Group gap="sm">
+              <ThemeIcon size={32} radius="xl" color="green" variant="light">
+                <IconCheck size={16} stroke={2.5} />
+              </ThemeIcon>
+              <Text fw={500} size="sm">{t('admin.closeBookingTitle')}</Text>
+            </Group>
+            <ActionIcon variant="subtle" color="gray" size="sm" onClick={() => setCloseTarget(null)}>
+              <IconX size={13} stroke={2.5} />
+            </ActionIcon>
+          </Group>
+        </Box>
+
+        {/* Body */}
+        <Box px="xl" pt="md" pb="sm">
+          <Text size="sm" c="dimmed" lh={1.6} mb="md">
+            {t('admin.closeBookingConfirmMessage', { ref: closeTarget?.ref })}
+          </Text>
+          <Alert
+            icon={<IconCheck size={14} />}
+            color="green"
+            variant="light"
+            radius="md"
+            styles={{ message: { fontSize: 12.5 } }}
+          >
+            {t('admin.closeBookingArchiveNotice')}
+          </Alert>
+        </Box>
+
+        {/* Footer */}
+        <Group px="xl" pb="xl" pt="sm" justify="flex-end" gap="xs">
+          <Button variant="subtle" color="gray" size="sm" onClick={() => setCloseTarget(null)}>
+            {t('account.closeModal')}
+          </Button>
+          <Button
+            color="green"
+            variant="light"
+            size="sm"
+            loading={closeLoading}
+            leftSection={<IconCheck size={13} stroke={2.5} />}
+            onClick={closeBooking}
+          >
+            {t('admin.confirmClose')}
+          </Button>
+        </Group>
       </Modal>
     </Stack>
   );

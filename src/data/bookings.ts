@@ -1,6 +1,6 @@
 import { toImagePath } from "../utils/general";
 
-export type BookingStatus = 'accepted' | 'refused' | 'finished';
+export type BookingStatus = 'accepted' | 'refused' | 'done';
 
 export type AdditionalService = {
   id: string;
@@ -37,7 +37,7 @@ export interface Booking {
 const STATUS_MAP: Record<number, Booking['status']> = {
   1: 'accepted',
   2: 'refused',
-  3: 'finished',
+  3: 'done',
 };
 
 const REFUSED_MAP: Record<number, Booking['refuzedBy']> = {
@@ -65,12 +65,14 @@ export function mapApiBooking(dto: any): Booking {
     total: Number(dto.totalPrice ?? 0),
     phoneNumber: dto.phoneNumber ?? '',
     paymentMethod: PAYMENT_MAP[dto.paymentMethod] ?? 'cash',  
-    status: STATUS_MAP[dto.status] ?? 'accepted',          
+    status: STATUS_MAP[dto.status] ?? '-',          
     refuzedBy: REFUSED_MAP[dto.refuzedBy] ?? '-',
     user: {
       firstName: dto.user?.firstName ?? '',
       lastName: dto.user?.lastName ?? '',
-      image: dto.user?.image ?? undefined,
+      image: {
+        imageData : dto.user?.image.imagePath ?? undefined,
+      }
     },
     services: (dto.bookingServices ?? []).map((bs: any) => ({  
       id: bs.additionalService?.id ?? bs.id,

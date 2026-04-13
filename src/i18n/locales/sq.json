@@ -297,6 +297,13 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "acceptBookingSlotNotice": "Duke pranuar, vendi i rezervimit do të bllokohet dhe nuk do të jetë më i disponueshëm për mysafirët e tjerë.",
+    "closeBookingArchiveNotice": "Pasi të përfundojë, kjo rezervim do të arkivohet dhe nuk do të mund të bëhen ndryshime të mëtejshme.",
+    "closeBooking": "Mbyll rezervimin",
+    "closeBookingTitle": "Mbyll Rezervimin",
+    "closeBookingConfirmMessage": "Jeni i sigurt që doni të mbyllni rezervimin {{ref}}?",
+    "confirmClose": "Konfirmo Mbylljen",
+    "bookingClosed": "Rezervimi u mbyll me sukses",
     "subscriptions": "Abonimet",
     "privacies": "Politika e Privatësisë",
     "terms": "Kushtet & Rregullat",

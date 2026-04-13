@@ -254,7 +254,7 @@
     "viewDetails": "View Details",
     "accepted": "Accepted",
     "refused": "Refused",
-    "finished": "Finished",
+    "done": "Done",
     "bookingDetailsTitle": "Booking details",
     "clickRowForDetails": "Click any row for full details",
     "rentalPeriod": "Rental period",
@@ -297,6 +297,13 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "acceptBookingSlotNotice": "Accepting will lock in the booking slot and make it unavailable to other guests.",
+    "closeBookingArchiveNotice": "Once completed, this booking will be archived and no further changes can be made.",
+    "closeBooking": "Close booking",
+    "closeBookingTitle": "Close Booking",
+    "closeBookingConfirmMessage": "Are you sure you want to close booking {{ref}}?",
+    "confirmClose": "Confirm Close",
+    "bookingClosed": "Booking closed successfully",
     "subscriptions": "Subscriptions",
     "privacies": "Privacy Policy",
     "terms": "Terms & Conditions",

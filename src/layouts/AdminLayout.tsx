@@ -40,7 +40,7 @@ const navItems = [
   { path: '/admin/car-data', icon: IconClipboardList, labelKey: 'admin.carDatas', badge: null },
   { path: '/admin/cars', icon: IconCar, labelKey: 'admin.cars', badge: null },
   { path: '/admin/featured_cars', icon: IconStar, labelKey: 'admin.featuredCars', badge: null },
-  { path: '/admin/bookings', icon: IconCalendar, labelKey: 'admin.bookings', badge: '3' },
+  { path: '/admin/bookings', icon: IconCalendar, labelKey: 'admin.bookings', badge: null },
   { path: '/admin/promotion', icon: IconRosetteDiscount, labelKey: 'admin.promotions', badge: null },
   { path: '/admin/additional-services', icon: IconLayoutGrid, labelKey: 'admin.aditionalServices', badge: null },
   { path: '/admin/customers', icon: IconUsers, labelKey: 'admin.customers', badge: null },

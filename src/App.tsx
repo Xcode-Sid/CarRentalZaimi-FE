@@ -59,13 +59,13 @@ export default function App() {
         <ThemeToggle />
       </div>
       <Routes>
-          <Route path="/unsubscribe" element={<UnsubscribePage />} />
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/fleet" element={<FleetPage />} />
           <Route path="/fleet/:id" element={<VehicleDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/unsubscribe" element={<UnsubscribePage />} />
         </Route>
 
         <Route path="/login" element={<LoginPage />} />
@@ -93,10 +93,10 @@ export default function App() {
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
             <Route path="/admin/ads" element={<AdminAdsPage />} />
             <Route path="/admin/reports" element={<AdminReportsPage />} />
-            <Route path="/admin/car-data" element={<AdminCarDataPage />}  />
-            <Route path="/admin/promotion" element={<PromotionsPage />}  />
-            <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />}  />
-            <Route path="/admin/featured_cars" element={<RecomandedCarsPage />}  />
+            <Route path="/admin/car-data" element={<AdminCarDataPage />} />
+            <Route path="/admin/promotion" element={<PromotionsPage />} />
+            <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />} />
+            <Route path="/admin/featured_cars" element={<RecomandedCarsPage />} />
             <Route path="/admin/partners" element={<PartnersPage />} />
             <Route path="/admin/terms" element={<TermsPage />} />
             <Route path="/admin/privacies" element={<PrivacyPolicyPage />} />

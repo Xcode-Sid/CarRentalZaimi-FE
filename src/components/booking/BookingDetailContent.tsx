@@ -16,27 +16,27 @@ import { useState, type ReactNode } from 'react';
 import type { Booking } from '../../data/bookings';
 
 export const bookingStatusColors: Record<string, string> = {
-  accepted: 'teal',
+  accepted: 'orange',
   refused: 'red',
-  finished: 'gray',
+  done: 'teal',
 };
 
 export const bookingStatusKeys: Record<string, string> = {
   accepted: 'account.accepted',
   refused: 'account.refused',
-  finished: 'account.finished',
+  done: 'account.done',
 };
 
 const statusGradients: Record<string, string> = {
-  accepted: 'linear-gradient(135deg, #0F6E56 0%, #1D9E75 40%, #5DCAA5 100%)',
+  accepted: 'linear-gradient(135deg, #7A3B00 0%, #B35900 40%, #F08030 100%)',
   refused: 'linear-gradient(135deg, #7a1a1a 0%, #A32D2D 50%, #E24B4A 100%)',
-  finished: 'linear-gradient(135deg, #2C2C2A 0%, #5F5E5A 50%, #888780 100%)',
+  done: 'linear-gradient(135deg, #0D4D4D 0%, #1A7A7A 50%, #2AADAD 100%)',
 };
 
 const statusDotColors: Record<string, string> = {
-  accepted: '#9FE1CB',
+  accepted: '#FFD4A8',
   refused: '#F7C1C1',
-  finished: '#D3D1C7',
+  done: '#A8EDED',
 };
 
 export function rentalDayCount(start: string, end?: string): number | null {

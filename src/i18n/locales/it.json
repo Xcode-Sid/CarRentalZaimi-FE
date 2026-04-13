@@ -291,6 +291,13 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+     "acceptBookingSlotNotice": "Accettando la prenotazione, il posto verrà bloccato e non sarà più disponibile per altri ospiti.",
+    "closeBookingArchiveNotice": "Una volta completata, questa prenotazione verrà archiviata e non sarà più possibile apportare modifiche.",
+    "closeBooking": "Chiudi prenotazione",
+    "closeBookingTitle": "Chiudi Prenotazione",
+    "closeBookingConfirmMessage": "Sei sicuro di voler chiudere la prenotazione {{ref}}?",
+    "confirmClose": "Conferma chiusura",
+    "bookingClosed": "Prenotazione chiusa con successo",
     "subscriptions": "Iscrizioni",
     "privacies": "Informativa sulla Privacy",
     "terms": "Termini & Condizioni",
