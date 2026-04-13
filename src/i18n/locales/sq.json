@@ -869,6 +869,8 @@
   "required": "Ky fushë është e detyrueshme",
   "edit": "Ndrysho",
   "promotions": {
+    "showing": "Duke shfaqur",
+    "of": "nga",
     "active": "Aktiv",
     "inactive": "Joaktiv",
     "fieldActive": "Aktiv",
@@ -913,6 +915,8 @@
   },
   "perDay": "/ ditë",
   "additionalServices": {
+    "showing": "Duke shfaqur",
+    "of": "nga",
     "aditionalServices": "Menaxho Shërbime Shtesë",
     "subtitle": "Menaxho shërbimet opsionale të ofruara për ditë",
     "add": "Shto Shërbim",

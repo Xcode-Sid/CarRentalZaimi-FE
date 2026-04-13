@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Title,
     TextInput,
@@ -19,6 +19,8 @@ import {
     Center,
     Select,
     Textarea,
+    Pagination,
+    Loader,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { motion } from "framer-motion";
@@ -36,6 +38,7 @@ import {
     IconCar,
     IconCategory,
     IconPercentage,
+    IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
@@ -67,7 +70,6 @@ interface CarCategory {
 interface Car {
     id: string;
     title: string;
-    // add other car fields if needed
 }
 
 // ─── Input styles ─────────────────────────────────────────────────────────────
@@ -86,6 +88,8 @@ const inputStyles = {
     },
 };
 
+const PAGE_SIZE = 10;
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function PromotionsPage() {
@@ -95,7 +99,13 @@ export default function PromotionsPage() {
     const [cars, setCars] = useState<Car[]>([]);
     const [categories, setCategories] = useState<CarCategory[]>([]);
     const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Promotion | null>(null);
@@ -142,7 +152,6 @@ export default function PromotionsPage() {
             numberOfDays: (v) =>
                 v <= 0 ? t("validation.mustBePositive") : null,
 
-            // Only required on CREATE — carId field shows the error for both
             carId: (v, values) =>
                 !editTarget && !v && !values.carCategoryId
                     ? t("validation.carOrCategoryRequired")
@@ -150,23 +159,43 @@ export default function PromotionsPage() {
         },
     });
 
-    // ─── Fetch ────────────────────────────────────────────────────────────────
+    // ─── Debounce search ──────────────────────────────────────────────────────
 
     useEffect(() => {
-        const fetchPromotions = async () => {
-            setLoading(true);
-            try {
-                const promoRes = await get("Promotion/getAll");
-                if (promoRes.success) setPromotions(promoRes.data ?? []);
-            } catch (error) {
-                console.error("Failed to fetch promotions:", error);
-                notifications.show({ message: t("promotions.loadFailed"), color: "red" });
-            } finally {
-                setLoading(false);
+        const timer = setTimeout(() => setDebouncedSearch(search), 400);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => { setPage(1); }, [debouncedSearch]);
+
+    // ─── Fetch promotions (paginated) ─────────────────────────────────────────
+
+    const fetchPromotions = useCallback(async () => {
+        setLoading(true);
+        try {
+            const params = new URLSearchParams({
+                PageNr: String(page),
+                PageSize: String(PAGE_SIZE),
+            });
+            if (debouncedSearch.trim()) params.set("Search", debouncedSearch.trim());
+
+            const promoRes = await get(`Promotion/getAll?${params.toString()}`);
+            if (promoRes.success) {
+                setPromotions(promoRes.data?.items ?? []);
+                setTotalPages(promoRes.data?.totalPages ?? 1);
+                setTotalCount(promoRes.data?.totalCount ?? 0);
             }
-        };
-        fetchPromotions();
-    }, []);
+        } catch (error) {
+            console.error("Failed to fetch promotions:", error);
+            notifications.show({ message: t("promotions.loadFailed"), color: "red" });
+        } finally {
+            setLoading(false);
+        }
+    }, [page, debouncedSearch]);
+
+    useEffect(() => { fetchPromotions(); }, [fetchPromotions]);
+
+    // ─── Fetch cars & categories once ────────────────────────────────────────
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -184,7 +213,6 @@ export default function PromotionsPage() {
         const fetchCars = async () => {
             try {
                 const carRes = await get("Cars/getAll");
-                console.log("carRes.data", carRes.data);
                 if (carRes.success) setCars(carRes.data ?? []);
             } catch (error) {
                 console.error("Failed to fetch cars:", error);
@@ -192,6 +220,11 @@ export default function PromotionsPage() {
         };
         fetchCars();
     }, []);
+
+    // ─── Pagination derived ───────────────────────────────────────────────────
+
+    const startItem = (page - 1) * PAGE_SIZE + 1;
+    const endItem = Math.min(page * PAGE_SIZE, totalCount);
 
     // ─── Modal helpers ────────────────────────────────────────────────────────
 
@@ -241,7 +274,7 @@ export default function PromotionsPage() {
         const { title, description, code, discountPercentage, numberOfDays, isActive, carId, carCategoryId } =
             form.values;
 
-        setLoading(true);
+        setActionLoading(true);
         try {
             if (!editTarget) {
                 const response = await post("Promotion", {
@@ -254,9 +287,7 @@ export default function PromotionsPage() {
                     carId: carId || null,
                     carCategoryId: carCategoryId || null,
                 });
-                if (response.success) {
-                    setPromotions((prev) => [response.data, ...prev]);
-                }
+                if (!response.success) throw new Error(response.message ?? undefined);
             } else {
                 const response = await put(`Promotion/${editTarget.id}`, {
                     id: editTarget.id,
@@ -267,30 +298,22 @@ export default function PromotionsPage() {
                     numberOfDays,
                     isActive,
                 });
-                if (response.success) {
-                    setPromotions((prev) =>
-                        prev.map((p) => (p.id === editTarget.id ? response.data : p))
-                    );
-                }
+                if (!response.success) throw new Error(response.message ?? undefined);
             }
 
             notifications.show({
                 title: t("success"),
-                message: editTarget
-                    ? t("promotions.updated")
-                    : t("promotions.created"),
+                message: editTarget ? t("promotions.updated") : t("promotions.created"),
                 color: "teal",
             });
 
             closeModal();
+            fetchPromotions();
         } catch (error) {
             console.error("Failed to save promotion:", error);
-            notifications.show({
-                message: t("promotions.saveFailed"),
-                color: "red",
-            });
+            notifications.show({ message: t("promotions.saveFailed"), color: "red" });
         } finally {
-            setLoading(false);
+            setActionLoading(false);
         }
     };
 
@@ -299,40 +322,32 @@ export default function PromotionsPage() {
     const handleDelete = async () => {
         if (!deleteTarget) return;
 
-        setLoading(true);
+        setActionLoading(true);
         try {
             const response = await del(`Promotion/${deleteTarget.id}`);
             if (response.success) {
-                setPromotions((prev) => prev.filter((p) => p.id !== deleteTarget.id));
                 notifications.show({
                     title: t("success"),
                     message: t("promotions.deleted"),
                     color: "green",
                 });
                 setDeleteTarget(null);
+                // If we just deleted the last item on this page, go back one page
+                if (promotions.length === 1 && page > 1) {
+                    setPage((p) => p - 1);
+                } else {
+                    fetchPromotions();
+                }
             }
         } catch (error) {
             console.error("Failed to delete promotion:", error);
-            notifications.show({
-                title: t("error"),
-                message: t("promotions.deleteFailed"),
-                color: "red",
-            });
+            notifications.show({ title: t("error"), message: t("promotions.deleteFailed"), color: "red" });
         } finally {
-            setLoading(false);
+            setActionLoading(false);
         }
     };
 
     // ─── Derived ──────────────────────────────────────────────────────────────
-
-    const filtered = promotions.filter((p) => {
-        const q = search.toLowerCase();
-        return (
-            p.title?.toLowerCase().includes(q) ||
-            p.code?.toLowerCase().includes(q) ||
-            p.description?.toLowerCase().includes(q)
-        );
-    });
 
     const carOptions = cars
         .filter((c) => c.title != null)
@@ -344,11 +359,9 @@ export default function PromotionsPage() {
 
     // ─── Render ───────────────────────────────────────────────────────────────
 
-    console.log('cars', cars)
-    console.log('categoryOptions', categoryOptions)
     return (
         <>
-            <Spinner visible={loading} />
+            <Spinner visible={actionLoading} />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -376,19 +389,13 @@ export default function PromotionsPage() {
                                 radius="md"
                                 size="sm"
                                 onClick={openCreate}
-                                styles={{
-                                    root: {
-                                        transition: "box-shadow 0.15s",
-                                        "&:hover": { boxShadow: "0 4px 14px rgba(15,110,86,0.25)" },
-                                    },
-                                }}
                             >
                                 {t("promotions.add")}
                             </Button>
                         </motion.div>
                     </Group>
 
-                    {/* ── Search + Count ─────────────────────────────────── */}
+                    {/* ── Search + Refresh ───────────────────────────────── */}
                     <Group gap="sm">
                         <TextInput
                             placeholder={t("promotions.searchPlaceholder")}
@@ -417,6 +424,18 @@ export default function PromotionsPage() {
                                 </ActionIcon>
                             </motion.div>
                         )}
+                        <Tooltip label={t("refresh")} withArrow>
+                            <ActionIcon
+                                variant="light"
+                                color="teal"
+                                size="lg"
+                                radius="md"
+                                onClick={fetchPromotions}
+                                loading={loading}
+                            >
+                                <IconRefresh size={16} />
+                            </ActionIcon>
+                        </Tooltip>
                         <Badge
                             color="teal"
                             variant="light"
@@ -424,232 +443,228 @@ export default function PromotionsPage() {
                             radius="md"
                             style={{ fontVariantNumeric: "tabular-nums" }}
                         >
-                            {loading ? "…" : filtered.length}{" "}
+                            {loading ? "…" : totalCount}{" "}
                             {t("promotions.promotions")}
                         </Badge>
                     </Group>
 
                     {/* ── Table ──────────────────────────────────────────── */}
-                    <Paper
-                        radius="lg"
-                        withBorder
-                        style={{ overflow: "hidden", borderColor: "var(--mantine-color-default-border)" }}
-                    >
-                        <Table.ScrollContainer minWidth={700}>
-                            <Table
-                                highlightOnHover
-                                verticalSpacing="sm"
-                                horizontalSpacing="md"
-                                styles={{
-                                    thead: {
-                                        background: "var(--mantine-color-default-hover)",
-                                        borderBottom: "0.5px solid var(--mantine-color-default-border)",
-                                    },
-                                    th: {
-                                        fontWeight: 500,
-                                        fontSize: 12,
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.05em",
-                                        color: "var(--mantine-color-dimmed)",
-                                    },
-                                }}
+                    {loading ? (
+                        <Center py="xl">
+                            <Loader color="teal" size="md" />
+                        </Center>
+                    ) : (
+                        <Stack gap="md">
+                            <Paper
+                                radius="lg"
+                                withBorder
+                                style={{ overflow: "hidden", borderColor: "var(--mantine-color-default-border)" }}
                             >
-                                <Table.Thead>
-                                    <Table.Tr>
-                                        <Table.Th w={60}>#</Table.Th>
-                                        <Table.Th>{t("promotions.colTitle")}</Table.Th>
-                                        <Table.Th>{t("promotions.colCode")}</Table.Th>
-                                        <Table.Th>{t("promotions.colDiscount")}</Table.Th>
-                                        <Table.Th>{t("promotions.colDays")}</Table.Th>
-                                        <Table.Th>{t("promotions.colAppliesTo")}</Table.Th>
-                                        <Table.Th>{t("promotions.colStatus")}</Table.Th>
-                                        <Table.Th w={90}>{t("carData.colActions")}</Table.Th>
-                                    </Table.Tr>
-                                </Table.Thead>
-
-                                <Table.Tbody>
-                                    {/* Skeleton rows while loading */}
-                                    {loading &&
-                                        [1, 2, 3, 4].map((i) => (
-                                            <Table.Tr key={i}>
-                                                {[40, 25, 15, 10, 10, 20, 15, 15].map((w, j) => (
-                                                    <Table.Td key={j}>
-                                                        <Box
-                                                            style={{
-                                                                height: 12,
-                                                                borderRadius: 6,
-                                                                background: "var(--mantine-color-default-border)",
-                                                                opacity: 0.5,
-                                                                width: `${w + i * 2}%`,
-                                                                animation: "pulse 1.4s ease-in-out infinite",
-                                                            }}
-                                                        />
-                                                    </Table.Td>
-                                                ))}
+                                <Table.ScrollContainer minWidth={700}>
+                                    <Table
+                                        highlightOnHover
+                                        verticalSpacing="sm"
+                                        horizontalSpacing="md"
+                                        styles={{
+                                            thead: {
+                                                background: "var(--mantine-color-default-hover)",
+                                                borderBottom: "0.5px solid var(--mantine-color-default-border)",
+                                            },
+                                            th: {
+                                                fontWeight: 500,
+                                                fontSize: 12,
+                                                textTransform: "uppercase",
+                                                letterSpacing: "0.05em",
+                                                color: "var(--mantine-color-dimmed)",
+                                            },
+                                        }}
+                                    >
+                                        <Table.Thead>
+                                            <Table.Tr>
+                                                <Table.Th w={60}>#</Table.Th>
+                                                <Table.Th>{t("promotions.colTitle")}</Table.Th>
+                                                <Table.Th>{t("promotions.colCode")}</Table.Th>
+                                                <Table.Th>{t("promotions.colDiscount")}</Table.Th>
+                                                <Table.Th>{t("promotions.colDays")}</Table.Th>
+                                                <Table.Th>{t("promotions.colAppliesTo")}</Table.Th>
+                                                <Table.Th>{t("promotions.colStatus")}</Table.Th>
+                                                <Table.Th w={90}>{t("carData.colActions")}</Table.Th>
                                             </Table.Tr>
-                                        ))}
+                                        </Table.Thead>
 
-                                    {/* Empty state */}
-                                    {!loading && filtered.length === 0 && (
-                                        <Table.Tr>
-                                            <Table.Td colSpan={8}>
-                                                <Center py="xl">
-                                                    <Stack align="center" gap="xs">
-                                                        <ThemeIcon size={40} radius="xl" color="teal" variant="light">
-                                                            <IconTag size={18} />
-                                                        </ThemeIcon>
-                                                        <Text size="sm" c="dimmed">
-                                                            {search
-                                                                ? t("carData.noResultsSearch")
-                                                                : t("carData.noResultsEmpty")}
+                                        <Table.Tbody>
+                                            {/* Empty state */}
+                                            {promotions.length === 0 && (
+                                                <Table.Tr>
+                                                    <Table.Td colSpan={8}>
+                                                        <Center py="xl">
+                                                            <Stack align="center" gap="xs">
+                                                                <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                                                                    <IconTag size={18} />
+                                                                </ThemeIcon>
+                                                                <Text size="sm" c="dimmed">
+                                                                    {search
+                                                                        ? t("carData.noResultsSearch")
+                                                                        : t("carData.noResultsEmpty")}
+                                                                </Text>
+                                                            </Stack>
+                                                        </Center>
+                                                    </Table.Td>
+                                                </Table.Tr>
+                                            )}
+
+                                            {/* Data rows */}
+                                            {promotions.map((item, idx) => (
+                                                <motion.tr
+                                                    key={item.id}
+                                                    initial={{ opacity: 0, y: 6 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
+                                                >
+                                                    <Table.Td>
+                                                        <Text size="xs" c="dimmed" fw={500}>
+                                                            #{String((page - 1) * PAGE_SIZE + idx + 1).padStart(3, "0")}
                                                         </Text>
-                                                    </Stack>
-                                                </Center>
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    )}
+                                                    </Table.Td>
 
-                                    {/* Data rows */}
-                                    {!loading &&
-                                        filtered.map((item, idx) => (
-                                            <motion.tr
-                                                key={item.id}
-                                                initial={{ opacity: 0, y: 6 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
-                                            >
-                                                <Table.Td>
-                                                    <Text size="xs" c="dimmed" fw={500}>
-                                                        #{String(idx + 1).padStart(3, "0")}
-                                                    </Text>
-                                                </Table.Td>
-
-                                                <Table.Td>
-                                                    <Stack gap={2}>
-                                                        <Text size="sm" fw={500}>
-                                                            {item.title || <Text span c="dimmed" size="sm">—</Text>}
-                                                        </Text>
-                                                        {item.description && (
-                                                            <Text size="xs" c="dimmed" lineClamp={1}>
-                                                                {item.description}
+                                                    <Table.Td>
+                                                        <Stack gap={2}>
+                                                            <Text size="sm" fw={500}>
+                                                                {item.title || <Text span c="dimmed" size="sm">—</Text>}
                                                             </Text>
+                                                            {item.description && (
+                                                                <Text size="xs" c="dimmed" lineClamp={1}>
+                                                                    {item.description}
+                                                                </Text>
+                                                            )}
+                                                        </Stack>
+                                                    </Table.Td>
+
+                                                    <Table.Td>
+                                                        {item.code ? (
+                                                            <Badge
+                                                                color="violet"
+                                                                variant="light"
+                                                                size="sm"
+                                                                radius="md"
+                                                                leftSection={<IconTag size={10} />}
+                                                                style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
+                                                            >
+                                                                {item.code}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Text size="sm" c="dimmed">—</Text>
                                                         )}
-                                                    </Stack>
-                                                </Table.Td>
+                                                    </Table.Td>
 
-                                                <Table.Td>
-                                                    {item.code ? (
+                                                    <Table.Td>
                                                         <Badge
-                                                            color="violet"
+                                                            color="orange"
                                                             variant="light"
                                                             size="sm"
                                                             radius="md"
-                                                            leftSection={<IconTag size={10} />}
-                                                            style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
+                                                            leftSection={<IconPercentage size={10} />}
                                                         >
-                                                            {item.code}
+                                                            {item.discountPercentage}%
                                                         </Badge>
-                                                    ) : (
-                                                        <Text size="sm" c="dimmed">—</Text>
-                                                    )}
-                                                </Table.Td>
+                                                    </Table.Td>
 
-                                                <Table.Td>
-                                                    <Badge
-                                                        color="orange"
-                                                        variant="light"
-                                                        size="sm"
-                                                        radius="md"
-                                                        leftSection={<IconPercentage size={10} />}
-                                                    >
-                                                        {item.discountPercentage}%
-                                                    </Badge>
-                                                </Table.Td>
-
-                                                <Table.Td>
-                                                    <Badge
-                                                        color="blue"
-                                                        variant="light"
-                                                        size="sm"
-                                                        radius="md"
-                                                        leftSection={<IconCalendar size={10} />}
-                                                    >
-                                                        {item.numberOfDays}d
-                                                    </Badge>
-                                                </Table.Td>
-
-                                                <Table.Td>
-                                                    {item.carId ? (
-                                                        <Badge color="indigo" variant="light" size="sm" radius="md" leftSection={<IconCar size={10} />}>
-                                                            {cars.find((c) => c.id === item.carId)?.title ?? t("promotions.car")}
-                                                        </Badge>
-                                                    ) : item.carCategoryId ? (
-                                                        <Badge color="cyan" variant="light" size="sm" radius="md" leftSection={<IconCategory size={10} />}>
-                                                            {categories.find((c) => c.id === item.carCategoryId)?.name ?? t("promotions.category")}
-                                                        </Badge>
-                                                    ) : (
-                                                        <Badge color="gray" variant="light" size="sm" radius="md">
-                                                            {t("promotions.allCars")}
-                                                        </Badge>
-                                                    )}
-                                                </Table.Td>
-
-                                                <Table.Td>
-                                                    {item.isActive ? (
+                                                    <Table.Td>
                                                         <Badge
-                                                            color="green"
+                                                            color="blue"
                                                             variant="light"
                                                             size="sm"
                                                             radius="md"
-                                                            leftSection={<IconCheck size={11} />}
+                                                            leftSection={<IconCalendar size={10} />}
                                                         >
-                                                            {t("promotions.active")}
+                                                            {item.numberOfDays}d
                                                         </Badge>
-                                                    ) : (
-                                                        <Badge
-                                                            color="gray"
-                                                            variant="light"
-                                                            size="sm"
-                                                            radius="md"
-                                                            leftSection={<IconBan size={11} />}
-                                                        >
-                                                            {t("promotions.inactive")}
-                                                        </Badge>
-                                                    )}
-                                                </Table.Td>
+                                                    </Table.Td>
 
-                                                <Table.Td>
-                                                    <Group gap={4}>
-                                                        <Tooltip label={t("edit")} withArrow fz="xs">
-                                                            <ActionIcon
-                                                                variant="subtle"
-                                                                color="yellow"
-                                                                size="sm"
-                                                                radius="md"
-                                                                onClick={() => openEdit(item)}
-                                                            >
-                                                                <IconEdit size={15} />
-                                                            </ActionIcon>
-                                                        </Tooltip>
-                                                        <Tooltip label={t("delete")} withArrow fz="xs">
-                                                            <ActionIcon
-                                                                variant="subtle"
-                                                                color="red"
-                                                                size="sm"
-                                                                radius="md"
-                                                                onClick={() => setDeleteTarget(item)}
-                                                            >
-                                                                <IconTrash size={15} />
-                                                            </ActionIcon>
-                                                        </Tooltip>
-                                                    </Group>
-                                                </Table.Td>
-                                            </motion.tr>
-                                        ))}
-                                </Table.Tbody>
-                            </Table>
-                        </Table.ScrollContainer>
-                    </Paper>
+                                                    <Table.Td>
+                                                        {item.carId ? (
+                                                            <Badge color="indigo" variant="light" size="sm" radius="md" leftSection={<IconCar size={10} />}>
+                                                                {cars.find((c) => c.id === item.carId)?.title ?? t("promotions.car")}
+                                                            </Badge>
+                                                        ) : item.carCategoryId ? (
+                                                            <Badge color="cyan" variant="light" size="sm" radius="md" leftSection={<IconCategory size={10} />}>
+                                                                {categories.find((c) => c.id === item.carCategoryId)?.name ?? t("promotions.category")}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge color="gray" variant="light" size="sm" radius="md">
+                                                                {t("promotions.allCars")}
+                                                            </Badge>
+                                                        )}
+                                                    </Table.Td>
+
+                                                    <Table.Td>
+                                                        {item.isActive ? (
+                                                            <Badge color="green" variant="light" size="sm" radius="md" leftSection={<IconCheck size={11} />}>
+                                                                {t("promotions.active")}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge color="gray" variant="light" size="sm" radius="md" leftSection={<IconBan size={11} />}>
+                                                                {t("promotions.inactive")}
+                                                            </Badge>
+                                                        )}
+                                                    </Table.Td>
+
+                                                    <Table.Td>
+                                                        <Group gap={4}>
+                                                            <Tooltip label={t("edit")} withArrow fz="xs">
+                                                                <ActionIcon
+                                                                    variant="subtle"
+                                                                    color="yellow"
+                                                                    size="sm"
+                                                                    radius="md"
+                                                                    onClick={() => openEdit(item)}
+                                                                >
+                                                                    <IconEdit size={15} />
+                                                                </ActionIcon>
+                                                            </Tooltip>
+                                                            <Tooltip label={t("delete")} withArrow fz="xs">
+                                                                <ActionIcon
+                                                                    variant="subtle"
+                                                                    color="red"
+                                                                    size="sm"
+                                                                    radius="md"
+                                                                    onClick={() => setDeleteTarget(item)}
+                                                                >
+                                                                    <IconTrash size={15} />
+                                                                </ActionIcon>
+                                                            </Tooltip>
+                                                        </Group>
+                                                    </Table.Td>
+                                                </motion.tr>
+                                            ))}
+                                        </Table.Tbody>
+                                    </Table>
+                                </Table.ScrollContainer>
+                            </Paper>
+
+                            {/* ── Pagination ──────────────────────────────── */}
+                            {totalPages > 1 && (
+                                <Group justify="space-between" align="center" px={4}>
+                                    <Text size="xs" c="dimmed">
+                                        {t("promotions.showing")}{" "}
+                                        <Text component="span" size="xs" fw={500}>{startItem}–{endItem}</Text>
+                                        {" "}{t("promotions.of")}{" "}
+                                        <Text component="span" size="xs" fw={500}>{totalCount}</Text>
+                                        {" "}{t("promotions.promotions")}
+                                    </Text>
+                                    <Pagination
+                                        value={page}
+                                        onChange={setPage}
+                                        total={totalPages}
+                                        color="teal"
+                                        radius="md"
+                                        size="sm"
+                                        withEdges
+                                    />
+                                </Group>
+                            )}
+                        </Stack>
+                    )}
 
                     {/* ── Create / Edit Modal ────────────────────────────── */}
                     <Modal
@@ -661,9 +676,7 @@ export default function PromotionsPage() {
                                     {editTarget ? <IconEdit size={16} /> : <IconPlus size={16} />}
                                 </ThemeIcon>
                                 <Text fw={500} size="md">
-                                    {editTarget
-                                        ? t("promotions.editTitle")
-                                        : t("promotions.addTitle")}
+                                    {editTarget ? t("promotions.editTitle") : t("promotions.addTitle")}
                                 </Text>
                             </Group>
                         }
@@ -701,6 +714,7 @@ export default function PromotionsPage() {
                                 placeholder={t("promotions.fieldCodePlaceholder")}
                                 radius="md"
                                 leftSection={<IconTag size={15} />}
+                                required
                                 styles={{
                                     ...inputStyles,
                                     input: {
@@ -740,7 +754,6 @@ export default function PromotionsPage() {
                                 />
                             </Group>
 
-                            {/* Car / Category — mutually exclusive */}
                             {form.errors.carId && (
                                 <Text size="xs" c="red">
                                     {form.errors.carId}
@@ -808,21 +821,11 @@ export default function PromotionsPage() {
                                 fullWidth
                                 radius="md"
                                 size="md"
-                                loading={loading}
+                                loading={actionLoading}
                                 leftSection={editTarget ? <IconDeviceFloppy size={16} /> : <IconPlus size={16} />}
                                 onClick={handleSave}
-                                styles={{
-                                    root: {
-                                        transition: "transform 0.12s, box-shadow 0.15s",
-                                        "&:hover": {
-                                            transform: "translateY(-1px)",
-                                            boxShadow: "0 4px 14px rgba(15,110,86,0.25)",
-                                        },
-                                        "&:active": { transform: "scale(0.99)" },
-                                    },
-                                }}
                             >
-                                { t("save")}
+                                {t("save")}
                             </Button>
                         </Stack>
                     </Modal>
@@ -875,7 +878,7 @@ export default function PromotionsPage() {
                                     flex={1}
                                     radius="md"
                                     onClick={() => setDeleteTarget(null)}
-                                    disabled={loading}
+                                    disabled={actionLoading}
                                 >
                                     {t("cancel")}
                                 </Button>
@@ -883,7 +886,7 @@ export default function PromotionsPage() {
                                     color="red"
                                     flex={1}
                                     radius="md"
-                                    loading={loading}
+                                    loading={actionLoading}
                                     leftSection={<IconTrash size={15} />}
                                     onClick={handleDelete}
                                 >

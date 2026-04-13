@@ -869,6 +869,8 @@
   "required": "This field is required",
   "edit": "Edit",
   "promotions": {
+    "showing": "Showing",
+    "of": "of",
     "active": "Active",
     "inactive": "Inactive",
     "fieldActive": "Active",
@@ -913,6 +915,8 @@
   },
   "perDay": "/ day",
   "additionalServices": {
+    "showing": "Showing",
+    "of": "of",
     "aditionalServices": "Manage additional Services",
     "subtitle": "Manage optional services offered per day",
     "add": "Add Service",
