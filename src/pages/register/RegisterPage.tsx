@@ -36,7 +36,10 @@ import {
   IconShieldCheck,
   IconFileText,
   IconAlertCircle,
-  IconX,
+  IconX, IconKey,
+  IconScale, IconBuildingBank, IconUserCheck,
+  IconCookie, IconGlobe, IconInfoCircle,
+  IconClipboardList, IconNotes, IconStarFilled, IconBell,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
@@ -77,11 +80,9 @@ interface PhonePrefix {
 interface PolicyItem {
   id?: number | string;
   title?: string;
-  name?: string;
   description?: string;
-  content?: string;
-  text?: string;
-  [key: string]: any;
+  icon?: string;
+  color?: string;
 }
 
 // ─── PolicyModal ──────────────────────────────────────────────────────────────
@@ -98,6 +99,33 @@ interface PolicyModalProps {
   error: string | null;
 }
 
+const ICON_MAP: Record<string, React.FC<{ size?: number; color?: string }>> = {
+  'file-text': IconFileText,
+  'shield-check': IconShieldCheck,
+  'lock': IconLock,
+  'key': IconKey,
+  'scale': IconScale,
+  'building-bank': IconBuildingBank,
+  'user-check': IconUserCheck,
+  'alert-circle': IconAlertCircle,
+  'cookie': IconCookie,
+  'mail': IconMail,
+  'phone': IconPhone,
+  'globe': IconGlobe,
+  'info-circle': IconInfoCircle,
+  'clipboard-list': IconClipboardList,
+  'notes': IconNotes,
+  'star': IconStarFilled,
+  'bell': IconBell,
+};
+
+
+function getItemIcon(name: string, size = 14, color = 'currentColor') {
+  const IconComponent = ICON_MAP[name];
+  if (!IconComponent) return null;
+  return <IconComponent size={size} color={color} />;
+}
+
 function PolicyModal({
   opened,
   onClose,
@@ -109,6 +137,8 @@ function PolicyModal({
   loading,
   error,
 }: PolicyModalProps) {
+    const { t } = useTranslation();
+
   return (
     <Modal
       opened={opened}
@@ -198,20 +228,14 @@ function PolicyModal({
 
           {!loading && !error && items.length === 0 && (
             <Text c="dimmed" ta="center" py={56} size="sm">
-              No content available at this time.
+              {t('noContentsAvailableAtThisTime')}
             </Text>
           )}
 
           {!loading && !error && items.length > 0 && (
             <Stack gap={0}>
               {items.map((item, index) => {
-                const itemTitle = item.title ?? item.name;
-                const itemBody = item.description ?? item.content ?? item.text;
-                const fallback = !itemTitle && !itemBody
-                  ? Object.values(item)
-                      .filter((v) => typeof v === 'string' && v.length > 0)
-                      .join(' — ')
-                  : null;
+                const itemColor = item.color ?? accent;
 
                 return (
                   <Box
@@ -226,28 +250,37 @@ function PolicyModal({
                     }}
                   >
                     <Group gap="sm" align="flex-start" wrap="nowrap">
-                      {/* Numbered badge */}
+                      {/* Icon badge — shows item.icon if present, otherwise falls back to index number */}
                       <Box style={{
                         minWidth: 28, height: 28, borderRadius: 9,
-                        background: `${accent}14`,
-                        border: `1px solid ${accent}25`,
+                        background: `${itemColor}14`,
+                        border: `1px solid ${itemColor}25`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         marginTop: 1, flexShrink: 0,
                       }}>
-                        <Text size="xs" fw={700} style={{ color: accent, lineHeight: 1 }}>
-                          {index + 1}
-                        </Text>
+                        {item.icon
+                          ? (getItemIcon(item.icon, 14, itemColor) ?? (
+                            <Text size="xs" fw={700} style={{ color: itemColor, lineHeight: 1 }}>
+                              {index + 1}
+                            </Text>
+                          ))
+                          : (
+                            <Text size="xs" fw={700} style={{ color: itemColor, lineHeight: 1 }}>
+                              {index + 1}
+                            </Text>
+                          )
+                        }
                       </Box>
 
                       <Box style={{ flex: 1 }}>
-                        {itemTitle && (
-                          <Text fw={700} size="sm" mb={5} style={{ color: accent }}>
-                            {itemTitle}
+                        {item.title && (
+                          <Text fw={700} size="sm" mb={5} style={{ color: itemColor }}>
+                            {item.title}
                           </Text>
                         )}
-                        {(itemBody || fallback) && (
+                        {item.description && (
                           <Text size="sm" c="dimmed" style={{ lineHeight: 1.8 }}>
-                            {itemBody ?? fallback}
+                            {item.description}
                           </Text>
                         )}
                       </Box>
@@ -267,14 +300,14 @@ function PolicyModal({
         background: 'var(--mantine-color-default-hover)',
       }}>
         <Group justify="space-between" align="center">
-          <Text size="xs" c="dimmed">Please read carefully before accepting.</Text>
+          <Text size="xs" c="dimmed">{t('pleaseReadCarefullyBeforeAccepting')}</Text>
           <Button
             size="sm"
             radius="xl"
             style={{ background: accent, border: 'none', paddingInline: 22 }}
             onClick={onClose}
           >
-            I understand
+           {t('iUnderstand')}
           </Button>
         </Group>
       </Box>
@@ -484,8 +517,8 @@ export default function RegisterPage() {
       <PolicyModal
         opened={privacyModalOpen}
         onClose={() => setPrivacyModalOpen(false)}
-        title={t('register.privacyPolicy', 'Privacy Policy')}
-        subtitle={`Last updated · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+        title={t('privacyPolicy.title')}
+        subtitle={`${t('lastUpdated')} · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
         icon={<IconShieldCheck size={22} color="#12b886" />}
         accent="#12b886"
         items={privacyItems}
@@ -497,8 +530,8 @@ export default function RegisterPage() {
       <PolicyModal
         opened={termsModalOpen}
         onClose={() => setTermsModalOpen(false)}
-        title={t('register.termsAndConditions', 'Terms & Conditions')}
-        subtitle={`Last updated · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+        title={t('termsAndConditions')}
+        subtitle={`${t('lastUpdated')} · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
         icon={<IconFileText size={22} color="#228be6" />}
         accent="#228be6"
         items={termsItems}

@@ -193,6 +193,7 @@
     "deleteReviewConfirm": "Are you sure you want to delete this review? This action cannot be undone."
   },
   "rental": {
+    "phoneNumber": "Phone number",
     "startDate": "Pick up",
     "endDate": "Return",
     "inclServices": "Incl. all services",
@@ -953,6 +954,13 @@
   "carWasAddedToSaveSollection": "Car added to your saved collection",
   "carWasRemovedFromSavecollection": "Car removed from your saved collection",
   "terms": {
+    "deleteModal": {
+      "title": "Delete term",
+      "confirm": "Are you sure you want to delete \"{{name}}\"?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
     "title": "Terms & Conditions",
     "subtitle": "Manage terms and conditions entries",
     "addTerm": "Add Term",
@@ -1124,5 +1132,14 @@
     "successMessage": "You will no longer receive promotional emails from Car Rental Zaimi.",
     "errorTitle": "Invalid or expired link",
     "errorMessage": "This unsubscribe link is no longer valid. Please contact us if you need help."
-  }
+  },
+  "no_content": "No content available at this time.",
+  "footer_note": "Please read carefully before accepting.",
+  "confirm_button": "I understand",
+  "loadingContent": "Loading content…",
+  "noContentsAvailableAtThisTime": "No content available at this time.",
+  "pleaseReadCarefullyBeforeAccepting": "Please read carefully before accepting.",
+  "iUnderstand": "I understand",
+  "termsAndConditions": "Terms & Conditions",
+  "lastUpdated": "Last updated"
 }

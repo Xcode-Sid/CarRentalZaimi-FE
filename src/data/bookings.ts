@@ -71,7 +71,7 @@ export function mapApiBooking(dto: any): Booking {
       firstName: dto.user?.firstName ?? '',
       lastName: dto.user?.lastName ?? '',
       image: {
-        imageData : dto.user?.image.imagePath ?? undefined,
+        imageData : toImagePath(dto.user?.image.imagePath) ?? '',
       }
     },
     services: (dto.bookingServices ?? []).map((bs: any) => ({  

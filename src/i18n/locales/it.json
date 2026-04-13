@@ -193,6 +193,7 @@
     "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione? Questa azione non può essere annullata."
   },
   "rental": {
+    "phoneNumber": "Numri i telefonit",
     "startDate": "Ritiro",
     "endDate": "Restituzione",
     "inclServices": "Tutti i servizi inclusi",
@@ -947,6 +948,13 @@
   "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
   "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata",
   "terms": {
+    "deleteModal": {
+      "title": "Elimina termine",
+      "confirm": "Sei sicuro di voler eliminare \"{{name}}\"?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    },
     "title": "Termini e Condizioni",
     "subtitle": "Gestisci le voci dei termini e condizioni",
     "addTerm": "Aggiungi Termine",
@@ -1120,5 +1128,14 @@
     "successMessage": "Non riceverai più email promozionali da Car Rental Zaimi.",
     "errorTitle": "Link non valido o scaduto",
     "errorMessage": "Questo link per annullare l'iscrizione non è più valido. Contattaci se hai bisogno di assistenza."
-  }
+  },
+  "no_content": "Nessun contenuto disponibile al momento.",
+  "footer_note": "Si prega di leggere attentamente prima di accettare.",
+  "confirm_button": "Ho capito",
+  "loadingContent": "Caricamento in corso…",
+  "noContentsAvailableAtThisTime": "Nessun contenuto disponibile al momento.",
+  "pleaseReadCarefullyBeforeAccepting": "Si prega di leggere attentamente prima di accettare.",
+  "iUnderstand": "Ho capito",
+  "termsAndConditions": "Termini e Condizioni",
+  "lastUpdated": "Ultimo aggiornamento"
 }

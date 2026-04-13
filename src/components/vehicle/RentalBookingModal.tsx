@@ -15,6 +15,7 @@ import {
   Paper,
   Progress,
   Skeleton,
+  TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DatePickerInput } from '@mantine/dates';
@@ -70,7 +71,7 @@ function AnimatedTotal({ value }: { value: number }) {
         current = to;
         clearInterval(timer);
       }
-    setDisplay(Math.round(current * 10) / 10);
+      setDisplay(Math.round(current * 10) / 10);
     }, 16);
     prev.current = to;
     return () => clearInterval(timer);
@@ -93,7 +94,6 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
 
   const [promotionDiscount, setPromotionDiscount] = useState<number>(0);
 
-  console.log('additionalServices', additionalServices)
   const form = useForm<BookingForm>({
     initialValues: {
       userId: user?.id ?? null,
@@ -101,7 +101,7 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
       startDate: '',
       endDate: '',
       totalPrice: 0,
-      phoneNumber: null,
+      phoneNumber: user?.phoneNumber ?? null,
       paymentMethod: 'cash',
       aditionalServiceIds: [],
     },
@@ -129,12 +129,14 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
     [bookedDates],
   );
 
+
   const days = useMemo(() => {
     const { startDate, endDate } = form.values;
     if (!startDate || !endDate) return 0;
     const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
     return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   }, [form.values.startDate, form.values.endDate]);
+
 
   // Fetch promotion whenever car + days change
   useEffect(() => {
@@ -150,19 +152,14 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
       .catch(() => setPromotionDiscount(0));
   }, [vehicle.carId, days]);
 
+
   // Pricing — promotion applies to base only, not addons
   const { baseBeforeDiscount, discountPct, discountAmount, baseAfterDiscount, total, isPromotion } =
     useMemo(() => {
       const base = vehicle.pricePerDay * days;
-
-      const effectivePct =
-        promotionDiscount > 0
-          ? promotionDiscount
-          : getDayDiscount(days).percent;
-
+      const effectivePct = promotionDiscount > 0 ? promotionDiscount : getDayDiscount(days).percent;
       const discountedAmount = parseFloat(((effectivePct / 100) * base).toFixed(2));
       const baseAfter = parseFloat((base - discountedAmount).toFixed(2));
-
       const addonsCost = additionalServices
         .filter((s) => form.values.aditionalServiceIds.includes(String(s.id)))
         .reduce((sum, s) => sum + (Number(s.pricePerDay) || 0) * days, 0);
@@ -175,12 +172,8 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
         total: baseAfter + addonsCost,
         isPromotion: promotionDiscount > 0,
       };
-    }, [vehicle.pricePerDay, days, promotionDiscount, additionalServices, form.values.aditionalServiceIds]);
+    }, [vehicle.pricePerDay, days, promotionDiscount, additionalServices, JSON.stringify(form.values.aditionalServiceIds)]);
 
-  useEffect(() => {
-    form.setFieldValue('totalPrice', total);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [total]);
 
   const canContinue = !!(form.values.startDate && form.values.endDate && days >= 1);
 
@@ -201,6 +194,7 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
     if (s.hasError || e.hasError) return;
     setStepDirection('forward');
     setStep(1);
+    form.setFieldValue('totalPrice', total);
   };
 
   const goBack = () => {
@@ -222,12 +216,12 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
     setConfirmLoading(true);
     try {
       var res = await post('Booking', form.values);
-      if(res.success){
+      if (res.success) {
         notifications.show({
-        title: t('success'),
-        message: t('vehicle.sucessfullReservation'),
-        color: 'green',
-      });
+          title: t('success'),
+          message: t('vehicle.sucessfullReservation'),
+          color: 'green',
+        });
       }
     } catch {
       notifications.show({
@@ -318,8 +312,8 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
                     label={t('rental.dateRange')}
                     value={[form.values.startDate || null, form.values.endDate || null]}
                     onChange={([start, end]) => {
-                      form.setFieldValue('startDate', start ?? '');
-                      form.setFieldValue('endDate', end ?? '');
+                      form.setFieldValue('startDate', start ? new Date(start).toISOString() : '');
+                      form.setFieldValue('endDate', end ? new Date(end).toISOString() : '');
                     }}
                     minDate={new Date().toISOString().split('T')[0]}
                     excludeDate={(date) => bookedDateSet.has(new Date(date).toDateString())}
@@ -413,6 +407,14 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
                     })
                   )}
 
+                  <TextInput
+                    label={t('rental.phoneNumber')}
+                    placeholder="+355 6X XXX XXXX"
+                    value={form.values.phoneNumber ?? ''}
+                    onChange={(e) => form.setFieldValue('phoneNumber', e.currentTarget.value)}
+                    error={form.errors.phoneNumber}
+                    radius="md"
+                  />
                   <Divider />
 
                   {/* Payment method */}
@@ -527,7 +529,7 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
                       <Group justify="space-between">
                         <Text size="lg" fw={700}>{t('rental.total')}</Text>
                         <Text size="lg" fw={700} c="teal">
-                          €<AnimatedTotal value={total} />
+                          €{total}
                         </Text>
                       </Group>
                     </Stack>

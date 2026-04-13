@@ -41,8 +41,11 @@ const statusDotColors: Record<string, string> = {
 
 export function rentalDayCount(start: string, end?: string): number | null {
   if (!end) return null;
-  const s = new Date(`${start}T12:00:00`);
-  const e = new Date(`${end}T12:00:00`);
+  
+  const dateOnly = (s: string) => s.split('T')[0];
+  
+  const s = new Date(`${dateOnly(start)}T12:00:00`);
+  const e = new Date(`${dateOnly(end)}T12:00:00`);
   const d = Math.round((e.getTime() - s.getTime()) / 86400000);
   return d >= 1 ? d : 1;
 }
@@ -227,7 +230,7 @@ export function BookingDetailContent({ booking }: Props) {
           <Paper radius="md" p="md" withBorder mb="lg">
             <Group gap="sm">
               <Avatar
-                src={booking.user.image?.imageData ? `data:image/jpeg;base64,${booking.user.image.imageData}` : undefined}
+                src={booking.user.image?.imageData}
                 color="teal"
                 radius="xl"
                 size="md"
@@ -270,33 +273,33 @@ export function BookingDetailContent({ booking }: Props) {
       </motion.div>
 
       {/* ── Total ── */}
-   <Group
-          justify="space-between"
-          align="center"
-          px="lg"
-          py="md"
+      <Group
+        justify="space-between"
+        align="center"
+        px="lg"
+        py="md"
+        style={{
+          borderTop: '0.5px solid var(--mantine-color-default-border)',
+          background: 'var(--mantine-color-default)',
+        }}
+      >
+        <Box>
+          <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            {t('account.amount')}
+          </Text>
+          <Text size="xs" c="dimmed" mt={2}>{t('rental.inclServices') ?? 'Incl. all services'}</Text>
+        </Box>
+        <Text
+          fw={800}
           style={{
-            borderTop: '0.5px solid var(--mantine-color-default-border)',
-            background: 'var(--mantine-color-default)',
+            fontSize: 28,
+            color: booking.status === 'refused' ? 'var(--mantine-color-dimmed)' : 'var(--mantine-color-teal-6)',
+            textDecoration: booking.status === 'refused' ? 'line-through' : undefined,
           }}
         >
-          <Box>
-            <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              {t('account.amount')}
-            </Text>
-            <Text size="xs" c="dimmed" mt={2}>{t('rental.inclServices') ?? 'Incl. all services'}</Text>
-          </Box>
-          <Text
-            fw={800}
-            style={{
-              fontSize: 28,
-              color: booking.status === 'refused' ? 'var(--mantine-color-dimmed)' : 'var(--mantine-color-teal-6)',
-              textDecoration: booking.status === 'refused' ? 'line-through' : undefined,
-            }}
-          >
-            €{booking.total.toLocaleString()}
-          </Text>
-        </Group>
+          €{booking.total.toLocaleString()}
+        </Text>
+      </Group>
     </Box>
   );
 }

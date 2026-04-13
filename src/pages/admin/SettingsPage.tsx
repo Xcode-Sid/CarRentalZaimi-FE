@@ -55,9 +55,12 @@ import Spinner from '../../components/spinner/Spinner';
 import { toImagePath } from '../../utils/general';
 
 interface PhonePrefix {
+  countryName: string | null;
   phonePrefix: string | null;
   flag: string | null;
+  phoneRegex: string | null;
 }
+
 
 interface WhyChooseUsItem {
   icon: string;
@@ -178,7 +181,14 @@ export default function AdminSettingsPage() {
           : !/^\S+@\S+\.\S+$/.test(v)
             ? t('admin.validation.emailInvalid')
             : null,
-      phone: (v) => (v.trim().length === 0 ? t('admin.validation.phoneRequired') : null),
+             phone: (value) => {
+        if (!value || value.trim() === '') return t('phoneIsRequired');
+        const selected = phonePrefixes.find((p) => p.phonePrefix === phonePrefix);
+        if (!selected?.phoneRegex) return null;
+        return new RegExp(selected.phoneRegex).test(`${phonePrefix}${value}`)
+          ? null
+          : t('enterAValidPhoneNumber');
+      },
       address: (v) => (v.trim().length === 0 ? t('admin.validation.addressRequired') : null),
     },
   });

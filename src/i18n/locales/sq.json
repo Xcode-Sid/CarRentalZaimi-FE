@@ -193,6 +193,7 @@
     "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
+    "phoneNumber": "Numri i telefonit",
     "startDate": "Marrja",
     "endDate": "Kthimi",
     "inclServices": "Të gjitha shërbimet të përfshira",
@@ -952,6 +953,13 @@
   "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
   "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur",
   "terms": {
+    "deleteModal": {
+      "title": "Fshi termin",
+      "confirm": "Jeni i sigurt që dëshironi të fshini \"{{name}}\"?",
+      "warning": "Ky veprim nuk mund të zhbëhet.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    },
     "title": "Kushtet dhe Kushtet",
     "subtitle": "Menaxho kushtet dhe konditat",
     "addTerm": "Shto Kusht",
@@ -1125,5 +1133,14 @@
     "successMessage": "Nuk do të merrni më emaile promocionale nga Car Rental Zaimi.",
     "errorTitle": "Lidhje e pavlefshme ose e skaduar",
     "errorMessage": "Kjo lidhje për çregjistrim nuk është më e vlefshme. Ju lutemi na kontaktoni nëse keni nevojë për ndihmë."
-  }
+  },
+  "no_content": "Nuk ka përmbajtje në dispozicion për momentin.",
+  "footer_note": "Ju lutemi lexoni me kujdes para se të pranoni.",
+  "confirm_button": "Kuptova",
+  "loadingContent": "Po ngarkohet përmbajtja…",
+  "noContentsAvailableAtThisTime": "Nuk ka përmbajtje në dispozicion për momentin.",
+  "pleaseReadCarefullyBeforeAccepting": "Ju lutemi lexoni me kujdes para se të pranoni.",
+  "iUnderstand": "Kuptova",
+  "termsAndConditions": "Kushtet dhe Termat",
+  "lastUpdated": "Përditësuar së fundmi"
 }
