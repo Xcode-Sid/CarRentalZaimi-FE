@@ -38,6 +38,7 @@ import TermsPage from './pages/admin/TermsPage';
 import PrivacyPolicyPage from './pages/admin/PrivacyPage';
 import { SubscriptionManager } from 'framer-motion';
 import SubscriptionsPage from './pages/admin/SubscriptionsPage';
+import { UnsubscribePage } from './pages/account/UnsubscribePage';
 
 export default function App() {
   return (
@@ -58,6 +59,7 @@ export default function App() {
         <ThemeToggle />
       </div>
       <Routes>
+          <Route path="/unsubscribe" element={<UnsubscribePage />} />
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/fleet" element={<FleetPage />} />

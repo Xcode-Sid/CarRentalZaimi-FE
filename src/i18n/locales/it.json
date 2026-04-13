@@ -609,7 +609,9 @@
     "yes": "Sì",
     "no": "No",
     "perDay": "/giorno",
-    "saveAll": "Salva Tutto"
+    "saveAll": "Salva Tutto",
+    "somethingWentWrong": "Qualcosa è andato storto. Per favore riprova.",
+    "backToHome": "Torna alla Home"
   },
   "about": {
     "title": "Chi è ",
@@ -1063,40 +1065,49 @@
   "failedToCreatePrivacyPolicies": "Creazione della politica sulla privacy fallita. Per favore riprova.",
   "failedToDeletePrivacyPolicies": "Eliminazione della politica sulla privacy fallita. Per favore riprova.",
   "subscriptions": {
-      "title": "Iscrizioni",
-      "subtitle": "Gestisci tutti gli iscritti alla newsletter e via email",
-      "totalLabel": "totale",
-      "searchPlaceholder": "Cerca per email...",
-      "refresh": "Aggiorna",
-      "failedToLoad": "Caricamento delle iscrizioni non riuscito",
-      "failedToDelete": "Eliminazione dell'iscrizione non riuscita",
-      "table": {
-        "email": "Email",
-        "status": "Stato",
-        "actions": "Azioni"
-      },
-      "status": {
-        "subscribed": "Iscritto",
-        "unsubscribed": "Disiscritto"
-      },
-      "actions": {
-        "delete": "Elimina"
-      },
-      "empty": {
-        "hint": "Nessuna iscrizione trovata",
-        "searchHint": "Nessun risultato corrisponde alla tua ricerca"
-      },
-      "pagination": {
-        "showing": "Visualizzazione",
-        "of": "di",
-        "subscribers": "iscritti"
-      },
-      "deleteModal": {
-        "title": "Elimina Iscrizione",
-        "confirm": "Sei sicuro di voler eliminare {{email}}?",
-        "warning": "Questa azione non può essere annullata.",
-        "cancel": "Annulla",
-        "delete": "Elimina"
-      }
+    "title": "Iscrizioni",
+    "subtitle": "Gestisci tutti gli iscritti alla newsletter e via email",
+    "totalLabel": "totale",
+    "searchPlaceholder": "Cerca per email...",
+    "refresh": "Aggiorna",
+    "failedToLoad": "Caricamento delle iscrizioni non riuscito",
+    "failedToDelete": "Eliminazione dell'iscrizione non riuscita",
+    "table": {
+      "email": "Email",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "status": {
+      "subscribed": "Iscritto",
+      "unsubscribed": "Disiscritto"
+    },
+    "actions": {
+      "delete": "Elimina"
+    },
+    "empty": {
+      "hint": "Nessuna iscrizione trovata",
+      "searchHint": "Nessun risultato corrisponde alla tua ricerca"
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "subscribers": "iscritti"
+    },
+    "deleteModal": {
+      "title": "Elimina Iscrizione",
+      "confirm": "Sei sicuro di voler eliminare {{email}}?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
     }
+  },
+  "unsubscribe": {
+    "title": "Annulla iscrizione alle promozioni",
+    "description": "Clicca il pulsante qui sotto per smettere di ricevere email promozionali da Car Rental Zaimi.",
+    "confirmButton": "Conferma Annullamento",
+    "successTitle": "Iscrizione annullata",
+    "successMessage": "Non riceverai più email promozionali da Car Rental Zaimi.",
+    "errorTitle": "Link non valido o scaduto",
+    "errorMessage": "Questo link per annullare l'iscrizione non è più valido. Contattaci se hai bisogno di assistenza."
+  }
 }
