@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
-import { get } from '../../utils/api.utils';
+import { get, post } from '../../utils/api.utils';
 
 
 interface WorkingHoursEntry {
@@ -59,6 +59,7 @@ export function ContactSection() {
 
   const [profile, setProfile] = useState<CompanyProfileDto | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -129,18 +130,45 @@ export function ContactSection() {
     },
   ];
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setLoading(true);
     if (name && email && message) {
-      notifications.show({
-        title: '✅',
-        message: t('contact.sendSuccess'),
-        color: 'teal',
-      });
-      setName('');
-      setEmail('');
-      setPhone('');
-      setSubject('');
-      setMessage('');
+      try {
+        const res = await post('ContactMessage/contact', {
+          fullName: name,
+          email,
+          phone: phone || null,
+          subject: subject || null,
+          message,
+        });
+
+        if (res.success) {
+          notifications.show({
+            title: t('success'),
+            message: t('contact.sendSuccess'),
+            color: 'teal',
+          });
+          setName('');
+          setEmail('');
+          setPhone('');
+          setSubject('');
+          setMessage('');
+        } else {
+          notifications.show({
+            title: t('error'),
+            message: t('contact.sendError') ?? 'Something went wrong. Please try again.',
+            color: 'red',
+          });
+        }
+      } catch {
+        notifications.show({
+          title: t('error'),
+          message: t('contact.sendError') ?? 'Something went wrong. Please try again.',
+          color: 'red',
+        });
+      } finally {
+        setLoading(false)
+      }
     }
   };
 
@@ -239,6 +267,7 @@ export function ContactSection() {
                     color="teal"
                     size="md"
                     fullWidth
+                    loading={loading}
                     leftSection={<IconSend size={18} />}
                     onClick={handleSubmit}
                     disabled={!name || !email || !message}
