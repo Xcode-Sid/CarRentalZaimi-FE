@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { type CarImage as UploadedCarImage } from '../../../components/car-image/CarImageUploadPanel';
 import { CarFormModal, type Lookups } from './CarFormModal';
 import { type Vehicle, type GeneralData, type FormValues, mapApiCarToVehicle } from '../../../data/vehicles';
+import { PAGE_SIZE } from '../../../constants/pagination';
 import { del, get, post, put } from '../../../utils/api.utils';
 import { AnimatedSection } from '../../../components/common/AnimatedSection';
 import { toImagePath } from '../../../utils/general';
@@ -42,7 +43,6 @@ const normalizeArray = <T,>(raw: any): T[] => {
 const toSelectData = (items: GeneralData[]) =>
   items.map((x) => ({ value: x.id, label: x.name }));
 
-const PAGE_SIZE = 10;
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 

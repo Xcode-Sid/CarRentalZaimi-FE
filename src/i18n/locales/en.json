@@ -52,7 +52,38 @@
     "step3Desc": "Show up at the pickup point and start your journey"
   },
   "partners": {
-    "title": "Our Partners"
+    "title": "Our Partners",
+    "pageTitle": "Partners",
+    "pageSubtitle": "Manage partner organisations and their branding",
+    "addPartner": "Add Partner",
+    "searchPlaceholder": "Search partners…",
+    "editTitle": "Edit Partner",
+    "addTitle": "Add Partner",
+    "saveChanges": "Save Changes",
+    "createPartner": "Create Partner",
+    "deleteTitle": "Delete Partner",
+    "deleteWarning": "Are you sure you want to delete <strong>{{name}}</strong>?",
+    "deleteUndone": "This action cannot be undone.",
+    "noPartnersFound": "No partners found",
+    "noPartnersSearchHint": "Try a different search term",
+    "noPartnersEmptyHint": "Add your first partner to get started",
+    "showing": "Showing",
+    "of": "of",
+    "partners": "partners",
+    "preview": "Preview",
+    "partnerName": "Partner name",
+    "fieldName": "Name",
+    "fieldNamePlaceholder": "e.g. Acme Corporation",
+    "fieldInitials": "Initials",
+    "fieldInitialsPlaceholder": "e.g. AC",
+    "fieldInitialsDescription": "2–4 characters shown in the avatar",
+    "fieldColor": "Brand Color",
+    "fieldColorPlaceholder": "#2dd4a8",
+    "fieldActive": "Active",
+    "fieldActiveDesc": "Inactive partners are hidden from public-facing areas",
+    "tooltipEdit": "Edit partner",
+    "tooltipDelete": "Delete partner",
+    "tooltipRefresh": "Refresh"
   },
   "testimonials": {
     "title": "What Our Clients Say",
@@ -162,6 +193,10 @@
     "deleteReviewConfirm": "Are you sure you want to delete this review? This action cannot be undone."
   },
   "rental": {
+    "phoneNumber": "Phone number",
+    "startDate": "Pick up",
+    "endDate": "Return",
+    "inclServices": "Incl. all services",
     "title": "Book Car",
     "step1": "Dates",
     "step2": "Options & Summary",
@@ -192,6 +227,9 @@
     "backHome": "Back to Home"
   },
   "account": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "closeModal": "Close",
     "profile": "My Profile",
     "savedCars": "Saved Rental Cars",
     "myBookings": "My Bookings",
@@ -199,8 +237,6 @@
     "carsSubtitle": "Vehicles you saved from the fleet for easy booking later.",
     "savedCarsPaymentNote": "When you book, you can pay with cash or card at pickup.",
     "settings": "Settings",
-    "firstName": "First Name",
-    "lastName": "Last Name",
     "email": "Email",
     "phone": "Phone",
     "address": "Address",
@@ -219,7 +255,7 @@
     "viewDetails": "View Details",
     "accepted": "Accepted",
     "refused": "Refused",
-    "finished": "Finished",
+    "done": "Done",
     "bookingDetailsTitle": "Booking details",
     "clickRowForDetails": "Click any row for full details",
     "rentalPeriod": "Rental period",
@@ -234,7 +270,6 @@
     "filterCategory": "Category",
     "typeDay": "Daily",
     "viewCar": "View this car",
-    "closeModal": "Close",
     "currentPassword": "Current password",
     "newPassword": "New password",
     "confirmPassword": "Confirm password",
@@ -245,9 +280,36 @@
     "dark": "Dark",
     "light": "Light",
     "save": "Save",
-    "settingsSaved": "Settings saved successfully!"
+    "settingsSaved": "Settings saved successfully!",
+    "cancel": "Cancel",
+    "cancelBookingTitle": "Cancel Booking",
+    "cancelBookingConfirmText": "Are you sure you want to cancel this booking? This action cannot be undone.",
+    "cancelReason": "Reason (optional)",
+    "cancelReasonPlaceholder": "Let us know why you're cancelling...",
+    "confirmCancel": "Cancel booking",
+    "pending": "Pending",
+    "phoneNumber": "Phone",
+    "currentPasswordRequired": "Current password is required",
+    "changePassword": "Change Password",
+    "changePasswordSubtitle": "Choose a strong, unique password",
+    "newCredentials": "New credentials",
+    "settingsSubtitle": "Manage your account security",
+    "passwordChanged": "Your password has been changed successfully",
+    "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "acceptBookingSlotNotice": "Accepting will lock in the booking slot and make it unavailable to other guests.",
+    "closeBookingArchiveNotice": "Once completed, this booking will be archived and no further changes can be made.",
+    "closeBooking": "Close booking",
+    "closeBookingTitle": "Close Booking",
+    "closeBookingConfirmMessage": "Are you sure you want to close booking {{ref}}?",
+    "confirmClose": "Confirm Close",
+    "bookingClosed": "Booking closed successfully",
+    "subscriptions": "Subscriptions",
+    "privacies": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "bookingDetails": "Booking Details",
+    "refusedBy": "Refused by",
     "promotions": "Promotions",
     "aditionalServices": "Additional Services",
     "managefeaturedCars": "Manage Featured Cars",
@@ -266,6 +328,7 @@
     "bookings": "Bookings",
     "customers": "Users",
     "settings": "Settings",
+    "partners": "Partners",
     "analytics": "Analytics",
     "reports": "Reports",
     "carDatas": "Car Datas",
@@ -403,7 +466,100 @@
     "preview": "Preview",
     "edit": "Edit",
     "delete": "Delete",
-    "noCarsFound": "No cars found"
+    "noCarsFound": "No cars found",
+    "acceptBooking": "Accept Booking",
+    "refuseBooking": "Refuse Booking",
+    "acceptBookingTitle": "Accept Booking",
+    "acceptBookingConfirmMessage": "Are you sure you want to accept booking {{ref}}?",
+    "confirmAccept": "Confirm Accept",
+    "refuseBookingTitle": "Refuse Booking",
+    "refuseReason": "Reason (optional)",
+    "refuseReasonPlaceholder": "Enter a reason for refusal...",
+    "confirmRefuse": "Confirm Refusal",
+    "bookingAccepted": "Booking accepted successfully",
+    "bookingRefused": "Booking refused successfully",
+    "bookingsLoadFailed": "Failed to load bookings",
+    "statusUpdateFailed": "Failed to update booking status",
+    "noCustomersFound": "No customers found",
+    "failedToLoadUsers": "Failed to load users",
+    "failedToLoadBookings": "Failed to load bookings",
+    "settingsSubtitle": "Configure your platform profile and preferences",
+    "stepsCompleted": "{{done}}/{{total}} completed",
+    "platformSettings": "Platform Settings",
+    "siteName": "Site Name",
+    "siteNamePlaceholder": "Enter site name",
+    "tagline": "Tagline",
+    "taglinePlaceholder": "Premium car rental in Albania",
+    "logoUrl": "Logo URL",
+    "logoUrlPlaceholder": "https://...",
+    "emailPlaceholder": "info@autozaimi.al",
+    "phonePlaceholder": "6X XXX XXXX",
+    "addressPlaceholder": "Tirana, Albania",
+    "aboutText": "About Text",
+    "aboutTextPlaceholder": "Platforma premium për qira dhe blerje makinash në Shqipëri.",
+    "mission": "Mission",
+    "missionTitle": "Mission Title",
+    "missionTitlePlaceholder": "Our Mission",
+    "missionDescription": "Mission Description",
+    "missionDescriptionPlaceholder": "Describe your company's mission and values...",
+    "whyChooseUs": "Why Choose Us",
+    "addItem": "Add Item",
+    "item": "Item",
+    "icon": "Icon",
+    "title": "Title",
+    "whyChooseTitlePlaceholder": "e.g. Premium Fleet",
+    "whyChooseDescriptionPlaceholder": "Describe this benefit...",
+    "workingHours": "Working Hours",
+    "weekend": "Weekend",
+    "closed": "Closed",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "socialLinks": "Social Links",
+    "facebookUrl": "Facebook URL",
+    "facebookUrlPlaceholder": "https://facebook.com/...",
+    "instagramUrl": "Instagram URL",
+    "instagramUrlPlaceholder": "https://instagram.com/...",
+    "twitterUrl": "Twitter / X URL",
+    "twitterUrlPlaceholder": "https://twitter.com/...",
+    "youtubeUrl": "YouTube URL",
+    "youtubeUrlPlaceholder": "https://youtube.com/...",
+    "whatsAppNumber": "WhatsApp Number",
+    "lastStepHint": "You're on the last step. Review your info and save everything.",
+    "steps": {
+      "platform": "Platform",
+      "platformDesc": "Basic info & contact",
+      "mission": "Mission",
+      "missionDesc": "Your company mission",
+      "whyUs": "Why Us",
+      "whyUsDesc": "Key selling points",
+      "hours": "Hours",
+      "hoursDesc": "Working schedule",
+      "social": "Social",
+      "socialDesc": "Online presence"
+    },
+    "validation": {
+      "nameRequired": "Site name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email address",
+      "phoneRequired": "Phone number is required",
+      "addressRequired": "Address is required"
+    },
+    "notifications": {
+      "saveFailed": "Failed to save settings.",
+      "networkError": "Network error. Please try again."
+    },
+    "stats": "Statistics",
+    "changeLogo": "Change Logo",
+    "uploadLogo": "Upload Logo",
+    "removeLogo": "Remove Logo",
+    "viewCustomer": "View Customer"
   },
   "login": {
     "title": "Welcome Back",
@@ -452,6 +608,7 @@
     "backHome": "Back to Home"
   },
   "common": {
+    "saveAll": "Save All",
     "loading": "Loading...",
     "error": "An error occurred",
     "retry": "Try again",
@@ -466,10 +623,12 @@
     "next": "Continue",
     "yes": "Yes",
     "no": "No",
-    "perDay": "/day"
+    "perDay": "/day",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "backToHome": "Back to Home"
   },
   "about": {
-    "title": "About AutoZaimi",
+    "title": "About",
     "subtitle": "Your trusted car rental platform in Albania",
     "description": "AutoZaimi was founded with a simple mission: to offer every traveler in Albania the opportunity to travel in style, safety, and at reasonable prices. With a wide fleet of luxury, SUV, electric, and economy cars, we cover every need — from family vacations to business trips.",
     "mission": "Our Mission",
@@ -690,8 +849,7 @@
     "maxLength": "Cannot exceed {{max}} characters",
     "mustBeGreaterThan0": "Must be greater than 0",
     "mustBeLessThan100": "Must be less than 100",
-    "carOrCategoryRequired": "Either a car or a category must be selected",
-    "mustBePositive": "Must be greater than 0"
+    "carOrCategoryRequired": "Either a car or a category must be selected"
   },
   "dropImagesHere": "Drop images here",
   "uploadCarImages": "Upload car images",
@@ -712,6 +870,8 @@
   "required": "This field is required",
   "edit": "Edit",
   "promotions": {
+    "showing": "Showing",
+    "of": "of",
     "active": "Active",
     "inactive": "Inactive",
     "fieldActive": "Active",
@@ -754,9 +914,10 @@
     "categoryDisabledHint": "Clear the car to select a category",
     "deleteTitle": "Delete Promotion"
   },
-  "save": "Save",
   "perDay": "/ day",
   "additionalServices": {
+    "showing": "Showing",
+    "of": "of",
     "aditionalServices": "Manage additional Services",
     "subtitle": "Manage optional services offered per day",
     "add": "Add Service",
@@ -791,5 +952,194 @@
   "failedToUpdateFaturedStatus": "Failed to update featured status",
   "failedToUpdateSavedCar": "Failed to update saved car",
   "carWasAddedToSaveSollection": "Car added to your saved collection",
-  "carWasRemovedFromSavecollection": "Car removed from your saved collection"
+  "carWasRemovedFromSavecollection": "Car removed from your saved collection",
+  "terms": {
+    "deleteModal": {
+      "title": "Delete term",
+      "confirm": "Are you sure you want to delete \"{{name}}\"?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "title": "Terms & Conditions",
+    "subtitle": "Manage terms and conditions entries",
+    "addTerm": "Add Term",
+    "searchPlaceholder": "Search terms…",
+    "refresh": "Refresh",
+    "table": {
+      "title": "Title",
+      "description": "Description",
+      "color": "Color",
+      "icon": "Icon",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No terms found",
+      "hint": "Add your first term to get started",
+      "searchHint": "Try a different search term"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit term",
+      "delete": "Delete term"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "terms": "terms"
+    },
+    "modal": {
+      "editTitle": "Edit Term",
+      "addTitle": "Add Term"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Privacy Policy",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter the full description or content of this term…",
+      "iconLabel": "Icon",
+      "iconPlaceholder": "Select an icon (optional)",
+      "colorLabel": "Color",
+      "activeLabel": "Active",
+      "activeDescription": "Inactive terms are hidden from public-facing areas",
+      "saveChanges": "Save Changes",
+      "createTerm": "Create Term"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "colorRequired": "Color is required"
+    },
+    "errors": {
+      "loadFailed": "Failed to load terms",
+      "updateFailed": "Failed to update term",
+      "createFailed": "Failed to create term",
+      "deleteFailed": "Failed to delete term",
+      "unknown": "Unknown error"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "subtitle": "Manage privacy policy entries",
+    "addPolicy": "Add Policy",
+    "searchPlaceholder": "Search policies…",
+    "refresh": "Refresh",
+    "table": {
+      "title": "Title",
+      "description": "Description",
+      "color": "Color",
+      "icon": "Icon",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No policies found",
+      "hint": "Add your first policy to get started",
+      "searchHint": "Try a different search term"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit policy",
+      "delete": "Delete policy"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "policies": "policies"
+    },
+    "modal": {
+      "editTitle": "Edit Policy",
+      "addTitle": "Add Policy"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Data Collection",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter the full description or content of this policy…",
+      "iconLabel": "Icon",
+      "iconPlaceholder": "Select an icon (optional)",
+      "colorLabel": "Color",
+      "activeLabel": "Active",
+      "activeDescription": "Inactive policies are hidden from public-facing areas",
+      "saveChanges": "Save Changes",
+      "createPolicy": "Create Policy"
+    },
+    "deleteModal": {
+      "title": "Delete Policy",
+      "confirm": "Are you sure you want to delete {{name}}?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "colorRequired": "Color is required"
+    }
+  },
+  "failedToUpdatePrivacyPolicies": "Failed to update privacy policy. Please try again.",
+  "failedToCreatePrivacyPolicies": "Failed to create privacy policy. Please try again.",
+  "failedToDeletePrivacyPolicies": "Failed to delete privacy policy. Please try again.",
+  "subscriptions": {
+    "title": "Subscriptions",
+    "subtitle": "Manage all newsletter and email subscribers",
+    "totalLabel": "total",
+    "searchPlaceholder": "Search by email...",
+    "refresh": "Refresh",
+    "failedToLoad": "Failed to load subscriptions",
+    "failedToDelete": "Failed to delete subscription",
+    "table": {
+      "email": "Email",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "subscribed": "Subscribed",
+      "unsubscribed": "Unsubscribed"
+    },
+    "actions": {
+      "delete": "Delete"
+    },
+    "empty": {
+      "hint": "No subscriptions found",
+      "searchHint": "No results match your search"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "subscribers": "subscribers"
+    },
+    "deleteModal": {
+      "title": "Delete Subscription",
+      "confirm": "Are you sure you want to delete {{email}}?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    }
+  },
+  "unsubscribe": {
+    "title": "Unsubscribe from promotions",
+    "description": "Click the button below to stop receiving promotional emails from Car Rental Zaimi.",
+    "confirmButton": "Confirm Unsubscribe",
+    "successTitle": "You've been unsubscribed",
+    "successMessage": "You will no longer receive promotional emails from Car Rental Zaimi.",
+    "errorTitle": "Invalid or expired link",
+    "errorMessage": "This unsubscribe link is no longer valid. Please contact us if you need help."
+  },
+  "no_content": "No content available at this time.",
+  "footer_note": "Please read carefully before accepting.",
+  "confirm_button": "I understand",
+  "loadingContent": "Loading content…",
+  "noContentsAvailableAtThisTime": "No content available at this time.",
+  "pleaseReadCarefullyBeforeAccepting": "Please read carefully before accepting.",
+  "iUnderstand": "I understand",
+  "termsAndConditions": "Terms & Conditions",
+  "lastUpdated": "Last updated"
 }

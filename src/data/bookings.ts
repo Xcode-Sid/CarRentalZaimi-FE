@@ -1,76 +1,85 @@
+import { toImagePath } from "../utils/general";
+
+export type BookingStatus = 'accepted' | 'refused' | 'done';
+
+export type AdditionalService = {
+  id: string;
+  name: string;
+  pricePerDay: number;
+  description?: string;
+};
+
 export interface Booking {
   id: string;
   ref: string;
   userId: string;
   vehicleId: string; // Changed from number to string to match Vehicle.id
   vehicleName: string;
+  vehicleIamge: string;
   paymentMethod: 'cash' | 'card';
   startDate: string;
   endDate?: string;
   total: number;
-  status: 'accepted' | 'refused' | 'finished';
-  addons?: string[];
+  status: BookingStatus;
+  phoneNumber: string;
+  refuzedBy: string;
+  user: {
+    firstName: string;
+    lastName: string;
+    image?: {
+      imageData: string
+    };
+  };
+  services: AdditionalService[]
 }
 
-export const bookings: Booking[] = [
-  {
-    id: 'b1',
-    ref: 'AZR-2026-00142',
-    userId: 'user-1',
-    vehicleId: '2',
-    vehicleName: 'BMW X5',
-    paymentMethod: 'cash',
-    startDate: '2026-03-15',
-    endDate: '2026-03-20',
-    total: 570,
-    status: 'finished',
-  },
-  {
-    id: 'b2',
-    ref: 'AZR-2026-00087',
-    userId: 'user-1',
-    vehicleId: '3',
-    vehicleName: 'Tesla Model 3',
-    paymentMethod: 'cash',
-    startDate: '2026-03-02',
-    endDate: '2026-03-08',
-    total: 450,
-    status: 'accepted',
-  },
-  {
-    id: 'b3',
-    ref: 'AZR-2026-00198',
-    userId: 'user-1',
-    vehicleId: '4',
-    vehicleName: 'Audi A4',
-    paymentMethod: 'card',
-    startDate: '2026-03-28',
-    endDate: '2026-04-02',
-    total: 270,
-    status: 'accepted',
-  },
-  {
-    id: 'b4',
-    ref: 'AZR-2026-00156',
-    userId: 'user-1',
-    vehicleId: '6',
-    vehicleName: 'Mercedes-Benz GLE',
-    paymentMethod: 'cash',
-    startDate: '2026-02-10',
-    endDate: '2026-02-12',
-    total: 360,
-    status: 'refused',
-  },
-  {
-    id: 'b5',
-    ref: 'AZR-2026-00201',
-    userId: 'user-1',
-    vehicleId: '3',
-    vehicleName: 'Tesla Model 3',
-    paymentMethod: 'card',
-    startDate: '2026-04-05',
-    endDate: '2026-04-06',
-    total: 150,
-    status: 'accepted',
-  },
-];
+
+const STATUS_MAP: Record<number, Booking['status']> = {
+  1: 'accepted',
+  2: 'refused',
+  3: 'done',
+};
+
+const REFUSED_MAP: Record<number, Booking['refuzedBy']> = {
+  1: 'none',
+  2: 'user',
+  3: 'admin',
+};
+
+
+const PAYMENT_MAP: Record<string, 'cash' | 'card'> = {
+  '0': 'cash',
+  '1': 'card',
+};
+
+export function mapApiBooking(dto: any): Booking {
+  return {
+    id: dto.id,
+    ref: dto.reference ?? dto.id,
+    userId: dto.user?.id ?? '',
+    vehicleId: dto.car?.id ?? '',
+    vehicleName: dto.car?.title ?? '—',     
+    vehicleIamge: toImagePath(dto.car?.carImages?.[0].imagePath )?? '',  
+    startDate: dto.startDate,
+    endDate: dto.endDate,
+    total: Number(dto.totalPrice ?? 0),
+    phoneNumber: dto.phoneNumber ?? '',
+    paymentMethod: PAYMENT_MAP[dto.paymentMethod] ?? 'cash',  
+    status: STATUS_MAP[dto.status] ?? '-',          
+    refuzedBy: REFUSED_MAP[dto.refuzedBy] ?? '-',
+    user: {
+      firstName: dto.user?.firstName ?? '',
+      lastName: dto.user?.lastName ?? '',
+      image: {
+        imageData : toImagePath(dto.user?.image.imagePath) ?? '',
+      }
+    },
+    services: (dto.bookingServices ?? []).map((bs: any) => ({  
+      id: bs.additionalService?.id ?? bs.id,
+      name: bs.additionalService?.name ?? '',
+      pricePerDay: bs.additionalService?.pricePerDay ?? 0,
+      description: bs.additionalService?.description,
+    })),
+  };
+}
+

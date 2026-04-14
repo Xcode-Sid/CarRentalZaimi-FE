@@ -52,7 +52,38 @@
     "step3Desc": "Paraqitu në pikën e marrjes dhe nis udhëtimin"
   },
   "partners": {
-    "title": "Partnerët Tanë"
+    "title": "Partnerët Tanë",
+    "pageTitle": "Partnerët",
+    "pageSubtitle": "Menaxhoni organizatat partnere dhe identitetin e tyre vizual",
+    "addPartner": "Shto Partner",
+    "searchPlaceholder": "Kërko partnerë…",
+    "editTitle": "Modifiko Partnerin",
+    "addTitle": "Shto Partner",
+    "saveChanges": "Ruaj Ndryshimet",
+    "createPartner": "Krijo Partner",
+    "deleteTitle": "Fshi Partnerin",
+    "deleteWarning": "Jeni të sigurt që doni të fshini <strong>{{name}}</strong>?",
+    "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
+    "noPartnersFound": "Nuk u gjet asnjë partner",
+    "noPartnersSearchHint": "Provoni me një term tjetër kërkimi",
+    "noPartnersEmptyHint": "Shtoni partnerin tuaj të parë për të filluar",
+    "showing": "Duke shfaqur",
+    "of": "nga",
+    "partners": "partnerë",
+    "preview": "Pamje paraprake",
+    "partnerName": "Emri i partnerit",
+    "fieldName": "Emri",
+    "fieldNamePlaceholder": "p.sh. Acme Corporation",
+    "fieldInitials": "Inicialet",
+    "fieldInitialsPlaceholder": "p.sh. AC",
+    "fieldInitialsDescription": "2–4 karaktere të shfaqura në avatar",
+    "fieldColor": "Ngjyra e Brandit",
+    "fieldColorPlaceholder": "#2dd4a8",
+    "fieldActive": "Aktiv",
+    "fieldActiveDesc": "Partnerët joaktivë fshihen nga zonat publike",
+    "tooltipEdit": "Modifiko partnerin",
+    "tooltipDelete": "Fshi partnerin",
+    "tooltipRefresh": "Rifresko"
   },
   "testimonials": {
     "title": "Çfarë Thonë Klientët Tanë",
@@ -162,6 +193,10 @@
     "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
+    "phoneNumber": "Numri i telefonit",
+    "startDate": "Marrja",
+    "endDate": "Kthimi",
+    "inclServices": "Të gjitha shërbimet të përfshira",
     "title": "Rezervo Makinën",
     "step1": "Datat",
     "step2": "Opsionet & Përmbledhja",
@@ -192,6 +227,7 @@
     "backHome": "Kthehu në Faqen Kryesore"
   },
   "account": {
+    "phoneNumber": "Telefon",
     "profile": "Profili Im",
     "savedCars": "Makina me qira të ruajtura",
     "myBookings": "Rezervimet e mia",
@@ -245,9 +281,41 @@
     "dark": "E errët",
     "light": "E ndritshme",
     "save": "Ruaj",
-    "settingsSaved": "Cilësimet u ruajtën me sukses!"
+    "settingsSaved": "Cilësimet u ruajtën me sukses!",
+    "cancel": "Anulo",
+    "cancelBookingTitle": "Anulo Rezervimin",
+    "cancelBookingConfirmText": "Jeni i sigurt që dëshironi të anuloni këtë rezervim? Ky veprim nuk mund të kthehet.",
+    "cancelReason": "Arsyeja (opsionale)",
+    "cancelReasonPlaceholder": "Na tregoni pse po anuloni...",
+    "confirmCancel": "Anulo rezervimin",
+    "pending": "Në pritje",
+    "currentPasswordRequired": "Fjalëkalimi aktual është i detyrueshëm",
+    "changePassword": "Ndrysho Fjalëkalimin",
+    "changePasswordSubtitle": "Zgjidh një fjalëkalim të fortë dhe unik",
+    "newCredentials": "Kredencialet e reja",
+    "settingsSubtitle": "Menaxho sigurinë e llogarisë tënde",
+    "passwordChanged": "Fjalëkalimi u ndryshua me sukses",
+    "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "acceptBookingSlotNotice": "Duke pranuar, vendi i rezervimit do të bllokohet dhe nuk do të jetë më i disponueshëm për mysafirët e tjerë.",
+    "closeBookingArchiveNotice": "Pasi të përfundojë, kjo rezervim do të arkivohet dhe nuk do të mund të bëhen ndryshime të mëtejshme.",
+    "closeBooking": "Mbyll rezervimin",
+    "closeBookingTitle": "Mbyll Rezervimin",
+    "closeBookingConfirmMessage": "Jeni i sigurt që doni të mbyllni rezervimin {{ref}}?",
+    "confirmClose": "Konfirmo Mbylljen",
+    "bookingClosed": "Rezervimi u mbyll me sukses",
+    "subscriptions": "Abonimet",
+    "privacies": "Politika e Privatësisë",
+    "terms": "Kushtet & Rregullat",
+    "partners": "Partnerët",
+    "stats": "Statistika",
+    "changeLogo": "Ndrysho Logon",
+    "uploadLogo": "Ngarko Logon",
+    "removeLogo": "Fshi Logon",
+    "viewCustomer": "Shiko Klientin",
+    "bookingDetails": "Detajet e Rezervimit",
+    "refusedBy": "Refuzuar nga",
     "promotions": "Promocionet",
     "aditionalServices": "Shërbime Shtesë",
     "managefeaturedCars": "Menaxho Makina të Rekomanduara",
@@ -402,7 +470,96 @@
     "preview": "Pamje paraprake",
     "edit": "Ndrysho",
     "delete": "Fshi",
-    "noCarsFound": "Nuk u gjet asnjë makinë"
+    "noCarsFound": "Nuk u gjet asnjë makinë",
+    "acceptBooking": "Prano Rezervimin",
+    "refuseBooking": "Refuzo Rezervimin",
+    "acceptBookingTitle": "Prano Rezervimin",
+    "acceptBookingConfirmMessage": "Jeni të sigurt që doni të pranoni rezervimin {{ref}}?",
+    "confirmAccept": "Konfirmo Pranimin",
+    "refuseBookingTitle": "Refuzo Rezervimin",
+    "refuseReason": "Arsyeja (opsionale)",
+    "refuseReasonPlaceholder": "Shkruani arsyen e refuzimit...",
+    "confirmRefuse": "Konfirmo Refuzimin",
+    "bookingAccepted": "Rezervimi u pranua me sukses",
+    "bookingRefused": "Rezervimi u refuzua me sukses",
+    "bookingsLoadFailed": "Dështoi ngarkimi i rezervimeve",
+    "statusUpdateFailed": "Dështoi përditësimi i statusit",
+    "noCustomersFound": "Asnjë klient nuk u gjet",
+    "of": "nga",
+    "failedToLoadUsers": "Ngarkimi i përdoruesve dështoi",
+    "failedToLoadBookings": "Ngarkimi i rezervimeve dështoi",
+    "settingsSubtitle": "Konfiguro profilin dhe preferencat e platformës",
+    "stepsCompleted": "{{done}}/{{total}} të përfunduara",
+    "platformSettings": "Cilësimet e Platformës",
+    "siteName": "Emri i Faqes",
+    "siteNamePlaceholder": "Shkruaj emrin e faqes",
+    "tagline": "Slogani",
+    "taglinePlaceholder": "Makinë me qira premium në Shqipëri",
+    "logoUrl": "URL e Logos",
+    "logoUrlPlaceholder": "https://...",
+    "emailPlaceholder": "info@autozaimi.al",
+    "phonePlaceholder": "6X XXX XXXX",
+    "addressPlaceholder": "Tiranë, Shqipëri",
+    "aboutText": "Teksti About",
+    "aboutTextPlaceholder": "Platforma premium për qira dhe blerje makinash në Shqipëri.",
+    "mission": "Misioni",
+    "missionTitle": "Titulli i Misionit",
+    "missionTitlePlaceholder": "Misioni Ynë",
+    "missionDescription": "Përshkrimi i Misionit",
+    "missionDescriptionPlaceholder": "Përshkruaj misionin dhe vlerat e kompanisë suaj...",
+    "whyChooseUs": "Pse të Na Zgjidhni",
+    "addItem": "Shto Artikull",
+    "item": "Artikull",
+    "icon": "Ikona",
+    "title": "Titulli",
+    "whyChooseTitlePlaceholder": "p.sh. Flotë Premium",
+    "whyChooseDescriptionPlaceholder": "Përshkruaj këtë avantazh...",
+    "workingHours": "Orari i Punës",
+    "weekend": "Fundjavë",
+    "closed": "Mbyllur",
+    "days": {
+      "monday": "E Hënë",
+      "tuesday": "E Martë",
+      "wednesday": "E Mërkurë",
+      "thursday": "E Enjte",
+      "friday": "E Premte",
+      "saturday": "E Shtunë",
+      "sunday": "E Diel"
+    },
+    "socialLinks": "Lidhjet Sociale",
+    "facebookUrl": "URL Facebook",
+    "facebookUrlPlaceholder": "https://facebook.com/...",
+    "instagramUrl": "URL Instagram",
+    "instagramUrlPlaceholder": "https://instagram.com/...",
+    "twitterUrl": "URL Twitter / X",
+    "twitterUrlPlaceholder": "https://twitter.com/...",
+    "youtubeUrl": "URL YouTube",
+    "youtubeUrlPlaceholder": "https://youtube.com/...",
+    "whatsAppNumber": "Numri WhatsApp",
+    "lastStepHint": "Jeni në hapin e fundit. Rishikoni informacionin dhe ruajini të gjitha.",
+    "steps": {
+      "platform": "Platforma",
+      "platformDesc": "Info bazë & kontakt",
+      "mission": "Misioni",
+      "missionDesc": "Misioni i kompanisë",
+      "whyUs": "Pse Ne",
+      "whyUsDesc": "Pikat kryesore",
+      "hours": "Orari",
+      "hoursDesc": "Orari i punës",
+      "social": "Sociale",
+      "socialDesc": "Prania online"
+    },
+    "validation": {
+      "nameRequired": "Emri i faqes është i detyrueshëm",
+      "emailRequired": "Email-i është i detyrueshëm",
+      "emailInvalid": "Adresë email e pavlefshme",
+      "phoneRequired": "Numri i telefonit është i detyrueshëm",
+      "addressRequired": "Adresa është e detyrueshme"
+    },
+    "notifications": {
+      "saveFailed": "Ruajtja e cilësimeve dështoi.",
+      "networkError": "Gabim rrjeti. Ju lutemi provoni përsëri."
+    }
   },
   "login": {
     "title": "Mirë se Vini Përsëri",
@@ -465,10 +622,13 @@
     "next": "Vazhdo",
     "yes": "Po",
     "no": "Jo",
-    "perDay": "/ditë"
+    "perDay": "/ditë",
+    "saveAll": "Ruaj Të Gjitha",
+    "somethingWentWrong": "Diçka shkoi keq. Ju lutemi provoni përsëri.",
+    "backToHome": "Kthehu në Shtëpi"
   },
   "about": {
-    "title": "Rreth AutoZaimi",
+    "title": "Rreth",
     "subtitle": "Platforma juaj e besuar për qira makinash në Shqipëri",
     "description": "AutoZaimi u themelua me një mision të thjeshtë: t'i ofrojë çdo udhëtari në Shqipëri mundësinë për të udhëtuar me stil, siguri dhe çmime të arsyeshme. Me një flotë të gjerë makinash luksoze, SUV, elektrike dhe ekonomike, ne mbulojmë çdo nevojë — nga pushimet familjare deri te udhëtimet e biznesit.",
     "mission": "Misioni Ynë",
@@ -687,8 +847,7 @@
     "maxLength": "Nuk mund të kalojë {{max}} karaktere",
     "mustBeGreaterThan0": "Duhet të jetë më e madhe se 0",
     "mustBeLessThan100": "Duhet të jetë më e vogël se 100",
-    "carOrCategoryRequired": "Duhet të zgjidhni një makinë ose një kategori",
-    "mustBePositive": "Duhet të jetë më i madh se 0"
+    "carOrCategoryRequired": "Duhet të zgjidhni një makinë ose një kategori"
   },
   "dropImagesHere": "Lësho imazhet këtu",
   "uploadCarImages": "Ngarko imazhet e makinës",
@@ -711,6 +870,8 @@
   "required": "Ky fushë është e detyrueshme",
   "edit": "Ndrysho",
   "promotions": {
+    "showing": "Duke shfaqur",
+    "of": "nga",
     "active": "Aktiv",
     "inactive": "Joaktiv",
     "fieldActive": "Aktiv",
@@ -753,9 +914,10 @@
     "categoryDisabledHint": "Hiqni automjetin për të zgjedhur një kategori",
     "deleteTitle": "Fshij promocion"
   },
-  "save": "Ruaj",
   "perDay": "/ ditë",
   "additionalServices": {
+    "showing": "Duke shfaqur",
+    "of": "nga",
     "aditionalServices": "Menaxho Shërbime Shtesë",
     "subtitle": "Menaxho shërbimet opsionale të ofruara për ditë",
     "add": "Shto Shërbim",
@@ -789,5 +951,196 @@
   "removedFromFeatured": "u hoq nga të rekomanduarat",
   "failedToUpdateSavedCar": "Dështoi përditësimi i makinës së ruajtur",
   "carWasAddedToSaveSollection": "Makina u shtua në koleksionin tuaj të ruajtur",
-  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur"
+  "carWasRemovedFromSavecollection": "Makina u hoq nga koleksioni juaj i ruajtur",
+  "terms": {
+    "deleteModal": {
+      "title": "Fshi termin",
+      "confirm": "Jeni i sigurt që dëshironi të fshini \"{{name}}\"?",
+      "warning": "Ky veprim nuk mund të zhbëhet.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    },
+    "title": "Kushtet dhe Kushtet",
+    "subtitle": "Menaxho kushtet dhe konditat",
+    "addTerm": "Shto Kusht",
+    "searchPlaceholder": "Kërko kushte…",
+    "refresh": "Rifresko",
+    "table": {
+      "title": "Titulli",
+      "description": "Përshkrimi",
+      "color": "Ngjyra",
+      "icon": "Ikona",
+      "status": "Statusi",
+      "actions": "Veprimet"
+    },
+    "empty": {
+      "title": "Asnjë kusht nuk u gjet",
+      "hint": "Shto kushtin tënd të parë për të filluar",
+      "searchHint": "Provo me një term kërkimi tjetër"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Joaktiv"
+    },
+    "actions": {
+      "edit": "Ndrysho kushtin",
+      "delete": "Fshi kushtin"
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "terms": "kushte"
+    },
+    "modal": {
+      "editTitle": "Ndrysho Kushtin",
+      "addTitle": "Shto Kusht"
+    },
+    "form": {
+      "titleLabel": "Titulli",
+      "titlePlaceholder": "p.sh. Politika e Privatësisë",
+      "descriptionLabel": "Përshkrimi",
+      "descriptionPlaceholder": "Shkruaj përshkrimin e plotë ose përmbajtjen e këtij kushti…",
+      "iconLabel": "Ikona",
+      "iconPlaceholder": "Zgjidh një ikonë (opsionale)",
+      "colorLabel": "Ngjyra",
+      "activeLabel": "Aktiv",
+      "activeDescription": "Kushtet joaktive janë të fshehura nga zonat publike",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createTerm": "Krijo Kusht"
+    },
+    "validation": {
+      "titleRequired": "Titulli është i detyrueshëm",
+      "descriptionRequired": "Përshkrimi është i detyrueshëm",
+      "colorRequired": "Ngjyra është e detyrueshme"
+    },
+    "errors": {
+      "loadFailed": "Ngarkimi i kushteve dështoi",
+      "updateFailed": "Përditësimi i kushtit dështoi",
+      "createFailed": "Krijimi i kushtit dështoi",
+      "deleteFailed": "Fshirja e kushtit dështoi",
+      "unknown": "Gabim i panjohur"
+    }
+  },
+  "delte": "Fshi",
+  "deleteUndone": "Ky veprim nuk mund të zhbëhet.",
+  "privacyPolicy": {
+    "title": "Politika e Privatësisë",
+    "subtitle": "Menaxho politikat e privatësisë",
+    "addPolicy": "Shto Politikë",
+    "searchPlaceholder": "Kërko politika…",
+    "refresh": "Rifresko",
+    "table": {
+      "title": "Titulli",
+      "description": "Përshkrimi",
+      "color": "Ngjyra",
+      "icon": "Ikona",
+      "status": "Statusi",
+      "actions": "Veprimet"
+    },
+    "empty": {
+      "title": "Asnjë politikë nuk u gjet",
+      "hint": "Shto politikën tënde të parë për të filluar",
+      "searchHint": "Provo me një term kërkimi tjetër"
+    },
+    "status": {
+      "active": "Aktive",
+      "inactive": "Joaktive"
+    },
+    "actions": {
+      "edit": "Ndrysho politikën",
+      "delete": "Fshi politikën"
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "policies": "politika"
+    },
+    "modal": {
+      "editTitle": "Ndrysho Politikën",
+      "addTitle": "Shto Politikë"
+    },
+    "form": {
+      "titleLabel": "Titulli",
+      "titlePlaceholder": "p.sh. Mbledhja e të Dhënave",
+      "descriptionLabel": "Përshkrimi",
+      "descriptionPlaceholder": "Shkruaj përshkrimin e plotë ose përmbajtjen e kësaj politike…",
+      "iconLabel": "Ikona",
+      "iconPlaceholder": "Zgjidh një ikonë (opsionale)",
+      "colorLabel": "Ngjyra",
+      "activeLabel": "Aktive",
+      "activeDescription": "Politikat joaktive janë të fshehura nga zonat publike",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createPolicy": "Krijo Politikë"
+    },
+    "deleteModal": {
+      "title": "Fshi Politikën",
+      "confirm": "Jeni të sigurt që doni të fshini {{name}}?",
+      "warning": "Ky veprim nuk mund të zhbëhet.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    },
+    "validation": {
+      "titleRequired": "Titulli është i detyrueshëm",
+      "descriptionRequired": "Përshkrimi është i detyrueshëm",
+      "colorRequired": "Ngjyra është e detyrueshme"
+    }
+  },
+  "failedToUpdatePrivacyPolicies": "Përditësimi i politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
+  "failedToCreatePrivacyPolicies": "Krijimi i politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
+  "failedToDeletePrivacyPolicies": "Fshirja e politikës së privatësisë dështoi. Ju lutemi provoni përsëri.",
+  "subscriptions": {
+    "title": "Abonimet",
+    "subtitle": "Menaxhoni të gjithë abonentët e buletin-it dhe emailit",
+    "totalLabel": "gjithsej",
+    "searchPlaceholder": "Kërko me email...",
+    "refresh": "Rifresko",
+    "failedToLoad": "Dështoi ngarkimi i abonimeve",
+    "failedToDelete": "Dështoi fshirja e abonimit",
+    "table": {
+      "email": "Email",
+      "status": "Statusi",
+      "actions": "Veprimet"
+    },
+    "status": {
+      "subscribed": "I abonuar",
+      "unsubscribed": "I çabonuar"
+    },
+    "actions": {
+      "delete": "Fshi"
+    },
+    "empty": {
+      "hint": "Nuk u gjetën abonime",
+      "searchHint": "Asnjë rezultat nuk përputhet me kërkimin tuaj"
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "subscribers": "abonentë"
+    },
+    "deleteModal": {
+      "title": "Fshi Abonimin",
+      "confirm": "Jeni të sigurt që doni të fshini {{email}}?",
+      "warning": "Ky veprim nuk mund të zhbëhet.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    }
+  },
+  "unsubscribe": {
+    "title": "Çregjistrohu nga promovimet",
+    "description": "Klikoni butonin më poshtë për të ndaluar marrjen e emaileve promocionale nga Car Rental Zaimi.",
+    "confirmButton": "Konfirmo Çregjistrimin",
+    "successTitle": "Jeni çregjistruar",
+    "successMessage": "Nuk do të merrni më emaile promocionale nga Car Rental Zaimi.",
+    "errorTitle": "Lidhje e pavlefshme ose e skaduar",
+    "errorMessage": "Kjo lidhje për çregjistrim nuk është më e vlefshme. Ju lutemi na kontaktoni nëse keni nevojë për ndihmë."
+  },
+  "no_content": "Nuk ka përmbajtje në dispozicion për momentin.",
+  "footer_note": "Ju lutemi lexoni me kujdes para se të pranoni.",
+  "confirm_button": "Kuptova",
+  "loadingContent": "Po ngarkohet përmbajtja…",
+  "noContentsAvailableAtThisTime": "Nuk ka përmbajtje në dispozicion për momentin.",
+  "pleaseReadCarefullyBeforeAccepting": "Ju lutemi lexoni me kujdes para se të pranoni.",
+  "iUnderstand": "Kuptova",
+  "termsAndConditions": "Kushtet dhe Termat",
+  "lastUpdated": "Përditësuar së fundmi"
 }

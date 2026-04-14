@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Title,
     TextInput,
@@ -18,6 +18,8 @@ import {
     Tooltip,
     Center,
     Select,
+    Pagination,
+    Loader,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { motion } from "framer-motion";
@@ -28,14 +30,15 @@ import {
     IconTrash,
     IconDeviceFloppy,
     IconX,
-    IconStar,
     IconCheck,
     IconBan,
     IconMoodSmile,
+    IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 
 import { useForm } from "@mantine/form";
+import { PAGE_SIZE } from "../../constants/pagination";
 import { del, get, post, put } from "../../utils/api.utils";
 import Spinner from "../../components/spinner/Spinner";
 
@@ -65,7 +68,6 @@ const inputStyles = {
     },
 };
 
-
 const SERVICE_ICONS: { value: string; label: string }[] = [
     { value: "🛰️", label: "GPS / Satellite" },
     { value: "🪑", label: "Baby Seat" },
@@ -83,7 +85,7 @@ const SERVICE_ICONS: { value: string; label: string }[] = [
     { value: "📷", label: "Dashcam" },
     { value: "🎵", label: "Sound System" },
 ];
- 
+
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -92,7 +94,13 @@ export default function AdminAdditionalServicesPage() {
 
     const [services, setServices] = useState<AdditionalService[]>([]);
     const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<AdditionalService | null>(null);
@@ -107,36 +115,50 @@ export default function AdminAdditionalServicesPage() {
         },
         validate: {
             name: (v) => (!v.trim() ? t("validation.required") : null),
-            pricePerDay: (v) =>
-                v <= 0
-                    ? t("validation.mustBePositive")
-                    : null,
+            pricePerDay: (v) => (v <= 0 ? t("validation.mustBePositive") : null),
         },
     });
 
-    // ─── Fetch ────────────────────────────────────────────────────────────────
+    // ─── Debounce search ──────────────────────────────────────────────────────
 
     useEffect(() => {
-        const fetchServices = async () => {
-            setLoading(true);
-            try {
-                const response = await get("AdditionalService/getAll");
-                if (response.success) {
-                    setServices(response.data ?? []);
-                }
-            } catch (error) {
-                console.error("Failed to fetch additional services:", error);
-                notifications.show({
-                    message: t("additionalServices.loadFailed"),
-                    color: "red",
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
+        const timer = setTimeout(() => setDebouncedSearch(search), 400);
+        return () => clearTimeout(timer);
+    }, [search]);
 
-        fetchServices();
-    }, []);
+    useEffect(() => { setPage(1); }, [debouncedSearch]);
+
+    // ─── Fetch (paginated) ────────────────────────────────────────────────────
+
+    const fetchServices = useCallback(async () => {
+        setLoading(true);
+        try {
+            const params = new URLSearchParams({
+                PageNr: String(page),
+                PageSize: String(PAGE_SIZE),
+            });
+            if (debouncedSearch.trim()) params.set("Search", debouncedSearch.trim());
+
+            const response = await get(`AdditionalService/getAllPaged?${params.toString()}`);
+            if (response.success) {
+                setServices(response.data?.items ?? []);
+                setTotalPages(response.data?.totalPages ?? 1);
+                setTotalCount(response.data?.totalCount ?? 0);
+            }
+        } catch (error) {
+            console.error("Failed to fetch additional services:", error);
+            notifications.show({ message: t("additionalServices.loadFailed"), color: "red" });
+        } finally {
+            setLoading(false);
+        }
+    }, [page, debouncedSearch]);
+
+    useEffect(() => { fetchServices(); }, [fetchServices]);
+
+    // ─── Pagination derived ───────────────────────────────────────────────────
+
+    const startItem = (page - 1) * PAGE_SIZE + 1;
+    const endItem = Math.min(page * PAGE_SIZE, totalCount);
 
     // ─── Modal helpers ────────────────────────────────────────────────────────
 
@@ -172,7 +194,7 @@ export default function AdminAdditionalServicesPage() {
 
         const { name, icon, pricePerDay, isActive } = form.values;
 
-        setLoading(true);
+        setActionLoading(true);
         try {
             if (!editTarget) {
                 const response = await post("AdditionalService", {
@@ -181,9 +203,7 @@ export default function AdminAdditionalServicesPage() {
                     pricePerDay,
                     isActive,
                 });
-                if (response.success) {
-                    setServices((prev) => [response.data, ...prev]);
-                }
+                if (!response.success) throw new Error(response.message ?? undefined);
             } else {
                 const response = await put(`AdditionalService/${editTarget.id}`, {
                     id: editTarget.id,
@@ -192,30 +212,22 @@ export default function AdminAdditionalServicesPage() {
                     pricePerDay,
                     isActive,
                 });
-                if (response.success) {
-                    setServices((prev) =>
-                        prev.map((s) => (s.id === editTarget.id ? response.data : s))
-                    );
-                }
+                if (!response.success) throw new Error(response.message ?? undefined);
             }
 
             notifications.show({
                 title: t("success"),
-                message: editTarget
-                    ? t("additionalServices.updated")
-                    : t("additionalServices.created"),
+                message: editTarget ? t("additionalServices.updated") : t("additionalServices.created"),
                 color: "teal",
             });
 
             closeModal();
+            fetchServices();
         } catch (error) {
             console.error("Failed to save additional service:", error);
-            notifications.show({
-                message: t("additionalServices.saveFailed"),
-                color: "red",
-            });
+            notifications.show({ message: t("additionalServices.saveFailed"), color: "red" });
         } finally {
-            setLoading(false);
+            setActionLoading(false);
         }
     };
 
@@ -224,41 +236,35 @@ export default function AdminAdditionalServicesPage() {
     const handleDelete = async () => {
         if (!deleteTarget) return;
 
-        setLoading(true);
+        setActionLoading(true);
         try {
             const response = await del(`AdditionalService/${deleteTarget.id}`);
             if (response.success) {
-                setServices((prev) => prev.filter((s) => s.id !== deleteTarget.id));
                 notifications.show({
                     title: t("success"),
                     message: t("additionalServices.deleted"),
                     color: "green",
                 });
                 setDeleteTarget(null);
+                if (services.length === 1 && page > 1) {
+                    setPage((p) => p - 1);
+                } else {
+                    fetchServices();
+                }
             }
         } catch (error) {
             console.error("Failed to delete additional service:", error);
-            notifications.show({
-                title: t("error"),
-                message: t("additionalServices.deleteFailed"),
-                color: "red",
-            });
+            notifications.show({ title: t("error"), message: t("additionalServices.deleteFailed"), color: "red" });
         } finally {
-            setLoading(false);
+            setActionLoading(false);
         }
     };
-
-    // ─── Derived ──────────────────────────────────────────────────────────────
-
-    const filtered = services.filter((s) =>
-        s.name?.toLowerCase().includes(search.toLowerCase())
-    );
 
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
         <>
-            <Spinner visible={loading} />
+            <Spinner visible={actionLoading} />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -286,19 +292,13 @@ export default function AdminAdditionalServicesPage() {
                                 radius="md"
                                 size="sm"
                                 onClick={openCreate}
-                                styles={{
-                                    root: {
-                                        transition: "box-shadow 0.15s",
-                                        "&:hover": { boxShadow: "0 4px 14px rgba(15,110,86,0.25)" },
-                                    },
-                                }}
                             >
                                 {t("additionalServices.add")}
                             </Button>
                         </motion.div>
                     </Group>
 
-                    {/* ── Search + Count ─────────────────────────────────── */}
+                    {/* ── Search + Refresh + Count ───────────────────────── */}
                     <Group gap="sm">
                         <TextInput
                             placeholder={t("additionalServices.searchPlaceholder")}
@@ -327,6 +327,18 @@ export default function AdminAdditionalServicesPage() {
                                 </ActionIcon>
                             </motion.div>
                         )}
+                        <Tooltip label={t("refresh")} withArrow>
+                            <ActionIcon
+                                variant="light"
+                                color="teal"
+                                size="lg"
+                                radius="md"
+                                onClick={fetchServices}
+                                loading={loading}
+                            >
+                                <IconRefresh size={16} />
+                            </ActionIcon>
+                        </Tooltip>
                         <Badge
                             color="teal"
                             variant="light"
@@ -334,178 +346,174 @@ export default function AdminAdditionalServicesPage() {
                             radius="md"
                             style={{ fontVariantNumeric: "tabular-nums" }}
                         >
-                            {loading ? "…" : filtered.length}{" "}
+                            {loading ? "…" : totalCount}{" "}
                             {t("admin.aditionalServices")}
                         </Badge>
                     </Group>
 
                     {/* ── Table ──────────────────────────────────────────── */}
-                    <Paper
-                        radius="lg"
-                        withBorder
-                        style={{ overflow: "hidden", borderColor: "var(--mantine-color-default-border)" }}
-                    >
-                        <Table.ScrollContainer minWidth={600}>
-                            <Table
-                                highlightOnHover
-                                verticalSpacing="sm"
-                                horizontalSpacing="md"
-                                styles={{
-                                    thead: {
-                                        background: "var(--mantine-color-default-hover)",
-                                        borderBottom: "0.5px solid var(--mantine-color-default-border)",
-                                    },
-                                    th: {
-                                        fontWeight: 500,
-                                        fontSize: 12,
-                                        textTransform: "uppercase",
-                                        letterSpacing: "0.05em",
-                                        color: "var(--mantine-color-dimmed)",
-                                    },
-                                }}
+                    {loading ? (
+                        <Center py="xl">
+                            <Loader color="teal" size="md" />
+                        </Center>
+                    ) : (
+                        <Stack gap="md">
+                            <Paper
+                                radius="lg"
+                                withBorder
+                                style={{ overflow: "hidden", borderColor: "var(--mantine-color-default-border)" }}
                             >
-                                <Table.Thead>
-                                    <Table.Tr>
-                                        <Table.Th w={60}>#</Table.Th>
-                                        <Table.Th>{t("additionalServices.colName")}</Table.Th>
-                                        <Table.Th>{t("additionalServices.colPrice")}</Table.Th>
-                                        <Table.Th>{t("additionalServices.colStatus")}</Table.Th>
-                                        <Table.Th w={90}>{t("carData.colActions")}</Table.Th>
-                                    </Table.Tr>
-                                </Table.Thead>
-
-                                <Table.Tbody>
-                                    {/* Skeleton rows while loading */}
-                                    {loading &&
-                                        [1, 2, 3, 4].map((i) => (
-                                            <Table.Tr key={i}>
-                                                {[60, 30 + i * 10, 15, 15, 15].map((w, j) => (
-                                                    <Table.Td key={j}>
-                                                        <Box
-                                                            style={{
-                                                                height: 12,
-                                                                borderRadius: 6,
-                                                                background: "var(--mantine-color-default-border)",
-                                                                opacity: 0.5,
-                                                                width: `${w}%`,
-                                                                animation: "pulse 1.4s ease-in-out infinite",
-                                                            }}
-                                                        />
-                                                    </Table.Td>
-                                                ))}
+                                <Table.ScrollContainer minWidth={600}>
+                                    <Table
+                                        highlightOnHover
+                                        verticalSpacing="sm"
+                                        horizontalSpacing="md"
+                                        styles={{
+                                            thead: {
+                                                background: "var(--mantine-color-default-hover)",
+                                                borderBottom: "0.5px solid var(--mantine-color-default-border)",
+                                            },
+                                            th: {
+                                                fontWeight: 500,
+                                                fontSize: 12,
+                                                textTransform: "uppercase",
+                                                letterSpacing: "0.05em",
+                                                color: "var(--mantine-color-dimmed)",
+                                            },
+                                        }}
+                                    >
+                                        <Table.Thead>
+                                            <Table.Tr>
+                                                <Table.Th w={60}>#</Table.Th>
+                                                <Table.Th>{t("additionalServices.colName")}</Table.Th>
+                                                <Table.Th>{t("additionalServices.colPrice")}</Table.Th>
+                                                <Table.Th>{t("additionalServices.colStatus")}</Table.Th>
+                                                <Table.Th w={90}>{t("carData.colActions")}</Table.Th>
                                             </Table.Tr>
-                                        ))}
+                                        </Table.Thead>
 
-                                    {/* Empty state */}
-                                    {!loading && filtered.length === 0 && (
-                                        <Table.Tr>
-                                            <Table.Td colSpan={6}>
-                                                <Center py="xl">
-                                                    <Stack align="center" gap="xs">
-                                                        <ThemeIcon size={40} radius="xl" color="teal" variant="light">
-                                                            <IconSearch size={18} />
-                                                        </ThemeIcon>
-                                                        <Text size="sm" c="dimmed">
-                                                            {search
-                                                                ? t("carData.noResultsSearch")
-                                                                : t("carData.noResultsEmpty")}
+                                        <Table.Tbody>
+                                            {/* Empty state */}
+                                            {services.length === 0 && (
+                                                <Table.Tr>
+                                                    <Table.Td colSpan={5}>
+                                                        <Center py="xl">
+                                                            <Stack align="center" gap="xs">
+                                                                <ThemeIcon size={40} radius="xl" color="teal" variant="light">
+                                                                    <IconSearch size={18} />
+                                                                </ThemeIcon>
+                                                                <Text size="sm" c="dimmed">
+                                                                    {search
+                                                                        ? t("carData.noResultsSearch")
+                                                                        : t("carData.noResultsEmpty")}
+                                                                </Text>
+                                                            </Stack>
+                                                        </Center>
+                                                    </Table.Td>
+                                                </Table.Tr>
+                                            )}
+
+                                            {/* Data rows */}
+                                            {services.map((item, idx) => (
+                                                <motion.tr
+                                                    key={item.id}
+                                                    initial={{ opacity: 0, y: 6 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
+                                                >
+                                                    <Table.Td>
+                                                        <Text size="xs" c="dimmed" fw={500}>
+                                                            #{String((page - 1) * PAGE_SIZE + idx + 1).padStart(3, "0")}
                                                         </Text>
-                                                    </Stack>
-                                                </Center>
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    )}
+                                                    </Table.Td>
 
-                                    {/* Data rows */}
-                                    {!loading &&
-                                        filtered.map((item, idx) => (
-                                            <motion.tr
-                                                key={item.id}
-                                                initial={{ opacity: 0, y: 6 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
-                                            >
-                                                <Table.Td>
-                                                    <Text size="xs" c="dimmed" fw={500}>
-                                                        #{String(idx + 1).padStart(3, "0")}
-                                                    </Text>
-                                                </Table.Td>
-
-                                                <Table.Td>
-                                                    <Group gap={8}>
-                                                         {item.icon && (
-                                                            <Text size="lg" style={{ lineHeight: 1 }}>
-                                                                {item.icon}
+                                                    <Table.Td>
+                                                        <Group gap={8}>
+                                                            {item.icon && (
+                                                                <Text size="lg" style={{ lineHeight: 1 }}>
+                                                                    {item.icon}
+                                                                </Text>
+                                                            )}
+                                                            <Text size="sm" fw={500}>
+                                                                {item.name}
                                                             </Text>
+                                                        </Group>
+                                                    </Table.Td>
+
+                                                    <Table.Td>
+                                                        <Badge color="teal" variant="light" size="sm" radius="md">
+                                                            ${item.pricePerDay.toFixed(2)} {t("perDay")}
+                                                        </Badge>
+                                                    </Table.Td>
+
+                                                    <Table.Td>
+                                                        {item.isActive ? (
+                                                            <Badge color="green" variant="light" size="sm" radius="md" leftSection={<IconCheck size={11} />}>
+                                                                {t("additionalServices.active")}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge color="gray" variant="light" size="sm" radius="md" leftSection={<IconBan size={11} />}>
+                                                                {t("additionalServices.inactive")}
+                                                            </Badge>
                                                         )}
-                                                        <Text size="sm" fw={500}>
-                                                            {item.name}
-                                                        </Text>
-                                                    </Group>
-                                                </Table.Td>
+                                                    </Table.Td>
 
-                                                <Table.Td>
-                                                    <Badge color="teal" variant="light" size="sm" radius="md">
-                                                        ${item.pricePerDay.toFixed(2)} {t('perDay')}
-                                                    </Badge>
-                                                </Table.Td>
+                                                    <Table.Td>
+                                                        <Group gap={4}>
+                                                            <Tooltip label={t("edit")} withArrow fz="xs">
+                                                                <ActionIcon
+                                                                    variant="subtle"
+                                                                    color="yellow"
+                                                                    size="sm"
+                                                                    radius="md"
+                                                                    onClick={() => openEdit(item)}
+                                                                >
+                                                                    <IconEdit size={15} />
+                                                                </ActionIcon>
+                                                            </Tooltip>
+                                                            <Tooltip label={t("delete")} withArrow fz="xs">
+                                                                <ActionIcon
+                                                                    variant="subtle"
+                                                                    color="red"
+                                                                    size="sm"
+                                                                    radius="md"
+                                                                    onClick={() => setDeleteTarget(item)}
+                                                                >
+                                                                    <IconTrash size={15} />
+                                                                </ActionIcon>
+                                                            </Tooltip>
+                                                        </Group>
+                                                    </Table.Td>
+                                                </motion.tr>
+                                            ))}
+                                        </Table.Tbody>
+                                    </Table>
+                                </Table.ScrollContainer>
+                            </Paper>
 
-                                                <Table.Td>
-                                                    {item.isActive ? (
-                                                        <Badge
-                                                            color="green"
-                                                            variant="light"
-                                                            size="sm"
-                                                            radius="md"
-                                                            leftSection={<IconCheck size={11} />}
-                                                        >
-                                                            {t("additionalServices.active")}
-                                                        </Badge>
-                                                    ) : (
-                                                        <Badge
-                                                            color="gray"
-                                                            variant="light"
-                                                            size="sm"
-                                                            radius="md"
-                                                            leftSection={<IconBan size={11} />}
-                                                        >
-                                                            {t("additionalServices.inactive")}
-                                                        </Badge>
-                                                    )}
-                                                </Table.Td>
-
-                                                <Table.Td>
-                                                    <Group gap={4}>
-                                                        <Tooltip label={t("edit")} withArrow fz="xs">
-                                                            <ActionIcon
-                                                                variant="subtle"
-                                                                color="yellow"
-                                                                size="sm"
-                                                                radius="md"
-                                                                onClick={() => openEdit(item)}
-                                                            >
-                                                                <IconEdit size={15} />
-                                                            </ActionIcon>
-                                                        </Tooltip>
-                                                        <Tooltip label={t("delete")} withArrow fz="xs">
-                                                            <ActionIcon
-                                                                variant="subtle"
-                                                                color="red"
-                                                                size="sm"
-                                                                radius="md"
-                                                                onClick={() => setDeleteTarget(item)}
-                                                            >
-                                                                <IconTrash size={15} />
-                                                            </ActionIcon>
-                                                        </Tooltip>
-                                                    </Group>
-                                                </Table.Td>
-                                            </motion.tr>
-                                        ))}
-                                </Table.Tbody>
-                            </Table>
-                        </Table.ScrollContainer>
-                    </Paper>
+                            {/* ── Pagination ──────────────────────────────── */}
+                            {totalPages > 1 && (
+                                <Group justify="space-between" align="center" px={4}>
+                                    <Text size="xs" c="dimmed">
+                                        {t("additionalServices.showing")}{" "}
+                                        <Text component="span" size="xs" fw={500}>{startItem}–{endItem}</Text>
+                                        {" "}{t("additionalServices.of")}{" "}
+                                        <Text component="span" size="xs" fw={500}>{totalCount}</Text>
+                                        {" "}{t("admin.aditionalServices")}
+                                    </Text>
+                                    <Pagination
+                                        value={page}
+                                        onChange={setPage}
+                                        total={totalPages}
+                                        color="teal"
+                                        radius="md"
+                                        size="sm"
+                                        withEdges
+                                    />
+                                </Group>
+                            )}
+                        </Stack>
+                    )}
 
                     {/* ── Create / Edit Modal ────────────────────────────── */}
                     <Modal
@@ -541,7 +549,7 @@ export default function AdminAdditionalServicesPage() {
                                 styles={inputStyles}
                             />
 
-                             <Select
+                            <Select
                                 label={t("additionalServices.fieldIcon")}
                                 placeholder={t("additionalServices.fieldIconPlaceholder")}
                                 radius="md"
@@ -589,23 +597,11 @@ export default function AdminAdditionalServicesPage() {
                                 fullWidth
                                 radius="md"
                                 size="md"
-                                loading={loading}
+                                loading={actionLoading}
                                 leftSection={editTarget ? <IconDeviceFloppy size={16} /> : <IconPlus size={16} />}
                                 onClick={handleSave}
-                                styles={{
-                                    root: {
-                                        transition: "transform 0.12s, box-shadow 0.15s",
-                                        "&:hover": {
-                                            transform: "translateY(-1px)",
-                                            boxShadow: "0 4px 14px rgba(15,110,86,0.25)",
-                                        },
-                                        "&:active": { transform: "scale(0.99)" },
-                                    },
-                                }}
                             >
-                                {editTarget
-                                    ? t("carData.saveChanges")
-                                    : t("carData.createEntry")}
+                                {editTarget ? t("carData.saveChanges") : t("carData.createEntry")}
                             </Button>
                         </Stack>
                     </Modal>
@@ -658,7 +654,7 @@ export default function AdminAdditionalServicesPage() {
                                     flex={1}
                                     radius="md"
                                     onClick={() => setDeleteTarget(null)}
-                                    disabled={loading}
+                                    disabled={actionLoading}
                                 >
                                     {t("cancel")}
                                 </Button>
@@ -666,7 +662,7 @@ export default function AdminAdditionalServicesPage() {
                                     color="red"
                                     flex={1}
                                     radius="md"
-                                    loading={loading}
+                                    loading={actionLoading}
                                     leftSection={<IconTrash size={15} />}
                                     onClick={handleDelete}
                                 >

@@ -27,6 +27,7 @@ import { motion } from 'framer-motion';
 import { Logo } from './Logo';
 import { AnimatedSection, StaggerContainer, StaggerItem } from './AnimatedSection';
 import { AnimatedDivider } from './AnimatedDivider';
+import { get, post } from '../../utils/api.utils';
 
 const socialIcons = [
   { Icon: IconBrandFacebook, color: 'blue', label: 'Facebook' },
@@ -39,14 +40,34 @@ export function Footer() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
 
-  const handleSubscribe = () => {
-    if (email) {
+  const handleSubscribe = async () => {
+    if (!email) return;
+
+    try {
+      const response = await post('Subscribe/subscribe', {
+        email: email
+      });
+
+      if (!response.success) {
+        notifications.show({
+          title: t('error'),
+          message: t('footer.subscribeError'),
+          color: 'red',
+        });
+      }
+
       notifications.show({
-        title: '✅',
+        title: t('success'),
         message: t('footer.subscribeSuccess'),
         color: 'teal',
       });
       setEmail('');
+    } catch (error) {
+      notifications.show({
+        title: t('error'),
+        message: t('footer.subscribeError'),
+        color: 'red',
+      });
     }
   };
 

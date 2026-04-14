@@ -52,7 +52,38 @@
     "step3Desc": "Presentati al punto di ritiro e inizia il viaggio"
   },
   "partners": {
-    "title": "I Nostri Partner"
+    "title": "I Nostri Partner",
+    "pageTitle": "Partner",
+    "pageSubtitle": "Gestisci le organizzazioni partner e il loro branding",
+    "addPartner": "Aggiungi Partner",
+    "searchPlaceholder": "Cerca partner…",
+    "editTitle": "Modifica Partner",
+    "addTitle": "Aggiungi Partner",
+    "saveChanges": "Salva Modifiche",
+    "createPartner": "Crea Partner",
+    "deleteTitle": "Elimina Partner",
+    "deleteWarning": "Sei sicuro di voler eliminare <strong>{{name}}</strong>?",
+    "deleteUndone": "Questa azione non può essere annullata.",
+    "noPartnersFound": "Nessun partner trovato",
+    "noPartnersSearchHint": "Prova con un termine di ricerca diverso",
+    "noPartnersEmptyHint": "Aggiungi il tuo primo partner per iniziare",
+    "showing": "Visualizzando",
+    "of": "di",
+    "partners": "partner",
+    "preview": "Anteprima",
+    "partnerName": "Nome partner",
+    "fieldName": "Nome",
+    "fieldNamePlaceholder": "es. Acme Corporation",
+    "fieldInitials": "Iniziali",
+    "fieldInitialsPlaceholder": "es. AC",
+    "fieldInitialsDescription": "2–4 caratteri mostrati nell'avatar",
+    "fieldColor": "Colore del Brand",
+    "fieldColorPlaceholder": "#2dd4a8",
+    "fieldActive": "Attivo",
+    "fieldActiveDesc": "I partner inattivi sono nascosti nelle aree pubbliche",
+    "tooltipEdit": "Modifica partner",
+    "tooltipDelete": "Elimina partner",
+    "tooltipRefresh": "Aggiorna"
   },
   "testimonials": {
     "title": "Cosa Dicono i Nostri Clienti",
@@ -162,6 +193,10 @@
     "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione? Questa azione non può essere annullata."
   },
   "rental": {
+    "phoneNumber": "Numri i telefonit",
+    "startDate": "Ritiro",
+    "endDate": "Restituzione",
+    "inclServices": "Tutti i servizi inclusi",
     "title": "Prenota Auto",
     "step1": "Date",
     "step2": "Opzioni e Riepilogo",
@@ -192,6 +227,7 @@
     "backHome": "Torna alla Home"
   },
   "account": {
+    "phoneNumber": "Telefono",
     "profile": "Il Mio Profilo",
     "savedCars": "Auto a noleggio salvate",
     "myBookings": "Le mie prenotazioni",
@@ -245,9 +281,34 @@
     "dark": "Scuro",
     "light": "Chiaro",
     "save": "Salva",
-    "settingsSaved": "Impostazioni salvate con successo!"
+    "settingsSaved": "Impostazioni salvate con successo!",
+    "cancel": "Annulla",
+    "cancelBookingTitle": "Annulla Prenotazione",
+    "cancelBookingConfirmText": "Sei sicuro di voler annullare questa prenotazione? Questa azione non può essere annullata.",
+    "cancelReason": "Motivo (opzionale)",
+    "cancelReasonPlaceholder": "Dicci perché stai annullando...",
+    "confirmCancel": "Annulla prenotazione",
+    "pending": "In attesa",
+    "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "acceptBookingSlotNotice": "Accettando la prenotazione, il posto verrà bloccato e non sarà più disponibile per altri ospiti.",
+    "closeBookingArchiveNotice": "Una volta completata, questa prenotazione verrà archiviata e non sarà più possibile apportare modifiche.",
+    "closeBooking": "Chiudi prenotazione",
+    "closeBookingTitle": "Chiudi Prenotazione",
+    "closeBookingConfirmMessage": "Sei sicuro di voler chiudere la prenotazione {{ref}}?",
+    "confirmClose": "Conferma chiusura",
+    "bookingClosed": "Prenotazione chiusa con successo",
+    "subscriptions": "Iscrizioni",
+    "privacies": "Informativa sulla Privacy",
+    "terms": "Termini & Condizioni",
+    "partners": "Partner",
+    "stats": "Statistiche",
+    "changeLogo": "Cambia Logo",
+    "uploadLogo": "Carica Logo",
+    "removeLogo": "Rimuovi Logo",
+    "viewCustomer": "Visualizza Cliente",
+    "bookingDetails": "Dettagli Prenotazione",
     "promotions": "Promozioni",
     "aditionalServices": "Servizi Aggiuntivi",
     "managefeaturedCars": "Gestisci Auto in Evidenza",
@@ -403,7 +464,96 @@
     "preview": "Anteprima",
     "edit": "Modifica",
     "delete": "Elimina",
-    "noCarsFound": "Nessuna auto trovata"
+    "noCarsFound": "Nessuna auto trovata",
+    "acceptBooking": "Accetta Prenotazione",
+    "refuseBooking": "Rifiuta Prenotazione",
+    "acceptBookingTitle": "Accetta Prenotazione",
+    "acceptBookingConfirmMessage": "Sei sicuro di voler accettare la prenotazione {{ref}}?",
+    "confirmAccept": "Conferma Accettazione",
+    "refuseBookingTitle": "Rifiuta Prenotazione",
+    "refuseReason": "Motivo (opzionale)",
+    "refuseReasonPlaceholder": "Inserisci un motivo per il rifiuto...",
+    "confirmRefuse": "Conferma Rifiuto",
+    "bookingAccepted": "Prenotazione accettata con successo",
+    "bookingRefused": "Prenotazione rifiutata con successo",
+    "bookingsLoadFailed": "Caricamento delle prenotazioni fallito",
+    "statusUpdateFailed": "Aggiornamento dello stato fallito",
+    "refusedBy": "Rifiutato da",
+    "noCustomersFound": "Nessun cliente trovato",
+    "failedToLoadUsers": "Caricamento utenti fallito",
+    "failedToLoadBookings": "Caricamento prenotazioni fallito",
+    "settingsSubtitle": "Configura il profilo e le preferenze della piattaforma",
+    "stepsCompleted": "{{done}}/{{total}} completati",
+    "platformSettings": "Impostazioni Piattaforma",
+    "siteName": "Nome del Sito",
+    "siteNamePlaceholder": "Inserisci il nome del sito",
+    "tagline": "Slogan",
+    "taglinePlaceholder": "Noleggio auto premium in Albania",
+    "logoUrl": "URL Logo",
+    "logoUrlPlaceholder": "https://...",
+    "emailPlaceholder": "info@autozaimi.al",
+    "phonePlaceholder": "6X XXX XXXX",
+    "addressPlaceholder": "Tirana, Albania",
+    "aboutText": "Testo About",
+    "aboutTextPlaceholder": "Piattaforma premium per il noleggio e l'acquisto di auto in Albania.",
+    "mission": "Missione",
+    "missionTitle": "Titolo della Missione",
+    "missionTitlePlaceholder": "La Nostra Missione",
+    "missionDescription": "Descrizione della Missione",
+    "missionDescriptionPlaceholder": "Descrivi la missione e i valori della tua azienda...",
+    "whyChooseUs": "Perché Sceglierci",
+    "addItem": "Aggiungi Elemento",
+    "item": "Elemento",
+    "icon": "Icona",
+    "title": "Titolo",
+    "whyChooseTitlePlaceholder": "es. Flotta Premium",
+    "whyChooseDescriptionPlaceholder": "Descrivi questo vantaggio...",
+    "workingHours": "Orari di Lavoro",
+    "weekend": "Weekend",
+    "closed": "Chiuso",
+    "days": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    },
+    "socialLinks": "Link Social",
+    "facebookUrl": "URL Facebook",
+    "facebookUrlPlaceholder": "https://facebook.com/...",
+    "instagramUrl": "URL Instagram",
+    "instagramUrlPlaceholder": "https://instagram.com/...",
+    "twitterUrl": "URL Twitter / X",
+    "twitterUrlPlaceholder": "https://twitter.com/...",
+    "youtubeUrl": "URL YouTube",
+    "youtubeUrlPlaceholder": "https://youtube.com/...",
+    "whatsAppNumber": "Numero WhatsApp",
+    "lastStepHint": "Sei all'ultimo passaggio. Controlla le informazioni e salva tutto.",
+    "steps": {
+      "platform": "Piattaforma",
+      "platformDesc": "Info base e contatti",
+      "mission": "Missione",
+      "missionDesc": "La missione aziendale",
+      "whyUs": "Perché Noi",
+      "whyUsDesc": "Punti di forza",
+      "hours": "Orari",
+      "hoursDesc": "Orario di lavoro",
+      "social": "Social",
+      "socialDesc": "Presenza online"
+    },
+    "validation": {
+      "nameRequired": "Il nome del sito è obbligatorio",
+      "emailRequired": "L'email è obbligatoria",
+      "emailInvalid": "Indirizzo email non valido",
+      "phoneRequired": "Il numero di telefono è obbligatorio",
+      "addressRequired": "L'indirizzo è obbligatorio"
+    },
+    "notifications": {
+      "saveFailed": "Salvataggio delle impostazioni fallito.",
+      "networkError": "Errore di rete. Riprova."
+    }
   },
   "login": {
     "title": "Bentornato",
@@ -466,10 +616,13 @@
     "next": "Continua",
     "yes": "Sì",
     "no": "No",
-    "perDay": "/giorno"
+    "perDay": "/giorno",
+    "saveAll": "Salva Tutto",
+    "somethingWentWrong": "Qualcosa è andato storto. Per favore riprova.",
+    "backToHome": "Torna alla Home"
   },
   "about": {
-    "title": "Chi è AutoZaimi",
+    "title": "Chi è ",
     "subtitle": "La tua piattaforma di noleggio auto di fiducia in Albania",
     "description": "AutoZaimi è stata fondata con una missione semplice: offrire a ogni viaggiatore in Albania l'opportunità di viaggiare con stile, sicurezza e a prezzi ragionevoli. Con un'ampia flotta di auto di lusso, SUV, elettriche ed economiche, copriamo ogni esigenza — dalle vacanze in famiglia ai viaggi d'affari.",
     "mission": "La Nostra Missione",
@@ -688,8 +841,7 @@
     "maxLength": "Non può superare {{max}} caratteri",
     "mustBeGreaterThan0": "Deve essere maggiore di 0",
     "mustBeLessThan100": "Deve essere minore di 100",
-    "carOrCategoryRequired": "È necessario selezionare un'auto o una categoria",
-    "mustBePositive": "Deve essere maggiore di 0"
+    "carOrCategoryRequired": "È necessario selezionare un'auto o una categoria"
   },
   "dropImagesHere": "Rilascia le immagini qui",
   "uploadCarImages": "Carica immagini dell'auto",
@@ -712,6 +864,8 @@
   "required": "Questo campo è obbligatorio",
   "edit": "Modifica",
   "promotions": {
+    "showing": "Visualizzazione",
+    "of": "di",
     "active": "Attivo",
     "inactive": "Inattivo",
     "fieldActive": "Attivo",
@@ -754,9 +908,10 @@
     "categoryDisabledHint": "Rimuovi l'auto per selezionare una categoria",
     "deleteTitle": "Elimina"
   },
-  "save": "Salva",
   "perDay": "/ giorno",
   "additionalServices": {
+    "showing": "Visualizzazione",
+    "of": "di",
     "aditionalServices": "Gestisci Servizi Aggiuntivi",
     "subtitle": "Gestisci i servizi opzionali offerti al giorno",
     "add": "Aggiungi Servizio",
@@ -791,5 +946,196 @@
   "failedToUpdateFaturedStatus": "Impossibile aggiornare lo stato in evidenza",
   "failedToUpdateSavedCar": "Impossibile aggiornare l'auto salvata",
   "carWasAddedToSaveSollection": "Auto aggiunta alla tua collezione salvata",
-  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata"
+  "carWasRemovedFromSavecollection": "Auto rimossa dalla tua collezione salvata",
+  "terms": {
+    "deleteModal": {
+      "title": "Elimina termine",
+      "confirm": "Sei sicuro di voler eliminare \"{{name}}\"?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    },
+    "title": "Termini e Condizioni",
+    "subtitle": "Gestisci le voci dei termini e condizioni",
+    "addTerm": "Aggiungi Termine",
+    "searchPlaceholder": "Cerca termini…",
+    "refresh": "Aggiorna",
+    "table": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "color": "Colore",
+      "icon": "Icona",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "title": "Nessun termine trovato",
+      "hint": "Aggiungi il tuo primo termine per iniziare",
+      "searchHint": "Prova con un termine di ricerca diverso"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo"
+    },
+    "actions": {
+      "edit": "Modifica termine",
+      "delete": "Elimina termine"
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "terms": "termini"
+    },
+    "modal": {
+      "editTitle": "Modifica Termine",
+      "addTitle": "Aggiungi Termine"
+    },
+    "form": {
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "es. Informativa sulla Privacy",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Inserisci la descrizione completa o il contenuto di questo termine…",
+      "iconLabel": "Icona",
+      "iconPlaceholder": "Seleziona un'icona (opzionale)",
+      "colorLabel": "Colore",
+      "activeLabel": "Attivo",
+      "activeDescription": "I termini inattivi sono nascosti dalle aree pubbliche",
+      "saveChanges": "Salva Modifiche",
+      "createTerm": "Crea Termine"
+    },
+    "validation": {
+      "titleRequired": "Il titolo è obbligatorio",
+      "descriptionRequired": "La descrizione è obbligatoria",
+      "colorRequired": "Il colore è obbligatorio"
+    },
+    "errors": {
+      "loadFailed": "Caricamento dei termini non riuscito",
+      "updateFailed": "Aggiornamento del termine non riuscito",
+      "createFailed": "Creazione del termine non riuscita",
+      "deleteFailed": "Eliminazione del termine non riuscita",
+      "unknown": "Errore sconosciuto"
+    }
+  },
+  "delte": "Elimina",
+  "deleteUndone": "Questa azione non può essere annullata.",
+  "privacyPolicy": {
+    "title": "Informativa sulla Privacy",
+    "subtitle": "Gestisci le voci dell'informativa sulla privacy",
+    "addPolicy": "Aggiungi Politica",
+    "searchPlaceholder": "Cerca politiche…",
+    "refresh": "Aggiorna",
+    "table": {
+      "title": "Titolo",
+      "description": "Descrizione",
+      "color": "Colore",
+      "icon": "Icona",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "title": "Nessuna politica trovata",
+      "hint": "Aggiungi la tua prima politica per iniziare",
+      "searchHint": "Prova con un termine di ricerca diverso"
+    },
+    "status": {
+      "active": "Attiva",
+      "inactive": "Inattiva"
+    },
+    "actions": {
+      "edit": "Modifica politica",
+      "delete": "Elimina politica"
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "policies": "politiche"
+    },
+    "modal": {
+      "editTitle": "Modifica Politica",
+      "addTitle": "Aggiungi Politica"
+    },
+    "form": {
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "es. Raccolta Dati",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Inserisci la descrizione completa o il contenuto di questa politica…",
+      "iconLabel": "Icona",
+      "iconPlaceholder": "Seleziona un'icona (opzionale)",
+      "colorLabel": "Colore",
+      "activeLabel": "Attiva",
+      "activeDescription": "Le politiche inattive sono nascoste dalle aree pubbliche",
+      "saveChanges": "Salva Modifiche",
+      "createPolicy": "Crea Politica"
+    },
+    "deleteModal": {
+      "title": "Elimina Politica",
+      "confirm": "Sei sicuro di voler eliminare {{name}}?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    },
+    "validation": {
+      "titleRequired": "Il titolo è obbligatorio",
+      "descriptionRequired": "La descrizione è obbligatoria",
+      "colorRequired": "Il colore è obbligatorio"
+    }
+  },
+  "failedToUpdatePrivacyPolicies": "Aggiornamento della politica sulla privacy fallito. Per favore riprova.",
+  "failedToCreatePrivacyPolicies": "Creazione della politica sulla privacy fallita. Per favore riprova.",
+  "failedToDeletePrivacyPolicies": "Eliminazione della politica sulla privacy fallita. Per favore riprova.",
+  "subscriptions": {
+    "title": "Iscrizioni",
+    "subtitle": "Gestisci tutti gli iscritti alla newsletter e via email",
+    "totalLabel": "totale",
+    "searchPlaceholder": "Cerca per email...",
+    "refresh": "Aggiorna",
+    "failedToLoad": "Caricamento delle iscrizioni non riuscito",
+    "failedToDelete": "Eliminazione dell'iscrizione non riuscita",
+    "table": {
+      "email": "Email",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "status": {
+      "subscribed": "Iscritto",
+      "unsubscribed": "Disiscritto"
+    },
+    "actions": {
+      "delete": "Elimina"
+    },
+    "empty": {
+      "hint": "Nessuna iscrizione trovata",
+      "searchHint": "Nessun risultato corrisponde alla tua ricerca"
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "subscribers": "iscritti"
+    },
+    "deleteModal": {
+      "title": "Elimina Iscrizione",
+      "confirm": "Sei sicuro di voler eliminare {{email}}?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    }
+  },
+  "unsubscribe": {
+    "title": "Annulla iscrizione alle promozioni",
+    "description": "Clicca il pulsante qui sotto per smettere di ricevere email promozionali da Car Rental Zaimi.",
+    "confirmButton": "Conferma Annullamento",
+    "successTitle": "Iscrizione annullata",
+    "successMessage": "Non riceverai più email promozionali da Car Rental Zaimi.",
+    "errorTitle": "Link non valido o scaduto",
+    "errorMessage": "Questo link per annullare l'iscrizione non è più valido. Contattaci se hai bisogno di assistenza."
+  },
+  "no_content": "Nessun contenuto disponibile al momento.",
+  "footer_note": "Si prega di leggere attentamente prima di accettare.",
+  "confirm_button": "Ho capito",
+  "loadingContent": "Caricamento in corso…",
+  "noContentsAvailableAtThisTime": "Nessun contenuto disponibile al momento.",
+  "pleaseReadCarefullyBeforeAccepting": "Si prega di leggere attentamente prima di accettare.",
+  "iUnderstand": "Ho capito",
+  "termsAndConditions": "Termini e Condizioni",
+  "lastUpdated": "Ultimo aggiornamento"
 }

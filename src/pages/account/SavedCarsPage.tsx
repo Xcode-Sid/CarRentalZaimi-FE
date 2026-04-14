@@ -70,7 +70,6 @@ export default function SavedCarsPage() {
       if (!res.success) throw new Error(res.message || t('failedToLoadCars'));
 
       const mapped = res.data.items.map((item: any) => mapApiCarToVehicle(item.car));
-
       setVehicles(mapped);
       setTotalPages(res.data.totalPages);
       setTotalCount(res.data.totalCount);

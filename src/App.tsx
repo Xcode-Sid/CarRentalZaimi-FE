@@ -17,7 +17,7 @@ import BookingsPage from './pages/account/BookingsPage';
 import SettingsPage from './pages/account/SettingsPage';
 import AdminDashboardPage from './pages/admin/DashboardPage';
 import AdminCarsPage from './pages/admin/cars/CarsPage';
-import AdminBookingsPage from './pages/admin/BookingsPage';
+import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 import AdminCustomersPage from './pages/admin/CustomersPage';
 import AdminSettingsPage from './pages/admin/SettingsPage';
 import AdminAnalyticsPage from './pages/admin/AnalyticsPage';
@@ -25,14 +25,18 @@ import AdminReportsPage from './pages/admin/ReportsPage';
 import AdminAdsPage from './pages/admin/AdsPage';
 import { LanguageSwitcher } from './components/common/LanguageSwitcher';
 import { ThemeToggle } from './components/common/ThemeToggle';
-import { Box } from '@mantine/core';
-import { AdPageShell, AdsVerticalLayout } from './layouts/AdPageShell';
+import { AdsVerticalLayout } from './layouts/AdPageShell';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyPhonePage from './pages/register/VerifyPhonePage ';
 import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage ';
 import PromotionsPage from './pages/account/PromotionsPage';
 import AdminAdditionalServicesPage from './pages/account/AdditionalServicesPage ';
 import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
+import PartnersPage from './pages/admin/PartnersPage';
+import TermsPage from './pages/admin/TermsPage';
+import PrivacyPolicyPage from './pages/admin/PrivacyPage';
+import SubscriptionsPage from './pages/admin/SubscriptionsPage';
+import { UnsubscribePage } from './pages/account/UnsubscribePage';
 
 export default function App() {
   return (
@@ -59,6 +63,7 @@ export default function App() {
           <Route path="/fleet/:id" element={<VehicleDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/unsubscribe" element={<UnsubscribePage />} />
         </Route>
 
         <Route path="/login" element={<LoginPage />} />
@@ -86,10 +91,14 @@ export default function App() {
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
             <Route path="/admin/ads" element={<AdminAdsPage />} />
             <Route path="/admin/reports" element={<AdminReportsPage />} />
-            <Route path="/admin/car-data" element={<AdminCarDataPage />}  />
-            <Route path="/admin/promotion" element={<PromotionsPage />}  />
-            <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />}  />
-            <Route path="/admin/featured_cars" element={<RecomandedCarsPage />}  />
+            <Route path="/admin/car-data" element={<AdminCarDataPage />} />
+            <Route path="/admin/promotion" element={<PromotionsPage />} />
+            <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />} />
+            <Route path="/admin/featured_cars" element={<RecomandedCarsPage />} />
+            <Route path="/admin/partners" element={<PartnersPage />} />
+            <Route path="/admin/terms" element={<TermsPage />} />
+            <Route path="/admin/privacies" element={<PrivacyPolicyPage />} />
+            <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
           </Route>
         </Route>
 

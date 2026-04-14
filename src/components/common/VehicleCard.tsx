@@ -50,6 +50,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
     ?? vehicle.carImages?.[0]
     ?? null;
 
+    console.log('primaryImage',primaryImage)
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const optimistic = !isSaved;
@@ -106,7 +107,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
           <Box style={{ position: 'relative' }}>
             <Box className="card-image-zoom">
               <Image
-                src={primaryImage}
+                src={primaryImage.data}
                 alt={displayName}
                 radius="lg"
                 h={220}

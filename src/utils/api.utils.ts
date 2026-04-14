@@ -173,7 +173,7 @@ export const post = async (
     const isAuthEndpoint =
       endpoint.includes("Authentication/login") ||
       endpoint.includes("Authentication/refresh") ||
-      endpoint.includes("Authentication/logout"); // ← add this
+      endpoint.includes("Authentication/logout"); 
 
     if (!isAuthEndpoint) {
       const ok = await ensureFreshToken();

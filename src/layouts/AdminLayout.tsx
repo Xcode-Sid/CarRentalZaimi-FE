@@ -23,7 +23,11 @@ import {
   IconTagsOff,
   IconRosetteDiscount,
   IconLayoutGrid,
-  IconStar
+  IconStar,
+  IconBriefcase,
+  IconFileCheck,
+  IconShieldCheck,
+  IconMailbox
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -36,11 +40,15 @@ const navItems = [
   { path: '/admin/car-data', icon: IconClipboardList, labelKey: 'admin.carDatas', badge: null },
   { path: '/admin/cars', icon: IconCar, labelKey: 'admin.cars', badge: null },
   { path: '/admin/featured_cars', icon: IconStar, labelKey: 'admin.featuredCars', badge: null },
-  { path: '/admin/bookings', icon: IconCalendar, labelKey: 'admin.bookings', badge: '3' },
+  { path: '/admin/bookings', icon: IconCalendar, labelKey: 'admin.bookings', badge: null },
   { path: '/admin/promotion', icon: IconRosetteDiscount, labelKey: 'admin.promotions', badge: null },
   { path: '/admin/additional-services', icon: IconLayoutGrid, labelKey: 'admin.aditionalServices', badge: null },
   { path: '/admin/customers', icon: IconUsers, labelKey: 'admin.customers', badge: null },
+  { path: '/admin/partners', icon: IconBriefcase , labelKey: 'admin.partners', badge: null },
+  { path: '/admin/terms', icon: IconFileCheck  , labelKey: 'admin.terms', badge: null },
+  { path: '/admin/privacies', icon: IconShieldCheck   , labelKey: 'admin.privacies', badge: null },
   { path: '/admin/settings', icon: IconSettings, labelKey: 'admin.settings', badge: null },
+  { path: '/admin/subscriptions', icon: IconMailbox   , labelKey: 'admin.subscriptions', badge: null },
   { path: '/admin/analytics', icon: IconChartBar, labelKey: 'admin.analytics', badge: null },
   { path: '/admin/ads', icon: IconAd, labelKey: 'admin.ads', badge: null },
   { path: '/admin/reports', icon: IconFileText, labelKey: 'admin.reports', badge: null },

@@ -290,6 +290,7 @@ export function Navbar() {
               </Menu.Dropdown>
             </Menu>
           ) : (
+            <>
             <Button
               variant="filled"
               color="teal"
@@ -303,6 +304,19 @@ export function Navbar() {
             >
               {t('nav.register')}
             </Button>
+            <Button
+              variant="filled"
+              color="teal"
+              size="sm"
+              radius="xl"
+              ml="xs"
+              className="nav-cta-glow"
+              onClick={() => navigate('/login')}
+              style={{ fontWeight: 700, letterSpacing: '0.02em' }}
+              tt="uppercase"
+            >
+              {t('nav.login')}
+            </Button></>
           )}
         </Group>
 
