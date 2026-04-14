@@ -38,6 +38,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { useForm } from "@mantine/form";
+import { PAGE_SIZE } from "../../constants/pagination";
 import { del, get, post, put } from "../../utils/api.utils";
 import Spinner from "../../components/spinner/Spinner";
 
@@ -85,7 +86,6 @@ const SERVICE_ICONS: { value: string; label: string }[] = [
     { value: "🎵", label: "Sound System" },
 ];
 
-const PAGE_SIZE = 10;
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 

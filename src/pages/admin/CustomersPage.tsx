@@ -10,8 +10,6 @@ import {
   Stack,
   Modal,
   Button,
-  SimpleGrid,
-  Image,
   Paper,
   Tooltip,
   TextInput,
@@ -23,18 +21,17 @@ import {
   Box,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconEye, IconPencil, IconCalendar, IconSearch, IconUsers, IconCheck, IconBan } from '@tabler/icons-react';
+import { IconEye, IconCalendar, IconSearch, IconUsers, IconCheck, IconBan } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ads } from '../../data/ads';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
 import { BookingDetailContent, bookingStatusKeys } from '../../components/booking/BookingDetailContent';
 import { type User } from '../../data/users';
 import { mapApiBooking, type Booking } from '../../data/bookings';
+import { PAGE_SIZE } from '../../constants/pagination';
 import { get } from '../../utils/api.utils';
 import { toImagePath } from '../../utils/general';
 
-const PAGE_SIZE = 10;
 
 const statusColors: Record<string, string> = {
   accepted: 'green',
@@ -689,9 +686,12 @@ export default function CustomersPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <BookingDetailContent
-                booking={detailBooking}
-              />
+              <BookingDetailContent booking={detailBooking} />
+              <Stack gap="md" px="xl" py="md" style={{ borderTop: '0.5px solid var(--mantine-color-default-border)' }}>
+                <Button variant="light" color="gray" onClick={() => setDetailBooking(null)} radius="xl" fullWidth>
+                  {t('account.closeModal')}
+                </Button>
+              </Stack>
             </motion.div>
           )}
         </AnimatePresence>

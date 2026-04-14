@@ -29,6 +29,7 @@ import { notifications } from '@mantine/notifications';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
 import { BookingDetailContent, bookingStatusKeys } from '../../components/booking/BookingDetailContent';
 import { useDebouncedValue } from '@mantine/hooks';
+import { PAGE_SIZE } from '../../constants/pagination';
 import { get, put } from '../../utils/api.utils';
 import { toImagePath } from '../../utils/general';
 import { mapApiBooking, type Booking, type BookingStatus } from '../../data/bookings';
@@ -53,7 +54,6 @@ export default function AdminBookingsPage() {
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [pageNr, setPageNr] = useState(1);
-  const pageSize = 10;
 
   const [selected, setSelected] = useState<Booking | null>(null);
   const [search, setSearch] = useState('');
@@ -77,7 +77,7 @@ export default function AdminBookingsPage() {
     try {
       const params = new URLSearchParams();
       params.set('pageNr', String(pageNr));
-      params.set('pageSize', String(pageSize));
+      params.set('pageSize', String(PAGE_SIZE));
       if (debouncedSearch) params.set('search', debouncedSearch);
       if (statusFilter) params.set('status', statusFilter);
       if (paymentFilter) params.set('paymentType', paymentFilter);
@@ -189,7 +189,7 @@ export default function AdminBookingsPage() {
     setPaymentFilter(null);
   };
 
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
     <Stack gap="xl" className="animate-fade-in">

@@ -32,6 +32,7 @@ export interface User {
   dateOfBirth: Date | null;
   role: UserRole | null;          // ← was: 'admin' | 'user'
   image: UserImage | null;
+  avatar: string | null;    
   location: string | null;
   savedVehicles: number[];
   customerStatus?: 'active' | 'inactive';

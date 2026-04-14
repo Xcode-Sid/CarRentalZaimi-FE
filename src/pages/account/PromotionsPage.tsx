@@ -43,6 +43,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { useForm } from "@mantine/form";
+import { PAGE_SIZE } from "../../constants/pagination";
 import { del, get, post, put } from "../../utils/api.utils";
 import Spinner from "../../components/spinner/Spinner";
 
@@ -88,7 +89,6 @@ const inputStyles = {
     },
 };
 
-const PAGE_SIZE = 10;
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 

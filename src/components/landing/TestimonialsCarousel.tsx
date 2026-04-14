@@ -5,6 +5,7 @@ import { IconQuote } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../common/AnimatedSection';
+import { PAGE_SIZE } from '../../constants/pagination';
 import { get } from '../../utils/api.utils';
 
 type CarReview = {
@@ -33,7 +34,7 @@ export function TestimonialsCarousel() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await get(`CarReview/getAllPaged?pageNr=1&pageSize=10`);
+        const res = await get(`CarReview/getAllPaged?pageNr=1&pageSize=${PAGE_SIZE}`);
         const items: CarReview[] = res.data.items ?? res.data;
         setReviews(items);
       } catch {

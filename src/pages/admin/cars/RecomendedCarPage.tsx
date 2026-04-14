@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { type Vehicle, mapApiCarToVehicle } from '../../../data/vehicles';
+import { PAGE_SIZE } from '../../../constants/pagination';
 import { get, post } from '../../../utils/api.utils';
 import { AnimatedSection } from '../../../components/common/AnimatedSection';
 import Spinner from '../../../components/spinner/Spinner';
@@ -28,7 +29,6 @@ function getPrimaryImageSrc(car: Vehicle): string {
     return primary.data;
 }
 
-const PAGE_SIZE = 10;
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 

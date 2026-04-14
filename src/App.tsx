@@ -25,8 +25,7 @@ import AdminReportsPage from './pages/admin/ReportsPage';
 import AdminAdsPage from './pages/admin/AdsPage';
 import { LanguageSwitcher } from './components/common/LanguageSwitcher';
 import { ThemeToggle } from './components/common/ThemeToggle';
-import { Box } from '@mantine/core';
-import { AdPageShell, AdsVerticalLayout } from './layouts/AdPageShell';
+import { AdsVerticalLayout } from './layouts/AdPageShell';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import VerifyPhonePage from './pages/register/VerifyPhonePage ';
 import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage ';
@@ -36,7 +35,6 @@ import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
 import PartnersPage from './pages/admin/PartnersPage';
 import TermsPage from './pages/admin/TermsPage';
 import PrivacyPolicyPage from './pages/admin/PrivacyPage';
-import { SubscriptionManager } from 'framer-motion';
 import SubscriptionsPage from './pages/admin/SubscriptionsPage';
 import { UnsubscribePage } from './pages/account/UnsubscribePage';
 

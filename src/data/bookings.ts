@@ -13,7 +13,7 @@ export interface Booking {
   id: string;
   ref: string;
   userId: string;
-  vehicleId: number;
+  vehicleId: string; // Changed from number to string to match Vehicle.id
   vehicleName: string;
   vehicleIamge: string;
   paymentMethod: 'cash' | 'card';

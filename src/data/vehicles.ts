@@ -27,6 +27,7 @@ export interface VehicleImage {
 }
 export interface Vehicle {
   carId: string;
+  id: string; 
   title: string;
   description: string;
   year: number;
@@ -37,6 +38,7 @@ export interface Vehicle {
   mileage: string | null;
   horsePower: number | null;
   isRecommended: boolean;
+  status: 'available' | 'maintenance' | 'unavailable' | null;
   categoryId: string | null;
   categoryName: string | null;
   nameId: string | null;
@@ -74,6 +76,7 @@ export interface Vehicle {
   totalReviews: number | null;
   isSaved: boolean;
   carImages: VehicleImage[];
+  image: string | null; // Primary image URL for backwards compatibility
 }
 
 
@@ -117,8 +120,18 @@ export type FormValues = {
 };
 
 export function mapApiCarToVehicle(apiCar: any): Vehicle {
+  const carImages = (apiCar.carImages ?? []).map((img: any) => ({
+    id: img.id,
+    name: img.imageName,
+    data: toImagePath(img.imagePath),
+    isPrimary: img.isPrimary,
+  }));
+
+  const primaryImage = carImages.find((img: VehicleImage) => img.isPrimary)?.data ?? carImages[0]?.data ?? null;
+
   return {
     carId: apiCar.id,
+    id: apiCar.id, // Alias for backwards compatibility
     title: apiCar.title,
     description: apiCar.description,
     year: apiCar.year,
@@ -128,6 +141,7 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     doors: apiCar.doors,
     mileage: apiCar.mileage,
     horsePower: apiCar.horsePower,
+    status: apiCar.status ?? 'available',
 
     categoryId: apiCar.category?.id ?? null,
     categoryName: apiCar.category?.name ?? null,
@@ -172,12 +186,8 @@ export function mapApiCarToVehicle(apiCar: any): Vehicle {
     electricWindows: apiCar.electricWindows,
     totalReviews: apiCar.totalReviews,
     isSaved: apiCar.isSaved,
-    carImages: (apiCar.carImages ?? []).map((img: any) => ({
-      id: img.id,
-      name: img.imageName,
-      data: toImagePath(img.imagePath),
-      isPrimary: img.isPrimary,
-    })),
+    carImages,
+    image: primaryImage, // Primary image for backwards compatibility
   };
 }
 

@@ -17,9 +17,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
+import { PAGE_SIZE } from '../../constants/pagination';
 import { get, post, put, del } from '../../utils/api.utils';
 
-const PAGE_SIZE = 10;
 
 // ── Icon registry ─────────────────────────────────────────────────────────────
 const ICON_MAP: Record<string, React.FC<{ size?: number; color?: string }>> = {

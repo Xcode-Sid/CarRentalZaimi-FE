@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { mapApiBooking, type Booking } from '../../data/bookings';
+import { PAGE_SIZE } from '../../constants/pagination';
 import { EmptyState } from '../../components/common/EmptyState';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
@@ -37,7 +38,6 @@ import {
 import { get, put } from '../../utils/api.utils';
 
 
-const PAGE_SIZE = 10;
 
 // ─── Sub-component ─────────────────────────────────────────────────────────────
 
@@ -185,6 +185,7 @@ export default function BookingsPage() {
   const [paymentFilter, setPaymentFilter] = useState<string | null>(null);
 
   const [selected, setSelected] = useState<Booking | null>(null);
+  const liveBooking = selected ? bookings.find((booking) => booking.id === selected.id) ?? selected : null;
 
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
@@ -400,9 +401,12 @@ export default function BookingsPage() {
                             style={{ '--stagger-delay': `${i * 0.06}s` } as CSSProperties}
                           >
                             <Table.Td>
-                              <Text size="sm" fw={600} ff="monospace">
-                                {b.ref}
-                              </Text>
+                              <Group gap={4} wrap="nowrap">
+                                <Text size="sm" fw={600} ff="monospace">
+                                  {b.ref}
+                                </Text>
+                                <IconChevronRight size={14} style={{ opacity: 0.35, flexShrink: 0 }} />
+                              </Group>
                             </Table.Td>
                             <Table.Td>
                               <Group gap="sm" wrap="nowrap">
@@ -533,7 +537,7 @@ export default function BookingsPage() {
 
       {/* Detail Modal */}
       <Modal
-        opened={!!selected}
+        opened={!!liveBooking}
         onClose={() => setSelected(null)}
         title={null}
         size="lg"
@@ -546,15 +550,33 @@ export default function BookingsPage() {
         }}
       >
         <AnimatePresence mode="wait">
-          {selected && (
+          {liveBooking && (
             <motion.div
-              key={selected.id}
+              key={liveBooking.id}
               initial={{ opacity: 0, scale: 0.94, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
               transition={{ type: 'spring', stiffness: 380, damping: 28 }}
             >
-              <BookingDetailContent booking={selected} />
+              <BookingDetailContent booking={liveBooking} />
+              <Group grow p="lg" pt="md">
+                <Button variant="light" color="gray" onClick={() => setSelected(null)} radius="xl">
+                  {t('account.closeModal')}
+                </Button>
+                {liveBooking.vehicleId && (
+                  <Button
+                    component={Link}
+                    to={`/fleet/${liveBooking.vehicleId}`}
+                    variant="filled"
+                    color="teal"
+                    radius="xl"
+                    rightSection={<IconChevronRight size={18} />}
+                    onClick={() => setSelected(null)}
+                  >
+                    {t('account.viewCar')}
+                  </Button>
+                )}
+              </Group>
             </motion.div>
           )}
         </AnimatePresence>

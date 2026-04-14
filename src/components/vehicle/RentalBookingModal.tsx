@@ -215,7 +215,10 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
 
     setConfirmLoading(true);
     try {
-      var res = await post('Booking', form.values);
+      const res = await post('Booking', {
+        ...form.values,
+        totalPrice: total,
+      });
       if (res.success) {
         notifications.show({
           title: t('success'),
@@ -529,7 +532,7 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
                       <Group justify="space-between">
                         <Text size="lg" fw={700}>{t('rental.total')}</Text>
                         <Text size="lg" fw={700} c="teal">
-                          €{total}
+                          €<AnimatedTotal value={total} />
                         </Text>
                       </Group>
                     </Stack>
