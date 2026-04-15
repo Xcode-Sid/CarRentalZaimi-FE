@@ -1141,5 +1141,89 @@
   "pleaseReadCarefullyBeforeAccepting": "Please read carefully before accepting.",
   "iUnderstand": "I understand",
   "termsAndConditions": "Terms & Conditions",
-  "lastUpdated": "Last updated"
+  "lastUpdated": "Last updated",
+  "ads": {
+    "title": "Ads",
+    "subtitle": "Manage your advertisements",
+    "addAd": "Add Ad",
+    "searchPlaceholder": "Search ads...",
+    "refresh": "Refresh",
+    "table": {
+      "preview": "Preview",
+      "title": "Title",
+      "position": "Position",
+      "type": "Type",
+      "link": "Link",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "type": {
+      "image": "Image",
+      "video": "Video"
+    },
+    "position": {
+      "top": "Top",
+      "bottom": "Bottom"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "empty": {
+      "hint": "No ads found. Create your first ad.",
+      "searchHint": "No ads match your search."
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "ads": "ads"
+    },
+    "modal": {
+      "editTitle": "Edit Ad",
+      "addTitle": "Add Ad"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter ad title",
+      "mediaLabel": "Media",
+      "mediaHint": "Upload an image or a video. At least one is required.",
+      "imageLabel": "Image",
+      "imagePlaceholder": "Drag & drop an image or click to browse",
+      "videoLabel": "Video",
+      "videoPlaceholder": "Drag & drop a video or click to browse",
+      "linkLabel": "Link URL",
+      "linkPlaceholder": "https://example.com",
+      "positionLabel": "Position",
+      "positionPlaceholder": "Select position",
+      "activeLabel": "Active",
+      "activeDescription": "Enable or disable this ad",
+      "saveChanges": "Save Changes",
+      "createAd": "Create Ad"
+    },
+    "deleteModal": {
+      "title": "Delete Ad",
+      "confirm": "Are you sure you want to delete \"{{name}}\"?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "imageOrVideoRequired": "Please upload an image or a video",
+      "positionRequired": "Position is required",
+      "onlyOneMediaTitle": "Only one media allowed",
+      "onlyOneMediaMessage": "You can upload either an image or a video, not both. Please remove the existing file first."
+    },
+    "errors": {
+      "loadFailed": "Failed to load ads",
+      "createFailed": "Failed to create ad",
+      "updateFailed": "Failed to update ad",
+      "deleteFailed": "Failed to delete ad",
+      "unknown": "An unknown error occurred"
+    }
+  }
 }

@@ -1137,5 +1137,89 @@
   "pleaseReadCarefullyBeforeAccepting": "Si prega di leggere attentamente prima di accettare.",
   "iUnderstand": "Ho capito",
   "termsAndConditions": "Termini e Condizioni",
-  "lastUpdated": "Ultimo aggiornamento"
+  "lastUpdated": "Ultimo aggiornamento",
+  "ads": {
+    "title": "Annunci",
+    "subtitle": "Gestisci i tuoi annunci pubblicitari",
+    "addAd": "Aggiungi Annuncio",
+    "searchPlaceholder": "Cerca annunci...",
+    "refresh": "Aggiorna",
+    "table": {
+      "preview": "Anteprima",
+      "title": "Titolo",
+      "position": "Posizione",
+      "type": "Tipo",
+      "link": "Collegamento",
+      "status": "Stato",
+      "actions": "Azioni"
+    },
+    "type": {
+      "image": "Immagine",
+      "video": "Video"
+    },
+    "position": {
+      "top": "In alto",
+      "bottom": "In basso"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo"
+    },
+    "actions": {
+      "edit": "Modifica",
+      "delete": "Elimina"
+    },
+    "empty": {
+      "hint": "Nessun annuncio trovato. Crea il tuo primo annuncio.",
+      "searchHint": "Nessun annuncio corrisponde alla tua ricerca."
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "ads": "annunci"
+    },
+    "modal": {
+      "editTitle": "Modifica Annuncio",
+      "addTitle": "Aggiungi Annuncio"
+    },
+    "form": {
+      "titleLabel": "Titolo",
+      "titlePlaceholder": "Inserisci il titolo dell'annuncio",
+      "mediaLabel": "Media",
+      "mediaHint": "Carica un'immagine o un video. Almeno uno è obbligatorio.",
+      "imageLabel": "Immagine",
+      "imagePlaceholder": "Trascina e rilascia un'immagine o clicca per sfogliare",
+      "videoLabel": "Video",
+      "videoPlaceholder": "Trascina e rilascia un video o clicca per sfogliare",
+      "linkLabel": "URL del collegamento",
+      "linkPlaceholder": "https://esempio.com",
+      "positionLabel": "Posizione",
+      "positionPlaceholder": "Seleziona posizione",
+      "activeLabel": "Attivo",
+      "activeDescription": "Abilita o disabilita questo annuncio",
+      "saveChanges": "Salva Modifiche",
+      "createAd": "Crea Annuncio"
+    },
+    "deleteModal": {
+      "title": "Elimina Annuncio",
+      "confirm": "Sei sicuro di voler eliminare \"{{name}}\"?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    },
+    "validation": {
+      "titleRequired": "Il titolo è obbligatorio",
+      "imageOrVideoRequired": "Carica un'immagine o un video",
+      "positionRequired": "La posizione è obbligatoria",
+      "onlyOneMediaTitle": "È consentito un solo file multimediale",
+      "onlyOneMediaMessage": "Puoi caricare un'immagine oppure un video, non entrambi. Rimuovi prima il file esistente."
+    },
+    "errors": {
+      "loadFailed": "Caricamento degli annunci non riuscito",
+      "createFailed": "Creazione dell'annuncio non riuscita",
+      "updateFailed": "Aggiornamento dell'annuncio non riuscito",
+      "deleteFailed": "Eliminazione dell'annuncio non riuscita",
+      "unknown": "Si è verificato un errore sconosciuto"
+    }
+  }
 }

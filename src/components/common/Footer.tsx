@@ -115,7 +115,6 @@ export function Footer() {
                     { to: '/about', label: 'footer.aboutUs' },
                     { to: '/fleet', label: 'footer.fleet' },
                     { to: '/contact', label: 'footer.contact' },
-                    { to: '/', label: 'footer.faq' },
                   ].map((link) => (
                     <motion.div key={link.to + link.label} whileHover={{ x: 4 }} transition={{ type: 'spring', stiffness: 300 }}>
                       <Text component={Link} to={link.to} size="sm" c="dimmed" style={{ textDecoration: 'none', transition: 'color 0.2s' }}>
