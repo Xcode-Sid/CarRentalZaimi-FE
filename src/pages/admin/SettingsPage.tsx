@@ -324,7 +324,6 @@ export default function AdminSettingsPage() {
     setLoading(true);
     setCompletedSteps((prev) => new Set([...prev, currentStep]));
 
-    console.log('alues.logoUrl', values.logoUrl)
     const payload = {
       name: values.name || null,
       logoUrl: values.logoUrl?.startsWith('images/')

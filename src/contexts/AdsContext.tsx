@@ -35,7 +35,7 @@ export function AdsProvider({ children }: { children: ReactNode }) {
         throw new Error(res.message ?? 'Failed to load ads');
       }
 
-      console.log('res.data', res.data);
+      console.log('res.data',res.data )
       setAds((res.data ?? []).map(mapToAd));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load ads');

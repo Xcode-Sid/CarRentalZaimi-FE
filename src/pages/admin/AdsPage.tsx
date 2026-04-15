@@ -58,10 +58,8 @@ function FileUploadField({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
-    console.log('file.name', file.name);
     const reader = new FileReader();
     reader.onload = () => {
-      console.log('calling onChange with fileName:', file.name);
       onChange(reader.result as string, file.name);
     };
     reader.readAsDataURL(file);
@@ -319,8 +317,6 @@ export default function AdsPage() {
         position: form.values.position || null,
         isActive: form.values.isActive,
       };
-
-      console.log('payload', payload); // ← add this to verify imageName is present before sending
 
       if (editTarget) {
         const res = await put(`Ads/${editTarget.id}`, { id: editTarget.id, ...payload });
@@ -791,7 +787,6 @@ export default function AdsPage() {
                     });
                     return;
                   }
-                  console.log('received fileName:', fileName);
                   form.setFieldValue('imageData', base64);
                   form.setFieldValue('imageName', fileName);
                   form.clearFieldError('imageData');

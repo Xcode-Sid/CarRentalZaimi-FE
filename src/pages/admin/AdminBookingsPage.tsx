@@ -83,7 +83,7 @@ export default function AdminBookingsPage() {
       if (paymentFilter) params.set('paymentType', paymentFilter);
 
       const response = await get(`Booking/getAll?${params.toString()}`);
-      console.log('res', response.data)
+      console.log("b",response.data)
       if (response.success) {
         const paged: PagedResponse<any> = response.data;
         setBookings(paged.items.map(mapApiBooking));
