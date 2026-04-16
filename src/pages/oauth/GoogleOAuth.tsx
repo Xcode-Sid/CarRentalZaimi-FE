@@ -142,7 +142,6 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
       localStorage.setItem('az-user', JSON.stringify(userData));
       updateProfile(userData);
 
-      console.log('authData.user',authData.user)
       if (authData.token) localStorage.setItem('authToken', authData.token);
       const phone = authData.user?.phoneNumber;
       if (!phone) {

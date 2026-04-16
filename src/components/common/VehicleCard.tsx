@@ -50,7 +50,6 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
     ?? vehicle.carImages?.[0]
     ?? null;
 
-    console.log('primaryImage',primaryImage)
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const optimistic = !isSaved;
@@ -232,22 +231,24 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
               >
                 {t('account.viewDetails')}
               </Button>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  variant="filled"
-                  color="teal"
-                  size="xs"
-                  radius="md"
-                  fullWidth
-                  className="btn-glow ripple-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/fleet/${vehicle.carId}`);
-                  }}
-                >
-                  {t('vehicle.rentNow')}
-                </Button>
-              </motion.div>
+              {user?.role?.name !== 'Admin' && (
+                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    variant="filled"
+                    color="teal"
+                    size="xs"
+                    radius="md"
+                    fullWidth
+                    className="btn-glow ripple-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/fleet/${vehicle.carId}`);
+                    }}
+                  >
+                    {t('vehicle.rentNow')}
+                  </Button>
+                </motion.div>
+              )}
             </Group>
           </Stack>
         </Card>

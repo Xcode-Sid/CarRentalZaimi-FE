@@ -146,6 +146,7 @@
     "rentalLengthDesc": "Thekso çmimin për ditë ose për orë"
   },
   "vehicle": {
+    "startingFrom": "Duke filluar nga",
     "ratingLabel": "Vlerësimi",
     "commentLabel": "Koment",
     "overview": "Përmbledhje",
@@ -193,6 +194,7 @@
     "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
+    "phoneFromProfile": "Ky numër është marrë nga profili juaj. Mund të shkruani një numër tjetër më sipër.",
     "phoneNumber": "Numri i telefonit",
     "startDate": "Marrja",
     "endDate": "Kthimi",
@@ -298,6 +300,8 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "statePrefixes": "Prefikset Telefonike",
+    "occupiedDays": "Ditët e Zëna",
     "acceptBookingSlotNotice": "Duke pranuar, vendi i rezervimit do të bllokohet dhe nuk do të jetë më i disponueshëm për mysafirët e tjerë.",
     "closeBookingArchiveNotice": "Pasi të përfundojë, kjo rezervim do të arkivohet dhe nuk do të mund të bëhen ndryshime të mëtejshme.",
     "closeBooking": "Mbyll rezervimin",
@@ -1142,5 +1146,151 @@
   "pleaseReadCarefullyBeforeAccepting": "Ju lutemi lexoni me kujdes para se të pranoni.",
   "iUnderstand": "Kuptova",
   "termsAndConditions": "Kushtet dhe Termat",
-  "lastUpdated": "Përditësuar së fundmi"
+  "lastUpdated": "Përditësuar së fundmi",
+  "ads": {
+    "title": "Reklamat",
+    "subtitle": "Menaxhoni reklamat tuaja",
+    "addAd": "Shto Reklamë",
+    "searchPlaceholder": "Kërko reklama...",
+    "refresh": "Rifresko",
+    "table": {
+      "preview": "Pamja",
+      "title": "Titulli",
+      "position": "Pozicioni",
+      "type": "Lloji",
+      "link": "Lidhja",
+      "status": "Statusi",
+      "actions": "Veprimet"
+    },
+    "type": {
+      "image": "Imazh",
+      "video": "Video"
+    },
+    "position": {
+      "top": "Lart",
+      "bottom": "Poshtë"
+    },
+    "status": {
+      "active": "Aktive",
+      "inactive": "Joaktive"
+    },
+    "actions": {
+      "edit": "Ndrysho",
+      "delete": "Fshi"
+    },
+    "empty": {
+      "hint": "Nuk u gjetën reklama. Krijoni reklamën tuaj të parë.",
+      "searchHint": "Asnjë reklamë nuk përputhet me kërkimin tuaj."
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "ads": "reklama"
+    },
+    "modal": {
+      "editTitle": "Ndrysho Reklamën",
+      "addTitle": "Shto Reklamë"
+    },
+    "form": {
+      "titleLabel": "Titulli",
+      "titlePlaceholder": "Shkruani titullin e reklamës",
+      "mediaLabel": "Media",
+      "mediaHint": "Ngarkoni një imazh ose video. Të paktën njëra është e detyrueshme.",
+      "imageLabel": "Imazhi",
+      "imagePlaceholder": "Tërhiqni & lëshoni një imazh ose klikoni për të shfletuar",
+      "videoLabel": "Video",
+      "videoPlaceholder": "Tërhiqni & lëshoni një video ose klikoni për të shfletuar",
+      "linkLabel": "URL e Lidhjes",
+      "linkPlaceholder": "https://shembull.com",
+      "positionLabel": "Pozicioni",
+      "positionPlaceholder": "Zgjidhni pozicionin",
+      "activeLabel": "Aktive",
+      "activeDescription": "Aktivizoni ose çaktivizoni këtë reklamë",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createAd": "Krijo Reklamë"
+    },
+    "deleteModal": {
+      "title": "Fshi Reklamën",
+      "confirm": "Jeni të sigurt që dëshironi të fshini \"{{name}}\"?",
+      "warning": "Ky veprim nuk mund të zhbëhet.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    },
+    "validation": {
+      "titleRequired": "Titulli është i detyrueshëm",
+      "imageOrVideoRequired": "Ju lutemi ngarkoni një imazh ose video",
+      "positionRequired": "Pozicioni është i detyrueshëm",
+      "onlyOneMediaTitle": "Lejohet vetëm një media",
+      "onlyOneMediaMessage": "Mund të ngarkoni ose një imazh ose një video, jo të dyja. Ju lutemi hiqni skedarin ekzistues fillimisht."
+    },
+    "errors": {
+      "loadFailed": "Ngarkimi i reklamave dështoi",
+      "createFailed": "Krijimi i reklamës dështoi",
+      "updateFailed": "Përditësimi i reklamës dështoi",
+      "deleteFailed": "Fshirja e reklamës dështoi",
+      "unknown": "Ndodhi një gabim i panjohur"
+    }
+  },
+  "phonePrefix": {
+    "title": "Prefikset Telefonike",
+    "subtitle": "Menaxho prefikset telefonike të vendeve dhe modelet e tyre të validimit",
+    "addPrefix": "Shto Prefiks",
+    "searchPlaceholder": "Kërko sipas vendit ose prefiksit…",
+    "refresh": "Rifresko",
+    "table": {
+      "flag": "Flamuri",
+      "countryName": "Vendi",
+      "phonePrefix": "Prefiksi",
+      "phoneRegex": "Modeli Regex",
+      "actions": "Veprimet"
+    },
+    "actions": {
+      "edit": "Ndrysho prefiksin",
+      "delete": "Fshi prefiksin"
+    },
+    "empty": {
+      "hint": "Nuk ka prefiks telefonik. Shto një për të filluar.",
+      "searchHint": "Asnjë prefiks nuk përputhet me kërkimin tuaj."
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "prefixes": "prefikse"
+    },
+    "modal": {
+      "addTitle": "Shto Prefiks Telefonik",
+      "editTitle": "Ndrysho Prefiksin Telefonik"
+    },
+    "form": {
+      "countryNameLabel": "Emri i Vendit",
+      "countryNamePlaceholder": "p.sh. Shqipëri",
+      "phonePrefixLabel": "Prefiksi Telefonik",
+      "phonePrefixPlaceholder": "p.sh. +355",
+      "flagLabel": "Flamuri",
+      "flagPlaceholder": "Zgjidh flamurin e vendit…",
+      "phoneRegexLabel": "Regex Telefonit",
+      "phoneRegexPlaceholder": "p.sh. ^\\+355[0-9]{8,9}$",
+      "phoneRegexDescription": "Model validimi opsional për numrat me këtë prefiks.",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createPrefix": "Krijo Prefiks"
+    },
+    "validation": {
+      "countryNameRequired": "Emri i vendit është i detyrueshëm",
+      "phonePrefixRequired": "Prefiksi telefonik është i detyrueshëm"
+    },
+    "errors": {
+      "loadFailed": "Ngarkimi i prefikseve telefonike dështoi",
+      "createFailed": "Krijimi i prefiksit telefonik dështoi",
+      "updateFailed": "Përditësimi i prefiksit telefonik dështoi",
+      "deleteFailed": "Fshirja e prefiksit telefonik dështoi",
+      "unknown": "Ndodhi një gabim i papritur"
+    },
+    "deleteModal": {
+      "title": "Fshi Prefiksin Telefonik",
+      "confirm": "Jeni të sigurt që dëshironi të fshini \"{{name}}\"?",
+      "warning": "Ky veprim nuk mund të kthehet mbrapsht.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    }
+  }
 }

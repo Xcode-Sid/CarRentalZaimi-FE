@@ -474,73 +474,150 @@ export function VehicleDetailView({
             </Stack>
           </AnimatedSection>
 
-          <AnimatedSection direction="right" delay={0.2} scale>
-            <Box
-              className="glass-card"
-              p="xl"
-              style={{ borderRadius: 'var(--mantine-radius-xl)', position: 'sticky', top: 90 }}
-            >
-              <Stack gap="md">
-                <Text size="2rem" fw={800} c="teal">{priceDisplay}</Text>
+          {user?.role?.name !== 'Admin' && (
+            <AnimatedSection direction="right" delay={0.2} scale>
+              <Box
+                style={{
+                  position: 'sticky',
+                  top: 90,
+                  borderRadius: 'var(--mantine-radius-xl)',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
+                  backdropFilter: 'blur(20px)',
+                }}
+              >
+                {/* Top accent bar */}
+                <Box
+                  style={{
+                    height: 3,
+                    background: 'linear-gradient(90deg, var(--mantine-color-teal-6), var(--mantine-color-teal-4), transparent)',
+                  }}
+                />
 
-                <Badge
-                  leftSection={<IconShieldCheck size={14} />}
-                  color="green"
-                  variant="light"
-                  size="lg"
-                  fullWidth
-                >
-                  {t('vehicle.warranty')}
-                </Badge>
+                <Stack gap={0} p="xl">
 
-                <Stack gap={4}>
-                  {specRows.slice(0, 4).map(([label, val]) => (
-                    <Group key={String(label)} justify="space-between">
-                      <Text size="sm" c="dimmed">{label}</Text>
-                      <Text size="sm" fw={500}>{val}</Text>
-                    </Group>
-                  ))}
-                </Stack>
+                  {/* Price block */}
+                  <Box mb="lg" style={{ textAlign: 'center' }}>
+                    <Text size="xs" tt="uppercase" fw={600} c="dimmed" style={{ letterSpacing: 2 }} mb={4}>
+                      {t('vehicle.startingFrom')}
+                    </Text>
+                    <Text
+                      fw={900}
+                      c="teal"
+                      style={{
+                        fontSize: '2.6rem',
+                        lineHeight: 1,
+                        textShadow: '0 0 40px rgba(32,201,151,0.3)',
+                        letterSpacing: '-1px',
+                      }}
+                    >
+                      {priceDisplay}
+                    </Text>
+                  </Box>
 
-                <Divider />
-
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                  <Button
-                    fullWidth
-                    size="lg"
-                    variant="filled"
-                    color="teal"
-                    onClick={() => setRentalOpen(true)}
-                    className="ripple-btn"
+                  {/* Spec rows */}
+                  <Box
+                    mb="lg"
+                    style={{
+                      borderRadius: 'var(--mantine-radius-md)',
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      overflow: 'hidden',
+                    }}
                   >
-                    {t('vehicle.rentNow')}
-                  </Button>
-                </motion.div>
-                <Button fullWidth variant="outline" color="teal">
-                  {t('vehicle.contact')}
-                </Button>
+                    {specRows.slice(0, 4).map(([label, val], i) => (
+                      <Group
+                        key={String(label)}
+                        justify="space-between"
+                        px="md"
+                        py="sm"
+                        style={{
+                          borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                          transition: 'background 0.2s',
+                        }}
+                        className="spec-row-hover"
+                      >
+                        <Group gap="xs">
+                          <Box
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              background: 'var(--mantine-color-teal-5)',
+                              opacity: 0.7,
+                            }}
+                          />
+                          <Text size="sm" c="dimmed">{label}</Text>
+                        </Group>
+                        <Text size="sm" fw={600}>{val}</Text>
+                      </Group>
+                    ))}
+                  </Box>
 
-                <Text size="xs" c="dimmed" ta="center">
-                  {t('vehicle.moneyBack')}
-                </Text>
+                  {/* CTA buttons */}
+                  <Stack gap="sm" mb="lg">
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                      <Button
+                        fullWidth
+                        size="lg"
+                        variant="filled"
+                        color="teal"
+                        onClick={() => setRentalOpen(true)}
+                        className="ripple-btn"
+                        style={{
+                          fontWeight: 700,
+                          letterSpacing: '0.5px',
+                          boxShadow: '0 4px 24px rgba(32,201,151,0.25)',
+                        }}
+                      >
+                        {t('vehicle.rentNow')}
+                      </Button>
+                    </motion.div>
+                    <Button
+                      fullWidth
+                      variant="subtle"
+                      color="gray"
+                      style={{ opacity: 0.7 }}
+                    >
+                      {t('vehicle.contact')}
+                    </Button>
+                  </Stack>
 
-                <Divider />
+                  {/* Divider + share */}
+                  <Divider style={{ borderColor: 'rgba(255,255,255,0.06)' }} mb="md" />
 
-                <Group justify="center" gap="xs">
-                  <Tooltip label={t('vehicle.copyLink')}>
-                    <ActionIcon variant="subtle" onClick={handleCopyLink}>
-                      <IconCopy size={18} />
-                    </ActionIcon>
-                  </Tooltip>
-                  <Tooltip label={t('vehicle.whatsapp')}>
-                    <ActionIcon variant="subtle" color="green">
-                      <IconBrandWhatsapp size={18} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </Stack>
-            </Box>
-          </AnimatedSection>
+                  <Group justify="center" gap="xs">
+                    <Tooltip label={t('vehicle.copyLink')}>
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        radius="xl"
+                        size="lg"
+                        onClick={handleCopyLink}
+                        style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+                      >
+                        <IconCopy size={16} />
+                      </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label={t('vehicle.whatsapp')}>
+                      <ActionIcon
+                        variant="subtle"
+                        color="green"
+                        radius="xl"
+                        size="lg"
+                        style={{ border: '1px solid rgba(47,158,68,0.2)' }}
+                      >
+                        <IconBrandWhatsapp size={16} />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+
+                </Stack>
+              </Box>
+            </AnimatedSection>
+          )}
         </div>
 
         {similarVehicles.length > 0 && (

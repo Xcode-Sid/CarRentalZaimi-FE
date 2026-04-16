@@ -70,9 +70,9 @@ interface CarCategory {
 
 interface Car {
     id: string;
-    title: string;
+    title: string | null;
+    licensePlate: string;
 }
-
 // ─── Input styles ─────────────────────────────────────────────────────────────
 
 const inputStyles = {
@@ -221,6 +221,9 @@ export default function PromotionsPage() {
         fetchCars();
     }, []);
 
+    useEffect(() => {
+}, [cars]);
+
     // ─── Pagination derived ───────────────────────────────────────────────────
 
     const startItem = (page - 1) * PAGE_SIZE + 1;
@@ -349,10 +352,10 @@ export default function PromotionsPage() {
 
     // ─── Derived ──────────────────────────────────────────────────────────────
 
-    const carOptions = cars
-        .filter((c) => c.title != null)
-        .map((c) => ({ value: c.id, label: c.title }));
-
+const carOptions = cars.map((c) => ({ 
+    value: c.id, 
+    label: c.title ?? c.licensePlate
+}));
     const categoryOptions = categories
         .filter((c) => c.name != null)
         .map((c) => ({ value: c.id, label: c.name }));

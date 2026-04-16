@@ -24,9 +24,6 @@ import Spinner from '../../../components/spinner/Spinner';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function getDisplayName(car: Vehicle | null): string {
-  return car?.title ?? (car?.carId ? `Car #${car.carId}` : 'Unknown');
-}
 
 function getPrimaryImageSrc(car: Vehicle): string {
   const primary = car.carImages?.find((img) => img.isPrimary) ?? car.carImages?.[0];
@@ -386,7 +383,7 @@ export default function CarsPage() {
 
                             <Table.Td>
                               <Text size="sm" fw={500}>
-                                {getDisplayName(car)}
+                                {car?.title }
                               </Text>
                             </Table.Td>
 
@@ -559,7 +556,7 @@ export default function CarsPage() {
               >
                 <Stack gap={4} align="center">
                   <Text size="sm" ta="center" fw={500} c="red.8">
-                    {t('admin.deleteWarning', { name: getDisplayName(deleteTarget!) })}
+                    {t('admin.deleteWarning', { name: deleteTarget! })}
                   </Text>
                   <Text size="xs" ta="center" c="dimmed">
                     {t('admin.deleteUndone')}
