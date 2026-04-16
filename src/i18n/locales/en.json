@@ -1229,5 +1229,67 @@
       "deleteFailed": "Failed to delete ad",
       "unknown": "An unknown error occurred"
     }
+  },
+  "phonePrefix": {
+    "title": "Phone Prefixes",
+    "subtitle": "Manage country phone prefixes and their validation patterns",
+    "addPrefix": "Add Prefix",
+    "searchPlaceholder": "Search by country or prefix…",
+    "refresh": "Refresh",
+    "table": {
+      "flag": "Flag",
+      "countryName": "Country",
+      "phonePrefix": "Prefix",
+      "phoneRegex": "Regex Pattern",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit prefix",
+      "delete": "Delete prefix"
+    },
+    "empty": {
+      "hint": "No phone prefixes yet. Add one to get started.",
+      "searchHint": "No prefixes match your search."
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "prefixes": "prefixes"
+    },
+    "modal": {
+      "addTitle": "Add Phone Prefix",
+      "editTitle": "Edit Phone Prefix"
+    },
+    "form": {
+      "countryNameLabel": "Country Name",
+      "countryNamePlaceholder": "e.g. Albania",
+      "phonePrefixLabel": "Phone Prefix",
+      "phonePrefixPlaceholder": "e.g. +355",
+      "flagLabel": "Flag",
+      "flagPlaceholder": "Select a country flag…",
+      "phoneRegexLabel": "Phone Regex",
+      "phoneRegexPlaceholder": "e.g. ^\\+355[0-9]{8,9}$",
+      "phoneRegexDescription": "Optional validation pattern for phone numbers with this prefix.",
+      "saveChanges": "Save Changes",
+      "createPrefix": "Create Prefix"
+    },
+    "validation": {
+      "countryNameRequired": "Country name is required",
+      "phonePrefixRequired": "Phone prefix is required"
+    },
+    "errors": {
+      "loadFailed": "Failed to load phone prefixes",
+      "createFailed": "Failed to create phone prefix",
+      "updateFailed": "Failed to update phone prefix",
+      "deleteFailed": "Failed to delete phone prefix",
+      "unknown": "An unexpected error occurred"
+    },
+    "deleteModal": {
+      "title": "Delete Phone Prefix",
+      "confirm": "Are you sure you want to delete \"{{name}}\"?",
+      "warning": "This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    }
   }
 }

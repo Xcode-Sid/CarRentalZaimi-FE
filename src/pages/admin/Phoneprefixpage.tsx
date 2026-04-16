@@ -7,7 +7,7 @@ import {
 import { useForm } from '@mantine/form';
 import {
     IconSearch, IconPlus, IconEdit, IconTrash, IconDeviceFloppy,
-    IconRefresh, IconPhone, IconCheck, IconBan, IconFlag,
+    IconRefresh, IconPhone, IconFlag,
     IconWorldPin, IconAlertCircle,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -16,23 +16,104 @@ import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { PAGE_SIZE } from '../../constants/pagination';
 import { get, post, put, del } from '../../utils/api.utils';
 
-// ── Common flag emoji helper ───────────────────────────────────────────────────
-// Converts a 2-letter country code to its flag emoji (e.g. "AL" → "🇦🇱")
+// ── Flag emoji helper ─────────────────────────────────────────────────────────
 function countryCodeToFlag(code: string | null): string {
     if (!code || code.length !== 2) return '🌐';
-    const offset = 127397; // 0x1F1E0 - 'A'.charCodeAt(0)
+    const offset = 127397;
     return String.fromCodePoint(
         code.toUpperCase().charCodeAt(0) + offset,
         code.toUpperCase().charCodeAt(1) + offset,
     );
 }
 
+// ── Country list ──────────────────────────────────────────────────────────────
+// value = 2-letter ISO code (stored as flag emoji via countryCodeToFlag)
+const COUNTRIES: { code: string; name: string; flag: string }[] = [
+    { code: 'AL', name: 'Albania', flag: '🇦🇱' },
+    { code: 'AD', name: 'Andorra', flag: '🇦🇩' },
+    { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+    { code: 'BY', name: 'Belarus', flag: '🇧🇾' },
+    { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+    { code: 'BA', name: 'Bosnia and Herzegovina', flag: '🇧🇦' },
+    { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
+    { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
+    { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
+    { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
+    { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
+    { code: 'EE', name: 'Estonia', flag: '🇪🇪' },
+    { code: 'FI', name: 'Finland', flag: '🇫🇮' },
+    { code: 'FR', name: 'France', flag: '🇫🇷' },
+    { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+    { code: 'GR', name: 'Greece', flag: '🇬🇷' },
+    { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
+    { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
+    { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
+    { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+    { code: 'XK', name: 'Kosovo', flag: '🇽🇰' },
+    { code: 'LV', name: 'Latvia', flag: '🇱🇻' },
+    { code: 'LI', name: 'Liechtenstein', flag: '🇱🇮' },
+    { code: 'LT', name: 'Lithuania', flag: '🇱🇹' },
+    { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
+    { code: 'MT', name: 'Malta', flag: '🇲🇹' },
+    { code: 'MD', name: 'Moldova', flag: '🇲🇩' },
+    { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
+    { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
+    { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+    { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
+    { code: 'NO', name: 'Norway', flag: '🇳🇴' },
+    { code: 'PL', name: 'Poland', flag: '🇵🇱' },
+    { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+    { code: 'RO', name: 'Romania', flag: '🇷🇴' },
+    { code: 'RU', name: 'Russia', flag: '🇷🇺' },
+    { code: 'SM', name: 'San Marino', flag: '🇸🇲' },
+    { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
+    { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
+    { code: 'SI', name: 'Slovenia', flag: '🇸🇮' },
+    { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+    { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+    { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+    { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
+    { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
+    { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+    { code: 'VA', name: 'Vatican City', flag: '🇻🇦' },
+    // Beyond Europe
+    { code: 'US', name: 'United States', flag: '🇺🇸' },
+    { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+    { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+    { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+    { code: 'CN', name: 'China', flag: '🇨🇳' },
+    { code: 'IN', name: 'India', flag: '🇮🇳' },
+    { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+    { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+    { code: 'NG', name: 'Nigeria', flag: '🇳🇬' },
+    { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+    { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
+    { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+];
+
+// Select data: value = ISO code, label = name only (used for search matching)
+const FLAG_SELECT_DATA = COUNTRIES.map(({ code, name }) => ({
+    value: code,
+    label: name,
+}));
+
 interface PhonePrefix {
     id: string;
     countryName: string | null;
     phonePrefix: string | null;
-    flag: string | null;       // 2-letter ISO country code or emoji
+    flag: string | null;       // stored as flag emoji e.g. "🇦🇱"
     phoneRegex: string | null;
+}
+
+// Convert stored emoji back to ISO code for the Select value
+function flagEmojiToCode(emoji: string | null): string {
+    if (!emoji) return '';
+    try {
+        const points = [...emoji].map((c) => (c.codePointAt(0) ?? 0) - 127397);
+        if (points.length === 2 && points.every((p) => p >= 65 && p <= 90))
+            return String.fromCharCode(...points);
+    } catch { /* ignore */ }
+    return '';
 }
 
 interface FormValues {
@@ -99,7 +180,7 @@ export default function PhonePrefixPage() {
             });
             if (debouncedSearch.trim()) params.set('Search', debouncedSearch.trim());
 
-            const res = await get(`StatePrefix/getPaged?${params.toString()}`);
+            const res = await get(`StatePrefix/getAllPaged?${params.toString()}`);
             if (!res.success) throw new Error(res.message || t('phonePrefix.errors.loadFailed'));
 
             setPrefixes(res.data.items ?? []);
@@ -128,7 +209,7 @@ export default function PhonePrefixPage() {
         form.setValues({
             countryName: prefix.countryName ?? '',
             phonePrefix: prefix.phonePrefix ?? '',
-            flag: prefix.flag ?? '',
+            flag: flagEmojiToCode(prefix.flag),   // emoji → ISO code for Select
             phoneRegex: prefix.phoneRegex ?? '',
         });
         setModalOpen(true);
@@ -150,7 +231,7 @@ export default function PhonePrefixPage() {
             const payload = {
                 countryName: form.values.countryName || null,
                 phonePrefix: form.values.phonePrefix || null,
-                flag: form.values.flag || null,
+                flag: form.values.flag ? countryCodeToFlag(form.values.flag) : null,  // ISO → emoji
                 phoneRegex: form.values.phoneRegex || null,
             };
 
@@ -374,11 +455,7 @@ export default function PhonePrefixPage() {
                                                         {/* Flag */}
                                                         <Table.Td>
                                                             <Text size="xl" style={{ lineHeight: 1 }}>
-                                                                {prefix.flag
-                                                                    ? (prefix.flag.length === 2
-                                                                        ? countryCodeToFlag(prefix.flag)
-                                                                        : prefix.flag)
-                                                                    : '🌐'}
+                                                                {prefix.flag ?? '🌐'}
                                                             </Text>
                                                         </Table.Td>
 
@@ -537,16 +614,31 @@ export default function PhonePrefixPage() {
                         styles={inputStyles}
                     />
 
-                    <TextInput
+                    <Select
                         label={t('phonePrefix.form.flagLabel')}
                         placeholder={t('phonePrefix.form.flagPlaceholder')}
                         radius="md"
+                        clearable
+                        searchable
+                        data={FLAG_SELECT_DATA}
                         leftSection={
                             form.values.flag
-                                ? <Text size="sm">{countryCodeToFlag(form.values.flag)}</Text>
+                                ? <Text size="lg" style={{ lineHeight: 1 }}>{countryCodeToFlag(form.values.flag)}</Text>
                                 : <IconFlag size={15} />
                         }
-                        description={t('phonePrefix.form.flagDescription')}
+                        renderOption={({ option }) => {
+                            const country = COUNTRIES.find(c => c.code === option.value);
+                            return (
+                                <Group gap={8} align="center">
+                                    <Text size="lg" style={{ lineHeight: 1, minWidth: 24 }}>
+                                        {country?.flag ?? '🌐'}
+                                    </Text>
+                                    <Text size="xs" fw={600} style={{ fontFamily: 'monospace' }}>
+                                        {option.value}
+                                    </Text>
+                                </Group>
+                            );
+                        }}
                         {...form.getInputProps('flag')}
                         styles={inputStyles}
                     />
@@ -617,11 +709,7 @@ export default function PhonePrefixPage() {
                                     fontSize: 22,
                                 }}
                             >
-                                {deleteTarget.flag
-                                    ? (deleteTarget.flag.length === 2
-                                        ? countryCodeToFlag(deleteTarget.flag)
-                                        : deleteTarget.flag)
-                                    : '🌐'}
+                                {deleteTarget.flag ?? '🌐'}
                             </Box>
                             <div>
                                 <Text fw={600} size="sm">{deleteTarget.countryName}</Text>

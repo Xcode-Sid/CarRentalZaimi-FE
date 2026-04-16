@@ -1225,5 +1225,67 @@
       "deleteFailed": "Eliminazione dell'annuncio non riuscita",
       "unknown": "Si è verificato un errore sconosciuto"
     }
+  },
+  "phonePrefix": {
+    "title": "Prefissi Telefonici",
+    "subtitle": "Gestisci i prefissi telefonici nazionali e i relativi pattern di validazione",
+    "addPrefix": "Aggiungi Prefisso",
+    "searchPlaceholder": "Cerca per paese o prefisso…",
+    "refresh": "Aggiorna",
+    "table": {
+      "flag": "Bandiera",
+      "countryName": "Paese",
+      "phonePrefix": "Prefisso",
+      "phoneRegex": "Pattern Regex",
+      "actions": "Azioni"
+    },
+    "actions": {
+      "edit": "Modifica prefisso",
+      "delete": "Elimina prefisso"
+    },
+    "empty": {
+      "hint": "Nessun prefisso telefonico presente. Aggiungine uno per iniziare.",
+      "searchHint": "Nessun prefisso corrisponde alla tua ricerca."
+    },
+    "pagination": {
+      "showing": "Visualizzazione",
+      "of": "di",
+      "prefixes": "prefissi"
+    },
+    "modal": {
+      "addTitle": "Aggiungi Prefisso Telefonico",
+      "editTitle": "Modifica Prefisso Telefonico"
+    },
+    "form": {
+      "countryNameLabel": "Nome Paese",
+      "countryNamePlaceholder": "es. Albania",
+      "phonePrefixLabel": "Prefisso Telefonico",
+      "phonePrefixPlaceholder": "es. +355",
+      "flagLabel": "Bandiera",
+      "flagPlaceholder": "Seleziona una bandiera…",
+      "phoneRegexLabel": "Regex Telefono",
+      "phoneRegexPlaceholder": "es. ^\\+355[0-9]{8,9}$",
+      "phoneRegexDescription": "Pattern di validazione opzionale per i numeri con questo prefisso.",
+      "saveChanges": "Salva Modifiche",
+      "createPrefix": "Crea Prefisso"
+    },
+    "validation": {
+      "countryNameRequired": "Il nome del paese è obbligatorio",
+      "phonePrefixRequired": "Il prefisso telefonico è obbligatorio"
+    },
+    "errors": {
+      "loadFailed": "Caricamento dei prefissi telefonici fallito",
+      "createFailed": "Creazione del prefisso telefonico fallita",
+      "updateFailed": "Aggiornamento del prefisso telefonico fallito",
+      "deleteFailed": "Eliminazione del prefisso telefonico fallita",
+      "unknown": "Si è verificato un errore imprevisto"
+    },
+    "deleteModal": {
+      "title": "Elimina Prefisso Telefonico",
+      "confirm": "Sei sicuro di voler eliminare \"{{name}}\"?",
+      "warning": "Questa azione non può essere annullata.",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    }
   }
 }

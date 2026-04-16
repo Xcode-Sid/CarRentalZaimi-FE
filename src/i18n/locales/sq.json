@@ -1230,5 +1230,67 @@
       "deleteFailed": "Fshirja e reklamës dështoi",
       "unknown": "Ndodhi një gabim i panjohur"
     }
+  },
+  "phonePrefix": {
+    "title": "Prefikset Telefonike",
+    "subtitle": "Menaxho prefikset telefonike të vendeve dhe modelet e tyre të validimit",
+    "addPrefix": "Shto Prefiks",
+    "searchPlaceholder": "Kërko sipas vendit ose prefiksit…",
+    "refresh": "Rifresko",
+    "table": {
+      "flag": "Flamuri",
+      "countryName": "Vendi",
+      "phonePrefix": "Prefiksi",
+      "phoneRegex": "Modeli Regex",
+      "actions": "Veprimet"
+    },
+    "actions": {
+      "edit": "Ndrysho prefiksin",
+      "delete": "Fshi prefiksin"
+    },
+    "empty": {
+      "hint": "Nuk ka prefiks telefonik. Shto një për të filluar.",
+      "searchHint": "Asnjë prefiks nuk përputhet me kërkimin tuaj."
+    },
+    "pagination": {
+      "showing": "Duke shfaqur",
+      "of": "nga",
+      "prefixes": "prefikse"
+    },
+    "modal": {
+      "addTitle": "Shto Prefiks Telefonik",
+      "editTitle": "Ndrysho Prefiksin Telefonik"
+    },
+    "form": {
+      "countryNameLabel": "Emri i Vendit",
+      "countryNamePlaceholder": "p.sh. Shqipëri",
+      "phonePrefixLabel": "Prefiksi Telefonik",
+      "phonePrefixPlaceholder": "p.sh. +355",
+      "flagLabel": "Flamuri",
+      "flagPlaceholder": "Zgjidh flamurin e vendit…",
+      "phoneRegexLabel": "Regex Telefonit",
+      "phoneRegexPlaceholder": "p.sh. ^\\+355[0-9]{8,9}$",
+      "phoneRegexDescription": "Model validimi opsional për numrat me këtë prefiks.",
+      "saveChanges": "Ruaj Ndryshimet",
+      "createPrefix": "Krijo Prefiks"
+    },
+    "validation": {
+      "countryNameRequired": "Emri i vendit është i detyrueshëm",
+      "phonePrefixRequired": "Prefiksi telefonik është i detyrueshëm"
+    },
+    "errors": {
+      "loadFailed": "Ngarkimi i prefikseve telefonike dështoi",
+      "createFailed": "Krijimi i prefiksit telefonik dështoi",
+      "updateFailed": "Përditësimi i prefiksit telefonik dështoi",
+      "deleteFailed": "Fshirja e prefiksit telefonik dështoi",
+      "unknown": "Ndodhi një gabim i papritur"
+    },
+    "deleteModal": {
+      "title": "Fshi Prefiksin Telefonik",
+      "confirm": "Jeni të sigurt që dëshironi të fshini \"{{name}}\"?",
+      "warning": "Ky veprim nuk mund të kthehet mbrapsht.",
+      "cancel": "Anulo",
+      "delete": "Fshi"
+    }
   }
 }
