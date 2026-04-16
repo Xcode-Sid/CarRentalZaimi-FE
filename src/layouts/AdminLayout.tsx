@@ -28,7 +28,9 @@ import {
   IconFileCheck,
   IconShieldCheck,
   IconMailbox,
-  IconCalendarOff
+  IconCalendarOff,
+  IconPhoneCall,
+  IconPhone
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -51,8 +53,9 @@ const navItems = [
   { path: '/admin/settings', icon: IconSettings, labelKey: 'admin.settings', badge: null },
   { path: '/admin/subscriptions', icon: IconMailbox   , labelKey: 'admin.subscriptions', badge: null },
   { path: '/admin/occupiedDays', icon: IconCalendarOff   , labelKey: 'admin.occupiedDays', badge: null },
-  { path: '/admin/analytics', icon: IconChartBar, labelKey: 'admin.analytics', badge: null },
+  { path: '/admin/statePrefixes', icon: IconPhone   , labelKey: 'admin.statePrefixes', badge: null },
   { path: '/admin/ads', icon: IconAd, labelKey: 'admin.ads', badge: null },
+  { path: '/admin/analytics', icon: IconChartBar, labelKey: 'admin.analytics', badge: null },
   { path: '/admin/reports', icon: IconFileText, labelKey: 'admin.reports', badge: null },
 ];
 

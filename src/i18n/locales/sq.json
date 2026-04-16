@@ -146,6 +146,7 @@
     "rentalLengthDesc": "Thekso çmimin për ditë ose për orë"
   },
   "vehicle": {
+    "startingFrom": "Duke filluar nga",
     "ratingLabel": "Vlerësimi",
     "commentLabel": "Koment",
     "overview": "Përmbledhje",
@@ -193,6 +194,7 @@
     "deleteReviewConfirm": "A jeni i sigurt që doni të fshini këtë vlerësim? Ky veprim nuk mund të zhbëhet."
   },
   "rental": {
+    "phoneFromProfile": "Ky numër është marrë nga profili juaj. Mund të shkruani një numër tjetër më sipër.",
     "phoneNumber": "Numri i telefonit",
     "startDate": "Marrja",
     "endDate": "Kthimi",
@@ -298,6 +300,8 @@
     "passwordChangeFailed": "Ndryshimi i fjalëkalimit dështoi. Provo përsëri."
   },
   "admin": {
+    "statePrefixes": "Prefikset Telefonike",
+    "occupiedDays": "Ditët e Zëna",
     "acceptBookingSlotNotice": "Duke pranuar, vendi i rezervimit do të bllokohet dhe nuk do të jetë më i disponueshëm për mysafirët e tjerë.",
     "closeBookingArchiveNotice": "Pasi të përfundojë, kjo rezervim do të arkivohet dhe nuk do të mund të bëhen ndryshime të mëtejshme.",
     "closeBooking": "Mbyll rezervimin",

@@ -146,6 +146,7 @@
     "rentalLengthDesc": "Evidenzia il prezzo giornaliero o orario"
   },
   "vehicle": {
+    "startingFrom": "A partire da",
     "ratingLabel": "Valutazione",
     "commentLabel": "Commento",
     "overview": "Panoramica",
@@ -193,6 +194,7 @@
     "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione? Questa azione non può essere annullata."
   },
   "rental": {
+    "phoneFromProfile": "Questo numero è stato preso dal tuo profilo. Puoi inserirne uno diverso qui sopra.",
     "phoneNumber": "Numri i telefonit",
     "startDate": "Ritiro",
     "endDate": "Restituzione",
@@ -292,6 +294,8 @@
     "passwordChangeFailed": "Failed to change password. Please try again."
   },
   "admin": {
+    "statePrefixes": "Prefissi Telefonici",
+    "occupiedDays": "Giorni Occupati",
     "acceptBookingSlotNotice": "Accettando la prenotazione, il posto verrà bloccato e non sarà più disponibile per altri ospiti.",
     "closeBookingArchiveNotice": "Una volta completata, questa prenotazione verrà archiviata e non sarà più possibile apportare modifiche.",
     "closeBooking": "Chiudi prenotazione",

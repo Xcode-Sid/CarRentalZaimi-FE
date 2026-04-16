@@ -38,6 +38,7 @@ import PrivacyPolicyPage from './pages/admin/PrivacyPage';
 import SubscriptionsPage from './pages/admin/SubscriptionsPage';
 import { UnsubscribePage } from './pages/account/UnsubscribePage';
 import OccupiedCarDaysPage from './pages/admin/OccupiedCarDaysPage';
+import PhonePrefixPage from './pages/admin/Phoneprefixpage';
 
 export default function App() {
   return (
@@ -101,6 +102,7 @@ export default function App() {
             <Route path="/admin/privacies" element={<PrivacyPolicyPage />} />
             <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
             <Route path="/admin/occupiedDays" element={<OccupiedCarDaysPage />} />
+            <Route path="/admin/statePrefixes" element={<PhonePrefixPage />} />
           </Route>
         </Route>
 
