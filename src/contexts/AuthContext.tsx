@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode, useEffect } from 'react';
 import { type User } from '../data/users';
 import { post, saveTokens } from '../utils/api.utils';
 import { toImagePath } from '../utils/general';
+import { SESSION_EXPIRED } from '../constants/events';
 
 interface AuthContextType {
   user: User | null;
@@ -105,6 +106,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('az-user', JSON.stringify(updated));
       return updated;
     });
+  }, []);
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setUser(null);
+      localStorage.removeItem('az-user');
+    };
+
+    window.addEventListener(SESSION_EXPIRED, handleSessionExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED, handleSessionExpired);
   }, []);
 
   return (

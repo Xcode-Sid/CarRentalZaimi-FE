@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { Logo } from './Logo';
+import { get } from '../../utils/api.utils';
 
 export function Navbar() {
   const { t } = useTranslation();
@@ -43,6 +44,7 @@ export function Navbar() {
   const [hidden, setHidden] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
 
   const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
@@ -61,6 +63,21 @@ export function Navbar() {
   useEffect(() => {
     if (searchOpen && searchRef.current) searchRef.current.focus();
   }, [searchOpen]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await get('CompanyProfile/get');
+        if (response?.data) {
+          setLogoUrl(response.data.logoUrl);
+        }
+      } catch (error) {
+        console.error('Failed to fetch company profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const navLinks = [
     { label: t('nav.home'), path: '/', hash: '' },
@@ -121,7 +138,7 @@ export function Navbar() {
           transition={{ duration: 0.5 }}
         >
           <UnstyledButton component={Link} to="/" className="nav-logo-wrap">
-            <Logo height={36} />
+            <Logo height={28} logoUrl={logoUrl} />
           </UnstyledButton>
         </motion.div>
 
@@ -291,32 +308,32 @@ export function Navbar() {
             </Menu>
           ) : (
             <>
-            <Button
-              variant="filled"
-              color="teal"
-              size="sm"
-              radius="xl"
-              ml="xs"
-              className="nav-cta-glow"
-              onClick={() => navigate('/register')}
-              style={{ fontWeight: 700, letterSpacing: '0.02em' }}
-              tt="uppercase"
-            >
-              {t('nav.register')}
-            </Button>
-            <Button
-              variant="filled"
-              color="teal"
-              size="sm"
-              radius="xl"
-              ml="xs"
-              className="nav-cta-glow"
-              onClick={() => navigate('/login')}
-              style={{ fontWeight: 700, letterSpacing: '0.02em' }}
-              tt="uppercase"
-            >
-              {t('nav.login')}
-            </Button></>
+              <Button
+                variant="filled"
+                color="teal"
+                size="sm"
+                radius="xl"
+                ml="xs"
+                className="nav-cta-glow"
+                onClick={() => navigate('/register')}
+                style={{ fontWeight: 700, letterSpacing: '0.02em' }}
+                tt="uppercase"
+              >
+                {t('nav.register')}
+              </Button>
+              <Button
+                variant="filled"
+                color="teal"
+                size="sm"
+                radius="xl"
+                ml="xs"
+                className="nav-cta-glow"
+                onClick={() => navigate('/login')}
+                style={{ fontWeight: 700, letterSpacing: '0.02em' }}
+                tt="uppercase"
+              >
+                {t('nav.login')}
+              </Button></>
           )}
         </Group>
 
@@ -413,9 +430,14 @@ export function Navbar() {
               </>
             )
           ) : (
-            <Button variant="filled" color="teal" fullWidth onClick={() => { navigate('/register'); setDrawerOpen(false); }}>
-              {t('nav.register')}
-            </Button>
+            <>
+              <Button variant="filled" color="teal" fullWidth onClick={() => { navigate('/register'); setDrawerOpen(false); }}>
+                {t('nav.register')}
+              </Button>
+              <Button variant="filled" color="teal" fullWidth onClick={() => { navigate('/login'); setDrawerOpen(false); }}>
+                {t('nav.login')}
+              </Button>
+            </>
           )}
         </Stack>
       </Drawer>

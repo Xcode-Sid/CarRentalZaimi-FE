@@ -1,13 +1,46 @@
 import { motion } from 'framer-motion';
+import { toImagePath } from '../../utils/general';
 
 interface LogoProps {
   height?: number;
+  logoUrl?: string;
 }
 
-export function Logo({ height = 32 }: LogoProps) {
+export function Logo({ height = 32, logoUrl }: LogoProps) {
   const aspectRatio = 240 / 50;
   const w = height * aspectRatio;
 
+  if (logoUrl) {
+    return (
+      <motion.div
+        style={{
+          width: 150,
+          height: 90,
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: -5,
+        }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      >
+        <img
+          src={toImagePath(logoUrl)}
+          style={{
+            maxHeight: 120,
+            maxWidth: 150,
+            width: 'auto',
+            height: 'auto',
+            display: 'block',
+            mixBlendMode: 'screen',
+            margin: '-10px',
+          }}
+          alt="Logo"
+        />
+      </motion.div>
+    );
+  }
   return (
     <motion.svg
       viewBox="0 0 240 50"
@@ -26,7 +59,6 @@ export function Logo({ height = 32 }: LogoProps) {
         </linearGradient>
       </defs>
 
-      {/* Car silhouette */}
       <motion.g
         variants={{
           rest: { x: 0 },
@@ -42,40 +74,12 @@ export function Logo({ height = 32 }: LogoProps) {
           strokeLinejoin="round"
           fill="none"
         />
-        <path
-          d="M20 40 L66 40"
-          stroke="url(#logoGrad)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
+        <path d="M20 40 L66 40" stroke="url(#logoGrad)" strokeWidth="2.5" strokeLinecap="round" />
         <circle cx="18" cy="40" r="5" stroke="url(#logoGrad)" strokeWidth="2.5" fill="none" />
         <circle cx="72" cy="40" r="5" stroke="url(#logoGrad)" strokeWidth="2.5" fill="none" />
-        <path
-          d="M8 36 L12 36"
-          stroke="url(#logoGrad)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
+        <path d="M8 36 L12 36" stroke="url(#logoGrad)" strokeWidth="2.5" strokeLinecap="round" />
       </motion.g>
 
-      {/* Text: AUTOZAIMI */}
-      <motion.text
-        x="96"
-        y="34"
-        fontFamily="Inter, system-ui, sans-serif"
-        fontWeight="800"
-        fontSize="22"
-        letterSpacing="0.5"
-        fill="url(#logoGrad)"
-        variants={{
-          rest: { opacity: 1 },
-          hover: { opacity: 1 },
-        }}
-      >
-        AUTOZAIMI
-      </motion.text>
-
-      {/* Glow line under text on hover */}
       <motion.rect
         x="96"
         y="39"

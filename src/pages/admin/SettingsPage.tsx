@@ -207,7 +207,6 @@ export default function AdminSettingsPage() {
         const res = await get('CompanyProfile/get');
         if (res.success) {
           const data = res.data;
-
           const matchPhone = (phone: string) => {
             if (!phone) return { prefix: prefixes[0]?.phonePrefix ?? '', number: '' };
             const cleaned = phone.replace(/\s+/g, '');
@@ -407,7 +406,6 @@ export default function AdminSettingsPage() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <form>
           <Stack gap="xl">
-
             <AnimatedSection>
               <Group justify="space-between" align="flex-start">
                 <div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Box,
@@ -11,6 +11,7 @@ import {
   Button,
   ActionIcon,
   Divider,
+  Skeleton,
 } from '@mantine/core';
 import {
   IconBrandFacebook,
@@ -29,64 +30,104 @@ import { AnimatedSection, StaggerContainer, StaggerItem } from './AnimatedSectio
 import { AnimatedDivider } from './AnimatedDivider';
 import { get, post } from '../../utils/api.utils';
 
-const socialIcons = [
-  { Icon: IconBrandFacebook, color: 'blue', label: 'Facebook' },
-  { Icon: IconBrandInstagram, color: 'pink', label: 'Instagram' },
-  { Icon: IconBrandTwitter, color: 'cyan', label: 'Twitter' },
-  { Icon: IconBrandYoutube, color: 'red', label: 'YouTube' },
-];
+
+interface CompanyProfileDto {
+  id?: string;
+  name?: string;
+  logoUrl?: string;
+  tagline?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  workingHours?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twiterUrl?: string;
+  youtubeUrl?: string;
+  whatsAppNumber?: string;
+  years: number;
+}
 
 export function Footer() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
+  const [profile, setProfile] = useState<CompanyProfileDto | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [carCategories, setCarCategories] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await get('CarCategory/getAll');
+        if (response?.data) {
+          setCarCategories(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch car categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await get('CompanyProfile/get');
+        if (response?.data) {
+          setProfile(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch company profile:', error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const socialIcons = [
+    { Icon: IconBrandFacebook, color: 'blue', label: 'Facebook', url: profile?.facebookUrl },
+    { Icon: IconBrandInstagram, color: 'pink', label: 'Instagram', url: profile?.instagramUrl },
+    { Icon: IconBrandTwitter, color: 'cyan', label: 'Twitter', url: profile?.twiterUrl },
+    { Icon: IconBrandYoutube, color: 'red', label: 'YouTube', url: profile?.youtubeUrl },
+  ];
 
   const handleSubscribe = async () => {
     if (!email) return;
-
+    setLoading(true);
     try {
-      const response = await post('Subscribe/subscribe', {
-        email: email
-      });
-
+      const response = await post('Subscribe/subscribe', { email });
       if (!response.success) {
-        notifications.show({
-          title: t('error'),
-          message: t('footer.subscribeError'),
-          color: 'red',
-        });
+        notifications.show({ title: t('error'), message: t('footer.subscribeError'), color: 'red' });
+      } else {
+        notifications.show({ title: t('success'), message: t('footer.subscribeSuccess'), color: 'teal' });
+        setEmail('');
       }
-
-      notifications.show({
-        title: t('success'),
-        message: t('footer.subscribeSuccess'),
-        color: 'teal',
-      });
-      setEmail('');
     } catch (error) {
-      notifications.show({
-        title: t('error'),
-        message: t('footer.subscribeError'),
-        color: 'red',
-      });
+      notifications.show({ title: t('error'), message: t('footer.subscribeError'), color: 'red' });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Box component="footer">
       <AnimatedDivider maxWidth={1200} />
-
       <Box py={60}>
         <Container size="xl">
           <StaggerContainer stagger={0.12}>
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing={40}>
               <StaggerItem>
-                <Stack gap="md">
-                  <Logo height={28} />
-                  <Text size="sm" c="dimmed" maw={280}>
-                    {t('footer.description')}
+                <Stack gap={2} align="flex-start" w="100%"  >
+                  <Logo logoUrl={profile?.logoUrl} />
+                  <Text size="sm" c="dimmed" style={{ marginLeft: 20 }}>
+                    {profile?.tagline}
                   </Text>
                   <Group gap="xs">
-                    {socialIcons.map(({ Icon, color, label }) => (
+                    {socialIcons.map(({ Icon, color, label, url }) => (
                       <motion.div
                         key={label}
                         whileHover={{ scale: 1.2, y: -3 }}
@@ -99,6 +140,11 @@ export function Footer() {
                           radius="xl"
                           color={color}
                           aria-label={label}
+                          component={url ? 'a' : 'button'}
+                          href={url || undefined}
+                          target={url ? '_blank' : undefined}
+                          rel={url ? 'noopener noreferrer' : undefined}
+                          style={{ opacity: url ? 1 : 0.4, pointerEvents: url ? 'auto' : 'none' }}
                         >
                           <Icon size={20} />
                         </ActionIcon>
@@ -128,10 +174,11 @@ export function Footer() {
               <StaggerItem>
                 <Stack gap="sm">
                   <Text fw={600} size="md">{t('footer.carTypes')}</Text>
-                  <Text size="sm" c="dimmed">{t('footer.luxury')}</Text>
-                  <Text size="sm" c="dimmed">{t('footer.suv')}</Text>
-                  <Text size="sm" c="dimmed">{t('footer.electric')}</Text>
-                  <Text size="sm" c="dimmed">{t('footer.economy')}</Text>
+                  {carCategories.map((category) => (
+                    <Text key={category.id} size="sm" c="dimmed">
+                      {category.name}
+                    </Text>
+                  ))}
                 </Stack>
               </StaggerItem>
 
@@ -155,24 +202,38 @@ export function Footer() {
                         onClick={handleSubscribe}
                         fullWidth
                         radius="md"
+                        loading={loading}
                         className="ripple-btn"
                       >
                         {t('footer.subscribe')}
                       </Button>
                     </motion.div>
                   </Stack>
+
                   <Stack gap={6} mt="xs">
                     <Group gap={6}>
                       <IconPhone size={14} style={{ opacity: 0.6 }} />
-                      <Text size="xs" c="dimmed">+355 44 123 456</Text>
+                      {loadingProfile ? (
+                        <Skeleton height={12} width={120} radius="sm" />
+                      ) : (
+                        <Text size="xs" c="dimmed">{profile?.phone}</Text>
+                      )}
                     </Group>
                     <Group gap={6}>
                       <IconMail size={14} style={{ opacity: 0.6 }} />
-                      <Text size="xs" c="dimmed">info@autozaimi.al</Text>
+                      {loadingProfile ? (
+                        <Skeleton height={12} width={150} radius="sm" />
+                      ) : (
+                        <Text size="xs" c="dimmed">{profile?.email}</Text>
+                      )}
                     </Group>
                     <Group gap={6}>
                       <IconMapPin size={14} style={{ opacity: 0.6 }} />
-                      <Text size="xs" c="dimmed">{t('footer.address')}</Text>
+                      {loadingProfile ? (
+                        <Skeleton height={12} width={180} radius="sm" />
+                      ) : (
+                        <Text size="xs" c="dimmed">{profile?.address}</Text>
+                      )}
                     </Group>
                   </Stack>
                 </Stack>
@@ -184,7 +245,7 @@ export function Footer() {
 
           <AnimatedSection>
             <Text ta="center" size="sm" c="dimmed">
-              © {new Date().getFullYear()} AutoZaimi. {t('footer.rights')}
+              © {new Date().getFullYear() - (profile?.years ?? 0)} {profile?.name}. {t('footer.rights')}
             </Text>
           </AnimatedSection>
         </Container>
