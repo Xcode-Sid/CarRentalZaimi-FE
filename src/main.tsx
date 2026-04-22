@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { BookingsProvider } from './contexts/BookingsContext';
 import { AdsProvider } from './contexts/AdsContext';
+import { NotificationsProvider } from './contexts/NotificationsContext';
 import { theme } from './theme';
 import App from './App';
 import './i18n';
@@ -26,13 +27,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Notifications position="top-right" />
       <BrowserRouter>
         <AuthProvider>
-          <FavoritesProvider>
-            <BookingsProvider>
-              <AdsProvider>
-                <App />
-              </AdsProvider>
-            </BookingsProvider>
-          </FavoritesProvider>
+          <NotificationsProvider>
+            <FavoritesProvider>
+              <BookingsProvider>
+                <AdsProvider>
+                  <App />
+                </AdsProvider>
+              </BookingsProvider>
+            </FavoritesProvider>
+          </NotificationsProvider>
         </AuthProvider>
       </BrowserRouter>
     </MantineProvider>

@@ -13,10 +13,6 @@ import {
   Divider,
 } from '@mantine/core';
 import {
-  IconBrandFacebook,
-  IconBrandInstagram,
-  IconBrandTwitter,
-  IconBrandYoutube,
   IconPhone,
   IconMail,
   IconMapPin,
@@ -27,14 +23,8 @@ import { motion } from 'framer-motion';
 import { Logo } from './Logo';
 import { AnimatedSection, StaggerContainer, StaggerItem } from './AnimatedSection';
 import { AnimatedDivider } from './AnimatedDivider';
-import { get, post } from '../../utils/api.utils';
-
-const socialIcons = [
-  { Icon: IconBrandFacebook, color: 'blue', label: 'Facebook' },
-  { Icon: IconBrandInstagram, color: 'pink', label: 'Instagram' },
-  { Icon: IconBrandTwitter, color: 'cyan', label: 'Twitter' },
-  { Icon: IconBrandYoutube, color: 'red', label: 'YouTube' },
-];
+import { get, post } from '../../utils/apiUtils';
+import { SOCIAL_ICONS as socialIcons } from '../../constants/landing';
 
 export function Footer() {
   const { t } = useTranslation();

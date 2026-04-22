@@ -11,9 +11,8 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
 import { useAuth } from '../../contexts/AuthContext';
 import { mapApiCarToVehicle, type Vehicle } from '../../data/vehicles';
-import { get } from '../../utils/api.utils';
-
-const PAGE_SIZE = 9;
+import { get } from '../../utils/apiUtils';
+import { SAVED_CARS_PAGE_SIZE as PAGE_SIZE } from '../../constants/pagination';
 
 export default function SavedCarsPage() {
   const { t } = useTranslation();
@@ -49,9 +48,9 @@ export default function SavedCarsPage() {
         label: cat.name,
       })));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : t('common.unknownError'));
     }
-  }, []);
+  }, [t]);
 
   const fetchSavedCars = useCallback(async () => {
     if (!user?.id) return;
@@ -74,7 +73,7 @@ export default function SavedCarsPage() {
       setTotalPages(res.data.totalPages);
       setTotalCount(res.data.totalCount);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : t('common.unknownError'));
       setVehicles([]);
     } finally {
       setLoading(false);
@@ -180,11 +179,11 @@ export default function SavedCarsPage() {
               {totalPages > 1 && (
                 <Group justify="space-between" align="center" px={4}>
                   <Text size="xs" c="dimmed">
-                    {t('admin.showing') ?? 'Showing'}{' '}
+                    {t('admin.showing')}{' '}
                     <Text component="span" size="xs" fw={500} c="default">{startItem}–{endItem}</Text>{' '}
-                    {t('admin.of') ?? 'of'}{' '}
+                    {t('admin.of')}{' '}
                     <Text component="span" size="xs" fw={500} c="default">{totalCount}</Text>{' '}
-                    {t('account.savedCars') ?? 'saved cars'}
+                    {t('account.savedCars')}
                   </Text>
                   <Pagination
                     value={page}

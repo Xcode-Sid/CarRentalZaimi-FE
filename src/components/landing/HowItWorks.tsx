@@ -1,14 +1,8 @@
 import { Container, Title, Text, SimpleGrid, Stack, ThemeIcon, Box, useMantineColorScheme } from '@mantine/core';
-import { IconCar, IconCalendarEvent, IconKey } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
-
-const steps = [
-  { icon: IconCar, titleKey: 'howItWorks.step1Title', descKey: 'howItWorks.step1Desc', color: 'teal' },
-  { icon: IconCalendarEvent, titleKey: 'howItWorks.step2Title', descKey: 'howItWorks.step2Desc', color: 'teal' },
-  { icon: IconKey, titleKey: 'howItWorks.step3Title', descKey: 'howItWorks.step3Desc', color: 'green' },
-];
+import { HOW_IT_WORKS_STEPS as steps } from '../../constants/landing';
 
 export function HowItWorks() {
   const { t } = useTranslation();

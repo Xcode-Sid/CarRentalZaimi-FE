@@ -8,33 +8,14 @@ import { notifications } from '@mantine/notifications';
 import { UAParser } from 'ua-parser-js';
 import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import Spinner from '../../components/spinner/Spinner';
 import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
-
-enum DeviceType {
-  Mobile = 1,
-  Tablet = 2,
-  Desktop = 3
-}
-
-interface DeviceInfo {
-  deviceType: DeviceType;
-  userAgent: string;
-  operatingSystem: string;
-  browser: string;
-  lastIPAddress: string;
-}
+import { DeviceType, type DeviceInfo, type PendingAuthData } from '../../types/oauth';
 
 interface SimpleFacebookOAuthProps {
   isMobile?: boolean;
   appId?: string;
-}
-
-interface PendingAuthData {
-  token: string;
-  user: Record<string, unknown>;
-  role: { name: string } | string;
 }
 
 const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
@@ -124,7 +105,7 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
     const { code, state, error: err, errorDescription } = params;
 
     if (err) {
-      setError(`Authentication failed: ${errorDescription || err}`);
+      setError(`${t('oauth.authFailed')}: ${errorDescription || err}`);
       window.history.replaceState({}, document.title, window.location.pathname);
       return;
     }
@@ -132,7 +113,7 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
     if (code && state) {
       const storedState = sessionStorage.getItem('facebook_oauth_state');
       if (storedState !== state) {
-        setError('Invalid state parameter. Please try again.');
+        setError(t('oauth.invalidState'));
         sessionStorage.removeItem('facebook_oauth_state');
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
@@ -186,7 +167,7 @@ const FacebookOAuth: React.FC<SimpleFacebookOAuthProps> = ({
       }
 
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Authentication failed';
+      const msg = err instanceof Error ? err.message : t('oauth.authFailed');
       setError(msg);
       notifications.show({ color: 'red', title: t('error'), message: msg });
     } finally {

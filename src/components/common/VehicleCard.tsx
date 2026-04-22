@@ -7,23 +7,12 @@ import { notifications } from '@mantine/notifications';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useAuth } from '../../contexts/AuthContext'; // adjust path if needed
 import type { Vehicle } from '../../data/vehicles';
-import { post } from '../../utils/api.utils';
+import { post } from '../../utils/apiUtils';
 import { useEffect, useState } from 'react';
 import Spinner from '../spinner/Spinner';
 import { createPortal } from 'react-dom';
 
-const categoryColors: Record<string, string> = {
-  Luksoze: 'yellow',
-  SUV: 'green',
-  Elektrike: 'blue',
-  Ekonomike: 'gray',
-};
-
-const statusDotClass: Record<string, string> = {
-  available: 'status-dot-available',
-  maintenance: 'status-dot-maintenance',
-  unavailable: 'status-dot-unavailable',
-};
+import { categoryColors, vehicleStatusDotClass as statusDotClass } from '../../constants/colors';
 
 interface Props {
   vehicle: Vehicle;
@@ -73,7 +62,7 @@ export function VehicleCard({ vehicle, index = 0 }: Props) {
       }
     } catch {
       setIsSaved(!optimistic); // revert
-      notifications.show({ message: 'Something went wrong.', color: 'red' });
+      notifications.show({ message: t('common.somethingWentWrong'), color: 'red' });
     } finally {
       setLoading(false);
     }

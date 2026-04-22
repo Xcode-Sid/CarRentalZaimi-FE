@@ -26,14 +26,10 @@ import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 
 
-interface WorkingHoursEntry {
-  day: string;
-  openTime: string;
-  closeTime: string;
-}
+import type { WorkingHoursEntry } from '../../types/company';
 
 function parseWorkingHours(raw?: string): WorkingHoursEntry[] {
   if (!raw) return [];
@@ -45,19 +41,14 @@ function parseWorkingHours(raw?: string): WorkingHoursEntry[] {
   }
 }
 
-interface CompanyProfileDto {
-  email?: string;
-  phone?: string;
-  address?: string;
-  workingHours?: string;
-}
+type ContactCompanyProfile = Pick<import('../../types/company').CompanyProfileDto, 'email' | 'phone' | 'address' | 'workingHours'>;
 
 export function ContactSection() {
   const { t } = useTranslation();
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const [profile, setProfile] = useState<CompanyProfileDto | null>(null);
+  const [profile, setProfile] = useState<ContactCompanyProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -72,7 +63,7 @@ export function ContactSection() {
       try {
         const res = await get('CompanyProfile/get');
         if (res.success) {
-          setProfile(res.data as CompanyProfileDto);
+          setProfile(res.data as ContactCompanyProfile);
         }
       } catch {
         // silently fail — cards will show '—'
@@ -156,14 +147,14 @@ export function ContactSection() {
         } else {
           notifications.show({
             title: t('error'),
-            message: t('contact.sendError') ?? 'Something went wrong. Please try again.',
+            message: t('contact.sendError'),
             color: 'red',
           });
         }
       } catch {
         notifications.show({
           title: t('error'),
-          message: t('contact.sendError') ?? 'Something went wrong. Please try again.',
+          message: t('contact.sendError'),
           color: 'red',
         });
       } finally {

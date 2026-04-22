@@ -13,14 +13,14 @@ import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { type Vehicle, mapApiCarToVehicle } from '../../../data/vehicles';
 import { PAGE_SIZE } from '../../../constants/pagination';
-import { get, post } from '../../../utils/api.utils';
+import { get, post } from '../../../utils/apiUtils';
 import { AnimatedSection } from '../../../components/common/AnimatedSection';
 import Spinner from '../../../components/spinner/Spinner';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function getDisplayName(car: Vehicle | null): string {
-    return car?.title ?? (car?.carId ? `Car #${car.carId}` : 'Unknown');
+function getDisplayName(car: Vehicle | null, t: (key: string, opts?: any) => string): string {
+    return car?.title ?? (car?.carId ? t('admin.carNumber', { id: car.carId }) : t('common.unknown'));
 }
 
 function getPrimaryImageSrc(car: Vehicle): string {
@@ -32,7 +32,7 @@ function getPrimaryImageSrc(car: Vehicle): string {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function RecomandedCarsPage() {
+export default function RecommendedCarsPage() {
     const { t } = useTranslation();
     const [cars, setCars] = useState<Vehicle[]>([]);
     const [loading, setLoading] = useState(true);
@@ -90,8 +90,8 @@ export default function RecomandedCarsPage() {
                 notifications.show({
                     title: t('success'),
                     message: next
-                        ? `${getDisplayName(car)} ${t('isNowFeatured')}`
-                        : `${getDisplayName(car)} ${t('removedFromFeatured')}`,
+                        ? `${getDisplayName(car, t)} ${t('isNowFeatured')}`
+                        : `${getDisplayName(car, t)} ${t('removedFromFeatured')}`,
                     color: 'teal'
                 });
             } else {
@@ -164,7 +164,7 @@ export default function RecomandedCarsPage() {
                         >
                             <Group gap="sm">
                                 <TextInput
-                                    placeholder={t('admin.searchPlaceholder') ?? 'Search cars…'}
+                                    placeholder={t('admin.searchPlaceholder')}
                                     leftSection={<IconSearch size={15} />}
                                     value={search}
                                     onChange={(e) => setSearch(e.currentTarget.value)}
@@ -188,7 +188,7 @@ export default function RecomandedCarsPage() {
                                             color="gray"
                                             radius="md"
                                             onClick={() => setSearch('')}
-                                            title="Clear search"
+                                            title={t('common.clearSearch')}
                                         >
                                             <IconX size={15} />
                                         </ActionIcon>
@@ -312,7 +312,7 @@ export default function RecomandedCarsPage() {
                                                                     />
                                                                 )}
                                                                 <Text size="sm" fw={500}>
-                                                                    {getDisplayName(car)}
+                                                                    {getDisplayName(car, t)}
                                                                 </Text>
                                                             </Group>
                                                         </Table.Td>
@@ -371,15 +371,15 @@ export default function RecomandedCarsPage() {
                                 {totalPages > 1 && (
                                     <Group justify="space-between" align="center" px={4}>
                                         <Text size="xs" c="dimmed">
-                                            {t('admin.showing') ?? 'Showing'}{' '}
+                                            {t('admin.showing')}{' '}
                                             <Text component="span" size="xs" fw={500} c="default">
                                                 {startItem}–{endItem}
                                             </Text>{' '}
-                                            {t('admin.of') ?? 'of'}{' '}
+                                            {t('admin.of')}{' '}
                                             <Text component="span" size="xs" fw={500} c="default">
                                                 {totalCount}
                                             </Text>{' '}
-                                            {t('admin.cars') ?? 'cars'}
+                                            {t('admin.cars')}
                                         </Text>
 
                                         <Pagination

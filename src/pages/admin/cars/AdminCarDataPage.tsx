@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { inputStyles } from "../../../constants/styles";
 import {
     Title,
     TextInput,
@@ -23,56 +24,21 @@ import { notifications } from "@mantine/notifications";
 import { motion } from "framer-motion";
 import { IconSearch, IconPlus, IconEdit, IconTrash, IconDeviceFloppy, IconX } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
-import { get, post, put, del } from "../../../utils/api.utils";
+import { get, post, put, del } from "../../../utils/apiUtils";
 import Spinner from "../../../components/spinner/Spinner";
 import type { CarCategory, CarCompanyModel, CarCompanyName, GeneralData } from "../../../data/vehicles";
 import { useForm } from "@mantine/form";
 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-
-type TabKey =
-    | "categories"
-    | "companyNames"
-    | "companyModels"
-    | "exteriorColors"
-    | "fuels"
-    | "interiorColors"
-    | "transmissions";
-
-// ─── API Config ───────────────────────────────────────────────────────────────
-
-const ENDPOINTS: Record<TabKey, string> = {
-    categories: "CarCategory",
-    companyNames: "CarCompanyName",
-    companyModels: "CarCompanyModel",
-    exteriorColors: "CarExteriorColor",
-    fuels: "CarFuel",
-    interiorColors: "CarInteriorColor",
-    transmissions: "CarTransmission",
-};
-
-// ─── Tab Config ───────────────────────────────────────────────────────────────
-
-// Labels are now translation keys — resolved inside the component via t()
-const TABS: { key: TabKey; labelKey: string; color: string }[] = [
-    { key: "categories", labelKey: "carData.tabs.categories", color: "teal" },
-    { key: "companyNames", labelKey: "carData.tabs.companyNames", color: "blue" },
-    { key: "companyModels", labelKey: "carData.tabs.companyModels", color: "violet" },
-    { key: "exteriorColors", labelKey: "carData.tabs.exteriorColors", color: "orange" },
-    { key: "fuels", labelKey: "carData.tabs.fuels", color: "pink" },
-    { key: "interiorColors", labelKey: "carData.tabs.interiorColors", color: "yellow" },
-    { key: "transmissions", labelKey: "carData.tabs.transmissions", color: "teal" },
-];
+import { type TabKey, ENDPOINTS, TABS } from "../../../constants/carData";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const fmtDate = (item: any): string => {
+const fmtDate = (item: any, locale = "en-GB"): string => {
     const iso = item.createdAt ?? item.createdOn;
     if (!iso) return "\u2014";
     const d = new Date(iso);
-    return isNaN(d.getTime()) ? "\u2014" : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    return isNaN(d.getTime()) ? "\u2014" : d.toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric" });
 };
 
 const resolveBrandName = (val: any): string => {
@@ -110,19 +76,6 @@ const deleteItem = async (endpoint: string, id: string): Promise<void> => {
 };
 
 
-const inputStyles = {
-    input: {
-        transition: 'border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.18s',
-        '&:focus': {
-            transform: 'translateY(-1px)',
-            boxShadow: '0 0 0 3px rgba(29, 158, 117, 0.12)',
-        },
-    },
-    label: {
-        transition: 'color 0.15s',
-        '&:has(+ * :focus)': { color: 'var(--mantine-color-teal-7)' },
-    },
-};
 
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -508,7 +461,7 @@ return (
                                 color="gray"
                                 radius="md"
                                 onClick={() => setSearch('')}
-                                title="Clear search"
+                                title={t('common.clearSearch')}
                             >
                                 <IconX size={15} />
                             </ActionIcon>
@@ -639,7 +592,7 @@ return (
                                             )}
 
                                             <Table.Td>
-                                                <Text size="xs" c="dimmed">{fmtDate(item)}</Text>
+                                                <Text size="xs" c="dimmed">{fmtDate(item, i18n.language)}</Text>
                                             </Table.Td>
 
                                             <Table.Td>

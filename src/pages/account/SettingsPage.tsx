@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconLock, IconShield, IconCheck, IconX } from '@tabler/icons-react';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
-import { post } from '../../utils/api.utils';
+import { post } from '../../utils/apiUtils';
 
 // ─── Password strength helpers ────────────────────────────────────────────────
 
@@ -46,12 +46,12 @@ function getStrengthColor(passed: number): string {
   return '#14b8a6';
 }
 
-function getStrengthLabel(passed: number): string {
-  if (passed <= 1) return 'Weak';
-  if (passed <= 2) return 'Fair';
-  if (passed <= 3) return 'Good';
-  if (passed <= 4) return 'Strong';
-  return 'Excellent';
+function getStrengthLabel(passed: number, t: (k: string) => string): string {
+  if (passed <= 1) return t('passwordStrength.weak');
+  if (passed <= 2) return t('passwordStrength.fair');
+  if (passed <= 3) return t('passwordStrength.good');
+  if (passed <= 4) return t('passwordStrength.strong');
+  return t('passwordStrength.excellent');
 }
 
 // ─── Form values ──────────────────────────────────────────────────────────────
@@ -153,7 +153,7 @@ export default function SettingsPage() {
               <Title order={2} fw={700}>
                 {t('account.settings')}
               </Title>
-              <Text size="sm" c="dimmed">{t('account.settingsSubtitle') || 'Manage your account security'}</Text>
+              <Text size="sm" c="dimmed">{t('account.settingsSubtitle')}</Text>
             </Box>
           </Group>
         </AnimatedSection>
@@ -170,8 +170,8 @@ export default function SettingsPage() {
                 <IconLock size={16} />
               </ThemeIcon>
               <Box>
-                <Text fw={600} size="md">{t('account.changePassword') || 'Change Password'}</Text>
-                <Text size="xs" c="dimmed">{t('account.changePasswordSubtitle') || 'Choose a strong, unique password'}</Text>
+                <Text fw={600} size="md">{t('account.changePassword')}</Text>
+                <Text size="xs" c="dimmed">{t('account.changePasswordSubtitle')}</Text>
               </Box>
             </Group>
 
@@ -196,7 +196,7 @@ export default function SettingsPage() {
                     <Divider
                       label={
                         <Text size="xs" c="dimmed">
-                          {t('account.newCredentials') || 'New credentials'}
+                          {t('account.newCredentials')}
                         </Text>
                       }
                       labelPosition="left"
@@ -227,13 +227,13 @@ export default function SettingsPage() {
                           >
                             <Stack gap={6}>
                               <Group justify="space-between">
-                                <Text size="xs" c="dimmed">{t('register.passwordRules') || 'Password strength'}</Text>
+                                <Text size="xs" c="dimmed">{t('register.passwordRules')}</Text>
                                 <Badge
                                   size="xs"
                                   variant="light"
                                   style={{ color: strengthColor, background: strengthColor + '20' }}
                                 >
-                                  {getStrengthLabel(passedRules.length)}
+                                  {getStrengthLabel(passedRules.length, t)}
                                 </Badge>
                               </Group>
                               <Progress
@@ -324,7 +324,7 @@ export default function SettingsPage() {
                           className="ripple-btn"
                           px="xl"
                         >
-                          {t('account.save') || 'Update Password'}
+                          {t('account.save')}
                         </Button>
                       </motion.div>
                     </Group>

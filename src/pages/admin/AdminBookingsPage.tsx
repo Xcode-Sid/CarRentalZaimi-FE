@@ -30,22 +30,12 @@ import { formatBookingPeriod } from '../../utils/bookingDisplay';
 import { BookingDetailContent, bookingStatusKeys } from '../../components/booking/BookingDetailContent';
 import { useDebouncedValue } from '@mantine/hooks';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get, put } from '../../utils/api.utils';
+import { get, put } from '../../utils/apiUtils';
+import type { PagedResponse } from '../../types/admin';
 import { toImagePath } from '../../utils/general';
 import { mapApiBooking, type Booking, type BookingStatus } from '../../data/bookings';
 
-const statusColors: Record<string, string> = {
-  accepted: 'orange',
-  refused: 'red',
-  done: 'teal',
-};
-
-interface PagedResponse<T> {
-  items: T[];
-  totalCount: number;
-  pageNr: number;
-  pageSize: number;
-}
+import { bookingStatusColors as statusColors } from '../../constants/colors';
 
 export default function AdminBookingsPage() {
   const { t } = useTranslation();

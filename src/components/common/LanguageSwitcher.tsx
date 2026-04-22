@@ -1,12 +1,7 @@
 import { Menu, ActionIcon, Text } from '@mantine/core';
 import { IconLanguage } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-
-const languages = [
-  { code: 'sq', label: 'Shqip', flag: '🇦🇱' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
-];
+import { LANGUAGES as languages } from '../../constants/landing';
 
 export function LanguageSwitcher() {
   const { i18n, t } = useTranslation();

@@ -37,16 +37,13 @@ import {
   IconFileText,
   IconAlertCircle,
   IconX, IconKey,
-  IconScale, IconBuildingBank, IconUserCheck,
-  IconCookie, IconGlobe, IconInfoCircle,
-  IconClipboardList, IconNotes, IconStarFilled, IconBell,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { Logo } from '../../components/common/Logo';
 import { AnimatedSection, StaggerContainer } from '../../components/common/AnimatedSection';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import GoogleOAuth from '../oauth/GoogleOAuth';
 import Spinner from '../../components/spinner/Spinner';
 import MicrosoftOAuth from '../oauth/MicrosoftOAuth';
@@ -54,7 +51,8 @@ import FacebookOAuth from '../oauth/FacebookOAuth';
 import YahooOAuth from '../oauth/YahooOAuth';
 import { LocationField, useLocation } from '../../components/location/Location';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+import type { PhonePrefix, PolicyItem } from '../../types/company';
+import { POLICY_ICON_MAP } from '../../constants/iconRegistry';
 
 interface FormValues {
   firstname: string;
@@ -70,23 +68,6 @@ interface FormValues {
   acceptTerms: boolean;
 }
 
-interface PhonePrefix {
-  countryName: string | null;
-  phonePrefix: string | null;
-  flag: string | null;
-  phoneRegex: string | null;
-}
-
-interface PolicyItem {
-  id?: number | string;
-  title?: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-}
-
-// ─── PolicyModal ──────────────────────────────────────────────────────────────
-
 interface PolicyModalProps {
   opened: boolean;
   onClose: () => void;
@@ -99,29 +80,8 @@ interface PolicyModalProps {
   error: string | null;
 }
 
-const ICON_MAP: Record<string, React.FC<{ size?: number; color?: string }>> = {
-  'file-text': IconFileText,
-  'shield-check': IconShieldCheck,
-  'lock': IconLock,
-  'key': IconKey,
-  'scale': IconScale,
-  'building-bank': IconBuildingBank,
-  'user-check': IconUserCheck,
-  'alert-circle': IconAlertCircle,
-  'cookie': IconCookie,
-  'mail': IconMail,
-  'phone': IconPhone,
-  'globe': IconGlobe,
-  'info-circle': IconInfoCircle,
-  'clipboard-list': IconClipboardList,
-  'notes': IconNotes,
-  'star': IconStarFilled,
-  'bell': IconBell,
-};
-
-
 function getItemIcon(name: string, size = 14, color = 'currentColor') {
-  const IconComponent = ICON_MAP[name];
+  const IconComponent = POLICY_ICON_MAP[name];
   if (!IconComponent) return null;
   return <IconComponent size={size} color={color} />;
 }
@@ -216,7 +176,7 @@ function PolicyModal({
           {loading && (
             <Stack align="center" py={56} gap="xs">
               <Loader color="teal" size="md" type="dots" />
-              <Text size="sm" c="dimmed" fw={500}>Loading content…</Text>
+              <Text size="sm" c="dimmed" fw={500}>{t('common.loadingContent')}</Text>
             </Stack>
           )}
 
@@ -318,7 +278,7 @@ function PolicyModal({
 // ─── RegisterPage ─────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -366,9 +326,9 @@ export default function RegisterPage() {
     try {
       const response = await get('Privacy/getAll');
       if (response.success) setPrivacyItems(response.data as PolicyItem[]);
-      else setPrivacyError('Failed to load privacy policy.');
+      else setPrivacyError(t('register.privacyLoadFailed'));
     } catch {
-      setPrivacyError('Failed to load privacy policy.');
+      setPrivacyError(t('register.privacyLoadFailed'));
     } finally {
       setPrivacyLoading(false);
     }
@@ -383,9 +343,9 @@ export default function RegisterPage() {
     try {
       const response = await get('Terms/getAll');
       if (response.success) setTermsItems(response.data as PolicyItem[]);
-      else setTermsError('Failed to load terms and conditions.');
+      else setTermsError(t('register.termsLoadFailed'));
     } catch {
-      setTermsError('Failed to load terms and conditions.');
+      setTermsError(t('register.termsLoadFailed'));
     } finally {
       setTermsLoading(false);
     }
@@ -518,7 +478,7 @@ export default function RegisterPage() {
         opened={privacyModalOpen}
         onClose={() => setPrivacyModalOpen(false)}
         title={t('privacyPolicy.title')}
-        subtitle={`${t('lastUpdated')} · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+        subtitle={`${t('lastUpdated')} · ${new Date().toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}`}
         icon={<IconShieldCheck size={22} color="#12b886" />}
         accent="#12b886"
         items={privacyItems}
@@ -531,7 +491,7 @@ export default function RegisterPage() {
         opened={termsModalOpen}
         onClose={() => setTermsModalOpen(false)}
         title={t('termsAndConditions')}
-        subtitle={`${t('lastUpdated')} · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
+        subtitle={`${t('lastUpdated')} · ${new Date().toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })}`}
         icon={<IconFileText size={22} color="#228be6" />}
         accent="#228be6"
         items={termsItems}
@@ -630,7 +590,7 @@ export default function RegisterPage() {
                   </Box>
 
                   {/* Date of birth */}
-                  <DateInput label={t('register.dateOfBirth')} placeholder="DD/MM/YYYY" leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
+                  <DateInput label={t('register.dateOfBirth')} placeholder={t('common.datePlaceholder')} leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
 
                   {/* Location */}
                   <LocationField

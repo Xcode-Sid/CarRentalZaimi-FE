@@ -17,38 +17,9 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
 import { useEffect, useState } from 'react';
-import { get } from '../../utils/api.utils';
+import { get } from '../../utils/apiUtils';
 import Spinner from '../spinner/Spinner';
-
-interface CompanyProfileDto {
-  id?: string;
-  name?: string;
-  logoUrl?: string;
-  tagline?: string;
-  aboutText?: string;
-  missionTitle?: string;
-  missionDescription?: string;
-  whyChooseUs?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  workingHours?: string;
-  facebookUrl?: string;
-  instagramUrl?: string;
-  twiterUrl?: string;
-  youtubeUrl?: string;
-  whatsAppNumber?: string;
-  years: number;
-  cars: number;
-  cities: number;
-  clients: number;
-}
-
-interface WhyChooseUsItem {
-  icon: string;
-  title: string;
-  description: string;
-}
+import type { CompanyProfileDto, WhyChooseUsItem } from '../../types/company';
 
 export function AboutSection() {
   const { t } = useTranslation();

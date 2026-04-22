@@ -12,15 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get, del } from '../../utils/api.utils';
+import { get, del } from '../../utils/apiUtils';
 import Spinner from '../../components/spinner/Spinner';
-
-
-interface Subscription {
-    id: string;
-    email: string | null;
-    isUnsubscribed: boolean;
-}
+import type { Subscription } from '../../types/admin';
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function SubscriptionsPage() {
@@ -63,7 +57,7 @@ export default function SubscriptionsPage() {
             setTotalPages(res.data.totalPages ?? 1);
             setTotalCount(res.data.totalCount ?? 0);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
+            setError(err instanceof Error ? err.message : t('common.unknownError'));
             setSubscriptions([]);
         } finally {
             setLoading(false);

@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 
-import { post } from '../../utils/api.utils';
+import { post } from '../../utils/apiUtils';
 import { Logo } from '../../components/common/Logo';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import Spinner from '../../components/spinner/Spinner';

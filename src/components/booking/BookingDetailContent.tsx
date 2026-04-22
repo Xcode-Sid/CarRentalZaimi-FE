@@ -15,29 +15,13 @@ import { motion } from 'framer-motion';
 import { useState, type ReactNode } from 'react';
 import type { Booking } from '../../data/bookings';
 
-export const bookingStatusColors: Record<string, string> = {
-  accepted: 'orange',
-  refused: 'red',
-  done: 'teal',
-};
-
-export const bookingStatusKeys: Record<string, string> = {
-  accepted: 'account.accepted',
-  refused: 'account.refused',
-  done: 'account.done',
-};
-
-const statusGradients: Record<string, string> = {
-  accepted: 'linear-gradient(135deg, #7A3B00 0%, #B35900 40%, #F08030 100%)',
-  refused: 'linear-gradient(135deg, #7a1a1a 0%, #A32D2D 50%, #E24B4A 100%)',
-  done: 'linear-gradient(135deg, #0D4D4D 0%, #1A7A7A 50%, #2AADAD 100%)',
-};
-
-const statusDotColors: Record<string, string> = {
-  accepted: '#FFD4A8',
-  refused: '#F7C1C1',
-  done: '#A8EDED',
-};
+import {
+  bookingStatusColors,
+  bookingStatusKeys,
+  bookingStatusGradients as statusGradients,
+  bookingStatusDotColors as statusDotColors,
+} from '../../constants/colors';
+export { bookingStatusColors, bookingStatusKeys } from '../../constants/colors';
 
 export function rentalDayCount(start: string, end?: string): number | null {
   if (!end) return null;
@@ -124,7 +108,7 @@ export function BookingDetailContent({ booking }: Props) {
     },
     {
       icon: <IconShield size={14} />,
-      label: t('account.bookingAddons') ?? 'Add-ons',
+      label: t('account.bookingAddons'),
       value: booking.services?.length ? (
         <Group gap={4} justify="flex-end" wrap="wrap">
           {booking.services.map((s) => (
@@ -205,7 +189,7 @@ export function BookingDetailContent({ booking }: Props) {
           <Group grow gap="sm" mb="lg">
             <Paper radius="md" p="md" withBorder>
               <Text size="xs" fw={500} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }} mb={4}>
-                {t('rental.startDate') ?? 'Pick up'}
+                {t('rental.startDate')}
               </Text>
               <Text fw={700} size="lg" lh={1}>{startParts.day}</Text>
               <Text size="xs" c="dimmed" mt={2}>{startParts.monthYear} · {startParts.weekday}</Text>
@@ -213,11 +197,11 @@ export function BookingDetailContent({ booking }: Props) {
             {endParts && (
               <Paper radius="md" p="md" withBorder>
                 <Text size="xs" fw={500} c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }} mb={4}>
-                  {t('rental.endDate') ?? 'Return'}
+                  {t('rental.endDate')}
                 </Text>
                 <Text fw={700} size="lg" lh={1}>{endParts.day}</Text>
                 <Text size="xs" c="dimmed" mt={2}>
-                  {endParts.monthYear} · {endParts.weekday}{days != null ? ` · ${days}d` : ''}
+                  {endParts.monthYear} · {endParts.weekday}{days != null ? ` · ${t('common.daysShort', { count: days })}` : ''}
                 </Text>
               </Paper>
             )}
@@ -225,7 +209,7 @@ export function BookingDetailContent({ booking }: Props) {
 
           {/* Customer card */}
           <Text size="xs" fw={500} mb="xs" style={{ letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mantine-color-dimmed)' }}>
-            {t('admin.customer') ?? 'Customer'}
+            {t('admin.customer')}
           </Text>
           <Paper radius="md" p="md" withBorder mb="lg">
             <Group gap="sm">
@@ -248,7 +232,7 @@ export function BookingDetailContent({ booking }: Props) {
 
           {/* Detail rows */}
           <Text size="xs" fw={500} mb="xs" style={{ letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--mantine-color-dimmed)' }}>
-            {t('admin.bookingDetails') ?? 'Booking details'}
+            {t('admin.bookingDetails')}
           </Text>
           <Stack gap={0} mb="lg">
             {detailRows.map((row, i) => (
@@ -287,7 +271,7 @@ export function BookingDetailContent({ booking }: Props) {
           <Text size="xs" c="dimmed" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             {t('account.amount')}
           </Text>
-          <Text size="xs" c="dimmed" mt={2}>{t('rental.inclServices') ?? 'Incl. all services'}</Text>
+          <Text size="xs" c="dimmed" mt={2}>{t('rental.inclServices')}</Text>
         </Box>
         <Text
           fw={800}

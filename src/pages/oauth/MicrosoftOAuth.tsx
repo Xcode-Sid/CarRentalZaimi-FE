@@ -8,34 +8,15 @@ import { notifications } from '@mantine/notifications';
 import { UAParser } from 'ua-parser-js';
 import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import Spinner from '../../components/spinner/Spinner';
 import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
-
-enum DeviceType {
-  Mobile = 1,
-  Tablet = 2,
-  Desktop = 3
-}
-
-interface DeviceInfo {
-  deviceType: DeviceType;
-  userAgent: string;
-  operatingSystem: string;
-  browser: string;
-  lastIPAddress: string;
-}
+import { DeviceType, type DeviceInfo, type PendingAuthData } from '../../types/oauth';
 
 interface SimpleMicrosoftOAuthProps {
   clientId?: string;
   tenantId?: string;
   isMobile?: boolean;
-}
-
-interface PendingAuthData {
-  token: string;
-  user: Record<string, unknown>;
-  role: { name: string } | string;
 }
 
 const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
@@ -81,7 +62,7 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
     const { code, state, error: errorParam, errorDescription } = capturedParams;
 
     if (errorParam) {
-      setError(`Authentication failed: ${errorDescription || errorParam}`);
+      setError(`${t('oauth.authFailed')}: ${errorDescription || errorParam}`);
       window.history.replaceState({}, document.title, window.location.pathname);
       return;
     }
@@ -91,7 +72,7 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
       const codeVerifier = sessionStorage.getItem('ms_verifier');
 
       if (!storedState || !codeVerifier || storedState !== state) {
-        setError('Invalid session. Please try again.');
+        setError(t('oauth.invalidSession'));
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
       }
@@ -190,7 +171,7 @@ const MicrosoftOAuth: React.FC<SimpleMicrosoftOAuthProps> = ({
       }
 
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Authentication failed';
+      const msg = err instanceof Error ? err.message : t('oauth.authFailed');
       setError(msg);
       notifications.show({ color: 'red', title: t('error'), message: msg });
     } finally {

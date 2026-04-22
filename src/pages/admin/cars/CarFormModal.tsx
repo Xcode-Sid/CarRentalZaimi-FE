@@ -17,52 +17,11 @@ import type {
     FormValues,
 } from '../../../data/vehicles';
 import { IconCar, IconCheck, IconDeviceFloppy, IconInfoCircle } from '@tabler/icons-react';
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
+import { inputStyles } from '../../../constants/styles';
+import { INITIAL_VALUES, type Lookups, FEATURE_FIELDS } from '../../../constants/carForm';
 
 const toSelectData = (items: GeneralData[]) =>
     items.map((x) => ({ value: x.id, label: x.name }));
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-export const INITIAL_VALUES: FormValues = {
-    title: '', description: '',
-    year: new Date().getFullYear(), licensePlate: null,
-    pricePerDay: 0, seats: 5, doors: 4, mileage: null, horsePower: null,
-    categoryId: null, nameId: null, modelId: null,
-    transmissionTypeId: null, fuelTypeId: null,
-    exteriorColorTypeId: null, interiorColorTypeId: null,
-    abs: false, bluetooth: false, airConditioner: false, gps: false,
-    camera: false, heatedSeats: false, panoramicRoof: false,
-    parkingSensors: false, cruiseControl: false, climateControl: false,
-    ledHeadlights: false, appleCarPlay: false, androidAuto: false,
-    laneDepartureAlert: false, adaptiveCruiseControl: false,
-    toyotaSafetySense: false, thirdRowSeats: false,
-    wirelessCharging: false, electricWindows: false,
-    carImages: [],
-};
-
-export type Lookups = {
-    categories: CarCategory[];
-    companyNames: CarCompanyName[];
-    companyModels: CarCompanyModel[];
-    exteriorColors: GeneralData[];
-    interiorColors: GeneralData[];
-    transmissions: GeneralData[];
-    fuels: GeneralData[];
-};
-
-const FEATURE_FIELDS: [keyof FormValues, string][] = [
-    ['abs', 'ABS'], ['bluetooth', 'Bluetooth'], ['airConditioner', 'Air Conditioner'],
-    ['gps', 'GPS'], ['camera', 'Camera'], ['heatedSeats', 'Heated Seats'],
-    ['panoramicRoof', 'Panoramic Roof'], ['parkingSensors', 'Parking Sensors'],
-    ['cruiseControl', 'Cruise Control'], ['climateControl', 'Climate Control'],
-    ['ledHeadlights', 'LED Headlights'], ['appleCarPlay', 'Apple CarPlay'],
-    ['androidAuto', 'Android Auto'], ['laneDepartureAlert', 'Lane Departure Alert'],
-    ['adaptiveCruiseControl', 'Adaptive Cruise Control'],
-    ['toyotaSafetySense', 'Toyota Safety Sense'], ['thirdRowSeats', 'Third Row Seats'],
-    ['wirelessCharging', 'Wireless Charging'], ['electricWindows', 'Electric Windows'],
-];
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -76,21 +35,6 @@ type CarFormModalProps = {
     saving: boolean;
 };
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
-const inputStyles = {
-    input: {
-        transition: 'border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.18s',
-        '&:focus': {
-            transform: 'translateY(-1px)',
-            boxShadow: '0 0 0 3px rgba(29, 158, 117, 0.12)',
-        },
-    },
-    label: {
-        transition: 'color 0.15s',
-        '&:has(+ * :focus)': { color: 'var(--mantine-color-teal-7)' },
-    },
-};
 export function CarFormModal({
     opened, onClose, editingCar, lookups, lookupsLoading, onSave, saving,
 }: CarFormModalProps) {
@@ -265,14 +209,14 @@ return (
                     <NumberInput
                         required
                         label={t('year')}
-                        placeholder="2022"
+                        placeholder={t('carForm.yearPlaceholder')}
                         {...form.getInputProps('year')}
                         styles={inputStyles}
                     />
                     <TextInput
                         required
                         label={t('licensePlate')}
-                        placeholder="AA 000 BB"
+                        placeholder={t('carForm.platePlaceholder')}
                         {...form.getInputProps('licensePlate')}
                         styles={inputStyles}
                     />
@@ -292,7 +236,7 @@ return (
                     <NumberInput
                         label={t('horsePower')}
                         placeholder="0"
-                        rightSection={<Text size="xs" c="dimmed" pr={4}>hp</Text>}
+                        rightSection={<Text size="xs" c="dimmed" pr={4}>{t('vehicle.hp')}</Text>}
                         rightSectionWidth={36}
                         {...form.getInputProps('horsePower')}
                         styles={inputStyles}
@@ -320,7 +264,7 @@ return (
                     />
                     <TextInput
                         label={t('mileage')}
-                        rightSection={<Text size="xs" c="dimmed" pr={4}>km</Text>}
+                        rightSection={<Text size="xs" c="dimmed" pr={4}>{t('vehicle.km')}</Text>}
                         rightSectionWidth={36}
                         {...form.getInputProps('mileage')}
                         styles={inputStyles}

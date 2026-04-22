@@ -50,114 +50,16 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import Spinner from '../../components/spinner/Spinner';
 import { toImagePath } from '../../utils/general';
-
-interface PhonePrefix {
-  countryName: string | null;
-  phonePrefix: string | null;
-  flag: string | null;
-  phoneRegex: string | null;
-}
-
-
-interface WhyChooseUsItem {
-  icon: string;
-  title: string;
-  description: string;
-}
-
-interface WorkingHours {
-  day: string;
-  openTime: string;
-  closeTime: string;
-}
-
-interface FormValues {
-  name: string;
-  tagline: string;
-  logoUrl: string;
-  email: string;
-  phone: string;
-  address: string;
-  aboutText: string;
-  missionTitle: string;
-  missionDescription: string;
-  whyChooseUs: WhyChooseUsItem[];
-  workingHours: WorkingHours[];
-  facebookUrl: string;
-  instagramUrl: string;
-  twiterUrl: string;
-  youtubeUrl: string;
-  whatsAppNumber: string;
-  years: number;
-  cars: number;
-  cities: number;
-  clients: number;
-}
-
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-const ICON_OPTIONS = [
-  { value: '⭐', label: '⭐ Star' },
-  { value: '🚗', label: '🚗 Car' },
-  { value: '🔑', label: '🔑 Key' },
-  { value: '💰', label: '💰 Money' },
-  { value: '🛡️', label: '🛡️ Shield' },
-  { value: '⚡', label: '⚡ Lightning' },
-  { value: '🏆', label: '🏆 Trophy' },
-  { value: '🤝', label: '🤝 Handshake' },
-  { value: '📍', label: '📍 Location' },
-  { value: '✅', label: '✅ Check' },
-  { value: '🔧', label: '🔧 Wrench' },
-  { value: '💎', label: '💎 Diamond' },
-];
-
-const INITIAL_VALUES: FormValues = {
-  name: '',
-  tagline: '',
-  logoUrl: '',
-  email: '',
-  phone: '',
-  address: '',
-  aboutText: '',
-  missionTitle: '',
-  missionDescription: '',
-  whyChooseUs: [{ icon: '⭐', title: '', description: '' }],
-  workingHours: [],
-  facebookUrl: '',
-  instagramUrl: '',
-  twiterUrl: '',
-  youtubeUrl: '',
-  whatsAppNumber: '',
-  years: 0,
-  cars: 0,
-  cities: 0,
-  clients: 0,
-};
-
-const STEPS = [
-  { id: 0, label: 'admin.steps.platform', description: 'admin.steps.platformDesc', icon: IconBuildingStore, color: 'teal' },
-  { id: 1, label: 'admin.steps.mission', description: 'admin.steps.missionDesc', icon: IconBriefcase, color: 'blue' },
-  { id: 2, label: 'admin.steps.whyUs', description: 'admin.steps.whyUsDesc', icon: IconStarFilled, color: 'yellow' },
-  { id: 3, label: 'admin.steps.hours', description: 'admin.steps.hoursDesc', icon: IconClock, color: 'violet' },
-  { id: 4, label: 'admin.steps.social', description: 'admin.steps.socialDesc', icon: IconShare, color: 'pink' },
-];
-
-const STEP_FIELDS: Record<number, (keyof FormValues | string)[]> = {
-  0: ['name', 'email', 'phone', 'address'],
-  1: [],
-  2: [],
-  3: [],
-  4: [],
-};
-
-const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 48 : -48, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -48 : 48, opacity: 0 }),
-};
+import type { PhonePrefix } from '../../types/company';
+import { WHY_CHOOSE_US_ICONS as ICON_OPTIONS } from '../../constants/iconRegistry';
+import {
+  type AdminSettingsFormValues as FormValues,
+  DAYS, ADMIN_SETTINGS_INITIAL_VALUES as INITIAL_VALUES,
+  STEPS, STEP_FIELDS, slideVariants,
+} from '../../constants/adminSettings';
 
 export default function AdminSettingsPage() {
   const { t } = useTranslation();

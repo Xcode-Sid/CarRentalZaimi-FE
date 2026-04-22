@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { mapToAd, type Ad } from '../data/ads';
-import { get } from '../utils/api.utils';
+import { get } from '../utils/apiUtils';
 
 interface AdsContextType {
   ads: Ad[];

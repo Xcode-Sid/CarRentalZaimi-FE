@@ -74,7 +74,7 @@ async function tryRefresh(): Promise<boolean> {
 
     try {
       const res = await api
-        .post(AUTH_REFRESH, { json: { refreshToken }, throwHttpErrors: false })
+        .post(AUTH_REFRESH, { json: { refreshToken }, headers: buildAuthHeaders(), throwHttpErrors: false })
         .json<ApiResponse<LoginTokens>>();
 
       if (res.success && res.data) {
@@ -95,7 +95,7 @@ async function tryRefresh(): Promise<boolean> {
 // ─── Shared header builder ────────────────────────────────────────────────────
 
 function buildAuthHeaders(extra?: Record<string, string>): Record<string, string> {
-  const language = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || DEFAULT_LANGUAGE;
+  const language = i18next.language || localStorage.getItem(STORAGE_KEYS.LANGUAGE) || DEFAULT_LANGUAGE;
   const accessToken = getAccessToken();
 
   return {
@@ -153,9 +153,26 @@ export const get = async <T = any>(
       response = await doGet();
     }
 
-    return response.json<ApiResponse<T>>();
+    const text = await response.text();
+    const res: ApiResponse<T> = text
+      ? JSON.parse(text)
+      : { success: false, data: null as any, message: null, errors: [] };
+
+    if (!res.success) {
+      let msg: string;
+      if (Array.isArray(res.errors) && res.errors.length > 0) {
+        msg = res.errors[0];
+      } else if (res.errors && typeof res.errors === "object") {
+        const allMsgs = Object.values(res.errors as unknown as Record<string, string[]>).flat();
+        msg = allMsgs.join("; ") || (res as any).title || res.message || i18next.t("common.somethingWentWrong");
+      } else {
+        msg = res.message || (res as any).title || i18next.t("common.somethingWentWrong");
+      }
+      showApiError(msg);
+    }
+
+    return res;
   } catch (error) {
-    console.error(`GET ${endpoint} failed:`, error);
     window.dispatchEvent(new CustomEvent(API_REQUEST_FAILED));
     throw error;
   }
@@ -205,16 +222,20 @@ export const post = async (
       : { success: true, data: null, message: null, errors: [] };
 
     if (!res.success) {
-      const msg =
-        (Array.isArray(res.errors) && res.errors.length > 0 && res.errors[0]) ||
-        res.message ||
-        i18next.t("common.somethingWentWrong");
+      let msg: string;
+      if (Array.isArray(res.errors) && res.errors.length > 0) {
+        msg = res.errors[0];
+      } else if (res.errors && typeof res.errors === "object") {
+        const allMsgs = Object.values(res.errors as unknown as Record<string, string[]>).flat();
+        msg = allMsgs.join("; ") || (res as any).title || res.message || i18next.t("common.somethingWentWrong");
+      } else {
+        msg = res.message || (res as any).title || i18next.t("common.somethingWentWrong");
+      }
       showApiError(msg);
     }
 
     return res;
   } catch (error) {
-    console.error(`POST ${endpoint} failed:`, error);
     window.dispatchEvent(new CustomEvent(API_REQUEST_FAILED));
     throw error;
   } finally {
@@ -257,12 +278,40 @@ export const put = async (
         },
         body: JSON.stringify(body),
       });
-      return retryResponse.json();
+      const retryText = await retryResponse.text();
+      const retryRes: ApiResponse<any> = retryText
+        ? JSON.parse(retryText)
+        : { success: true, data: null, message: null, errors: [] };
+      if (!retryRes.success) {
+        const msg =
+          (Array.isArray(retryRes.errors) && retryRes.errors.length > 0 && retryRes.errors[0]) ||
+          retryRes.message ||
+          i18next.t("common.somethingWentWrong");
+        showApiError(msg);
+      }
+      return retryRes;
     }
 
-    return response.json();
+    const text = await response.text();
+    const res: ApiResponse<any> = text
+      ? JSON.parse(text)
+      : { success: true, data: null, message: null, errors: [] };
+
+    if (!res.success) {
+      let msg: string;
+      if (Array.isArray(res.errors) && res.errors.length > 0) {
+        msg = res.errors[0];
+      } else if (res.errors && typeof res.errors === "object") {
+        const allMsgs = Object.values(res.errors as unknown as Record<string, string[]>).flat();
+        msg = allMsgs.join("; ") || (res as any).title || res.message || i18next.t("common.somethingWentWrong");
+      } else {
+        msg = res.message || (res as any).title || i18next.t("common.somethingWentWrong");
+      }
+      showApiError(msg);
+    }
+
+    return res;
   } catch (error) {
-    console.error(`PUT ${endpoint} failed:`, error);
     window.dispatchEvent(new CustomEvent(API_REQUEST_FAILED));
     throw error;
   } finally {
@@ -311,19 +360,20 @@ export const del = async (
     }
 
     if (!res.success) {
-      const msg =
-        (Array.isArray(res.errors) && res.errors.length > 0 && res.errors[0]) ||
-        res.message ||
-        i18next.t("common.somethingWentWrong");
-
-      throw new Error(msg);
+      let msg: string;
+      if (Array.isArray(res.errors) && res.errors.length > 0) {
+        msg = res.errors[0];
+      } else if (res.errors && typeof res.errors === "object") {
+        const allMsgs = Object.values(res.errors as unknown as Record<string, string[]>).flat();
+        msg = allMsgs.join("; ") || (res as any).title || res.message || i18next.t("common.somethingWentWrong");
+      } else {
+        msg = res.message || (res as any).title || i18next.t("common.somethingWentWrong");
+      }
+      showApiError(msg);
     }
 
     return res;
   } catch (error) {
-    console.error(`DELETE ${endpoint} failed:`, error);
-
-    // ✅ pass REAL error to global handler
     window.dispatchEvent(
       new CustomEvent(API_REQUEST_FAILED, {
         detail: (error as Error).message,
@@ -336,4 +386,4 @@ export const del = async (
   }
 };
 // Expose saveTokens so AuthContext can call it after login/refresh
-export { saveTokens };
+export { saveTokens, getAccessToken };
