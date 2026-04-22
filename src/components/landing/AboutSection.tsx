@@ -71,20 +71,15 @@ export function AboutSection() {
           let parsedWhyChooseUs: WhyChooseUsItem[] = [];
 
           if (Array.isArray(rawWhy)) {
-            // already parsed array
             parsedWhyChooseUs = rawWhy;
           } else if (typeof rawWhy === 'string' && rawWhy.trim().startsWith('[')) {
-            // JSON string — parse it
             try {
               const parsed = JSON.parse(rawWhy);
-              if (Array.isArray(parsed)) {
-                parsedWhyChooseUs = parsed;
-              }
+              if (Array.isArray(parsed)) parsedWhyChooseUs = parsed;
             } catch (e) {
               console.error('JSON.parse failed:', e);
             }
           } else if (typeof rawWhy === 'object' && rawWhy !== null) {
-            // single object wrapped — put in array
             parsedWhyChooseUs = [rawWhy as unknown as WhyChooseUsItem];
           }
 
@@ -102,7 +97,7 @@ export function AboutSection() {
   return (
     <>
       <Spinner visible={loading} />
-      <Box id="about" py={80} style={{ position: 'relative', scrollMarginTop: 80 }}>
+      <Box id="about" py={{ base: 48, sm: 80 }} style={{ position: 'relative', scrollMarginTop: 80 }}>
         <Box
           style={{
             position: 'absolute',
@@ -113,16 +108,23 @@ export function AboutSection() {
             pointerEvents: 'none',
           }}
         />
-        <Container size="lg" style={{ position: 'relative' }}>
+        <Container size="lg" px={{ base: 'sm', sm: 'xl' }} style={{ position: 'relative' }}>
+
+          {/* ── Header ── */}
           <AnimatedSection scale>
-            <Stack align="center" gap="xs" mb={50}>
-              <Title order={2} ta="center" fw={800} style={!isDark ? { color: '#1a1b1e' } : undefined}>
+            <Stack align="center" gap="xs" mb={{ base: 32, sm: 50 }}>
+              <Title
+                order={2}
+                ta="center"
+                fw={800}
+                style={!isDark ? { color: '#1a1b1e', fontSize: 'clamp(1.4rem, 5vw, 2rem)' } : { fontSize: 'clamp(1.4rem, 5vw, 2rem)' }}
+              >
                 {t('about.title')} {profile?.name}
               </Title>
               <Text
                 ta="center"
                 maw={600}
-                size="lg"
+                size="md"
                 c={isDark ? 'dimmed' : undefined}
                 style={!isDark ? { color: '#868e96' } : undefined}
               >
@@ -131,11 +133,12 @@ export function AboutSection() {
             </Stack>
           </AnimatedSection>
 
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl" mb={50}>
+          {/* ── About text + stats ── */}
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: 'lg', sm: 'xl' }} mb={{ base: 32, sm: 50 }}>
             <AnimatedSection direction="left" delay={0.1}>
               <Stack gap="lg">
                 <Text
-                  size="md"
+                  size="sm"
                   style={{
                     lineHeight: 1.8,
                     ...(!isDark && { color: '#868e96' }),
@@ -145,9 +148,10 @@ export function AboutSection() {
                   {profile?.aboutText}
                 </Text>
 
+                {/* Mission card */}
                 <Paper
                   className="glass-card"
-                  p="lg"
+                  p={{ base: 'md', sm: 'lg' }}
                   radius="lg"
                   style={{
                     ...(!isDark && {
@@ -157,14 +161,14 @@ export function AboutSection() {
                     }),
                   }}
                 >
-                  <Group gap="md" align="flex-start">
+                  <Group gap="md" align="flex-start" wrap="nowrap">
                     <motion.div whileHover={{ rotate: 10 }} transition={{ type: 'spring', stiffness: 300 }}>
-                      <ThemeIcon size={48} radius="xl" variant="filled" color="teal">
-                        <IconTargetArrow size={24} />
+                      <ThemeIcon size={44} radius="xl" variant="filled" color="teal" style={{ flexShrink: 0 }}>
+                        <IconTargetArrow size={22} />
                       </ThemeIcon>
                     </motion.div>
-                    <Stack gap={4} style={{ flex: 1 }}>
-                      <Text fw={700} size="lg" style={!isDark ? { color: '#1a1b1e' } : undefined}>
+                    <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+                      <Text fw={700} size="md" style={!isDark ? { color: '#1a1b1e' } : undefined}>
                         {profile?.missionTitle}
                       </Text>
                       <Text
@@ -179,9 +183,10 @@ export function AboutSection() {
                 </Paper>
               </Stack>
             </AnimatedSection>
+
             {/* Stats grid */}
             <StaggerContainer stagger={0.1}>
-              <SimpleGrid cols={2} spacing="md">
+              <SimpleGrid cols={2} spacing={{ base: 'sm', sm: 'md' }}>
                 {([
                   { key: 'years', value: profile?.years },
                   { key: 'cars', value: profile?.cars },
@@ -192,7 +197,7 @@ export function AboutSection() {
                     <motion.div whileHover={{ y: -4, scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }}>
                       <Paper
                         className="glass-card card-gradient-border"
-                        p="xl"
+                        p={{ base: 'md', sm: 'xl' }}
                         radius="lg"
                         ta="center"
                         style={{
@@ -203,11 +208,11 @@ export function AboutSection() {
                           }),
                         }}
                       >
-                        <Text size="2rem" fw={900} c="teal">
+                        <Text size="xl" fw={900} c="teal">
                           {value}+
                         </Text>
                         <Text
-                          size="sm"
+                          size="xs"
                           mt={4}
                           c={isDark ? 'dimmed' : undefined}
                           style={!isDark ? { color: '#868e96' } : undefined}
@@ -222,17 +227,22 @@ export function AboutSection() {
             </StaggerContainer>
           </SimpleGrid>
 
-          {/* Why us */}
+          {/* ── Why us ── */}
           <AnimatedSection>
             <Stack align="center" gap="xs" mb="xl">
-              <Title order={3} ta="center" fw={700} style={!isDark ? { color: '#1a1b1e' } : undefined}>
+              <Title
+                order={3}
+                ta="center"
+                fw={700}
+                style={!isDark ? { color: '#1a1b1e', fontSize: 'clamp(1.2rem, 4vw, 1.6rem)' } : { fontSize: 'clamp(1.2rem, 4vw, 1.6rem)' }}
+              >
                 {t('about.whyUs')}
               </Title>
             </Stack>
           </AnimatedSection>
 
           <StaggerContainer stagger={0.1}>
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>
               {whyChooseUs.map((item, index) => (
                 <motion.div
                   key={index}
@@ -241,10 +251,14 @@ export function AboutSection() {
                 >
                   <Paper
                     className="glass-card card-shimmer"
-                    p="xl"
+                    p={{ base: 'md', sm: 'xl' }}
                     radius="lg"
-                    ta="center"
                     style={{
+                      // On mobile: horizontal layout (icon left, text right)
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      textAlign: 'center',
                       ...(!isDark && {
                         background: '#ffffff',
                         border: '1px solid #e9ecef',
@@ -252,7 +266,7 @@ export function AboutSection() {
                       }),
                     }}
                   >
-                    <Text size="2.2rem" mb="md">{item.icon}</Text>
+                    <Text size="2rem" mb={{ base: 'xs', sm: 'md' }}>{item.icon}</Text>
                     <Text fw={700} mb={4} style={!isDark ? { color: '#1a1b1e' } : undefined}>
                       {item.title}
                     </Text>
@@ -268,6 +282,7 @@ export function AboutSection() {
               ))}
             </SimpleGrid>
           </StaggerContainer>
+
         </Container>
       </Box>
     </>

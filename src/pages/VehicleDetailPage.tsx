@@ -7,9 +7,6 @@ import { VehicleDetailView } from '../components/vehicle/VehicleDetailView';
 import { get } from '../utils/api.utils';
 import { mapApiCarToVehicle, type Vehicle } from '../data/vehicles';
 
-
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export default function VehicleDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -36,7 +33,6 @@ export default function VehicleDetailPage() {
           const mapped = mapApiCarToVehicle(res.data);
           setVehicle(mapped);
 
-          // Fetch similar vehicles from the same category, excluding this one
           if (mapped.categoryId) {
             try {
               const similarRes = await get(
@@ -70,7 +66,7 @@ export default function VehicleDetailPage() {
 
   if (loading) {
     return (
-      <Center py={120}>
+      <Center style={{ minHeight: '60vh', padding: '40px 16px' }}>
         <Loader color="teal" size="lg" />
       </Center>
     );
@@ -78,9 +74,9 @@ export default function VehicleDetailPage() {
 
   if (error || !vehicle) {
     return (
-      <Container size="sm" py={80}>
+      <Container size="sm" px="md" py={60}>
         <Stack align="center" gap="md">
-          <Text c="red" ta="center" size="lg">
+          <Text c="red" ta="center" size="md">
             {error ?? 'Vehicle not found.'}
           </Text>
           <Button
@@ -88,6 +84,8 @@ export default function VehicleDetailPage() {
             color="teal"
             leftSection={<IconArrowLeft size={16} />}
             onClick={() => navigate('/fleet')}
+            fullWidth={false}
+            style={{ minWidth: 160 }}
           >
             {t('nav.fleet')}
           </Button>

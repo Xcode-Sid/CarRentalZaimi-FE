@@ -75,12 +75,11 @@ export function ContactSection() {
           setProfile(res.data as CompanyProfileDto);
         }
       } catch {
-        // silently fail — cards will show '—'
+        // silently fail
       } finally {
         setLoadingProfile(false);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -113,7 +112,12 @@ export function ContactSection() {
       color: 'orange',
       renderValue: () => {
         const hours = parseWorkingHours(profile?.workingHours);
-        if (!hours.length) return <Text size="sm" c={isDark ? 'dimmed' : undefined} style={!isDark ? { color: '#868e96' } : undefined}>—</Text>;
+        if (!hours.length)
+          return (
+            <Text size="sm" c={isDark ? 'dimmed' : undefined} style={!isDark ? { color: '#868e96' } : undefined}>
+              —
+            </Text>
+          );
         return (
           <Stack gap={2}>
             {hours.map((h) => (
@@ -143,37 +147,21 @@ export function ContactSection() {
         });
 
         if (res.success) {
-          notifications.show({
-            title: t('success'),
-            message: t('contact.sendSuccess'),
-            color: 'teal',
-          });
-          setName('');
-          setEmail('');
-          setPhone('');
-          setSubject('');
-          setMessage('');
+          notifications.show({ title: t('success'), message: t('contact.sendSuccess'), color: 'teal' });
+          setName(''); setEmail(''); setPhone(''); setSubject(''); setMessage('');
         } else {
-          notifications.show({
-            title: t('error'),
-            message: t('contact.sendError') ?? 'Something went wrong. Please try again.',
-            color: 'red',
-          });
+          notifications.show({ title: t('error'), message: t('contact.sendError') ?? 'Something went wrong.', color: 'red' });
         }
       } catch {
-        notifications.show({
-          title: t('error'),
-          message: t('contact.sendError') ?? 'Something went wrong. Please try again.',
-          color: 'red',
-        });
+        notifications.show({ title: t('error'), message: t('contact.sendError') ?? 'Something went wrong.', color: 'red' });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
   };
 
   return (
-    <Box id="contact" py={80} style={{ position: 'relative', scrollMarginTop: 80 }}>
+    <Box id="contact" py={{ base: 48, sm: 80 }} style={{ position: 'relative', scrollMarginTop: 80 }}>
       <Box
         style={{
           position: 'absolute',
@@ -184,16 +172,26 @@ export function ContactSection() {
           pointerEvents: 'none',
         }}
       />
-      <Container size="lg" style={{ position: 'relative' }}>
+      <Container size="lg" px={{ base: 'sm', sm: 'xl' }} style={{ position: 'relative' }}>
+
+        {/* ── Header ── */}
         <AnimatedSection scale>
-          <Stack align="center" gap="xs" mb={50}>
-            <Title order={2} ta="center" fw={800} style={!isDark ? { color: '#1a1b1e' } : undefined}>
+          <Stack align="center" gap="xs" mb={{ base: 32, sm: 50 }}>
+            <Title
+              order={2}
+              ta="center"
+              fw={800}
+              style={!isDark
+                ? { color: '#1a1b1e', fontSize: 'clamp(1.4rem, 5vw, 2rem)' }
+                : { fontSize: 'clamp(1.4rem, 5vw, 2rem)' }
+              }
+            >
               {t('contact.title')}
             </Title>
             <Text
               ta="center"
               maw={500}
-              size="lg"
+              size="md"
               c={isDark ? 'dimmed' : undefined}
               style={!isDark ? { color: '#868e96' } : undefined}
             >
@@ -202,12 +200,13 @@ export function ContactSection() {
           </Stack>
         </AnimatedSection>
 
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-          {/* Contact form */}
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: 'lg', sm: 'xl' }}>
+
+          {/* ── Contact form ── */}
           <AnimatedSection direction="left" delay={0.1}>
             <Paper
               className="glass-card"
-              p="xl"
+              p={{ base: 'md', sm: 'xl' }}
               radius="lg"
               style={{
                 ...(!isDark && {
@@ -218,6 +217,7 @@ export function ContactSection() {
               }}
             >
               <Stack gap="md">
+                {/* Name + Email — stack on mobile, side-by-side on sm+ */}
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                   <TextInput
                     label={t('contact.nameLabel')}
@@ -236,6 +236,8 @@ export function ContactSection() {
                     radius="md"
                   />
                 </SimpleGrid>
+
+                {/* Phone + Subject — stack on mobile */}
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                   <TextInput
                     label={t('contact.phoneLabel')}
@@ -252,6 +254,7 @@ export function ContactSection() {
                     radius="md"
                   />
                 </SimpleGrid>
+
                 <Textarea
                   label={t('contact.messageLabel')}
                   placeholder={t('contact.messagePlaceholder')}
@@ -261,6 +264,7 @@ export function ContactSection() {
                   minRows={5}
                   radius="md"
                 />
+
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     variant="filled"
@@ -281,15 +285,15 @@ export function ContactSection() {
             </Paper>
           </AnimatedSection>
 
-          {/* Contact info cards */}
+          {/* ── Contact info cards ── */}
           <StaggerContainer stagger={0.12} delay={0.2}>
-            <Stack gap="md">
+            <Stack gap="sm">
               {contactInfo.map((item) => (
                 <StaggerItem key={item.titleKey} direction="right">
                   <motion.div whileHover={{ x: 6 }} transition={{ type: 'spring', stiffness: 300 }}>
                     <Paper
                       className="glass-card card-shimmer"
-                      p="lg"
+                      p={{ base: 'md', sm: 'lg' }}
                       radius="lg"
                       style={{
                         ...(!isDark && {
@@ -299,16 +303,16 @@ export function ContactSection() {
                         }),
                       }}
                     >
-                      <Group gap="md" align="flex-start">
+                      <Group gap="md" align="flex-start" wrap="nowrap">
                         <motion.div
                           whileHover={{ rotate: 15 }}
                           transition={{ type: 'spring', stiffness: 300 }}
                         >
-                          <ThemeIcon size={48} radius="xl" variant="light" color={item.color}>
-                            <item.icon size={24} />
+                          <ThemeIcon size={44} radius="xl" variant="light" color={item.color} style={{ flexShrink: 0 }}>
+                            <item.icon size={22} />
                           </ThemeIcon>
                         </motion.div>
-                        <Stack gap={2} style={{ flex: 1 }}>
+                        <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
                           <Text fw={700} size="sm" style={!isDark ? { color: '#1a1b1e' } : undefined}>
                             {t(item.titleKey)}
                           </Text>
@@ -333,6 +337,7 @@ export function ContactSection() {
               ))}
             </Stack>
           </StaggerContainer>
+
         </SimpleGrid>
       </Container>
     </Box>

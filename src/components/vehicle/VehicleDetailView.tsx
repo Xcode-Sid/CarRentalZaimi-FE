@@ -66,6 +66,121 @@ type CarReview = {
   };
 };
 
+const styles = `
+  /* ── Main layout grid ── */
+  .vdv-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .vdv-grid {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 2rem;
+    }
+  }
+
+  /* ── Sticky booking card ── */
+  .vdv-booking-card {
+    position: static;
+  }
+  @media (min-width: 900px) {
+    .vdv-booking-card {
+      position: sticky;
+      top: 90px;
+    }
+  }
+
+  /* ── Price text ── */
+  .vdv-price {
+    font-size: 2rem !important;
+    letter-spacing: -0.5px;
+  }
+  @media (min-width: 768px) {
+    .vdv-price {
+      font-size: 2.6rem !important;
+      letter-spacing: -1px;
+    }
+  }
+
+  /* ── Vehicle title ── */
+  .vdv-title {
+    font-size: 1.5rem !important;
+  }
+  @media (min-width: 768px) {
+    .vdv-title {
+      font-size: 2rem !important;
+    }
+  }
+
+  /* ── Review card ── */
+  .vdv-review-card {
+    padding: 16px !important;
+  }
+  @media (min-width: 768px) {
+    .vdv-review-card {
+      padding: 24px !important;
+    }
+  }
+
+  /* ── Booking card padding ── */
+  .vdv-booking-inner {
+    padding: 20px !important;
+  }
+  @media (min-width: 768px) {
+    .vdv-booking-inner {
+      padding: 28px !important;
+    }
+  }
+
+  /* ── Tabs scrollable on mobile ── */
+  .vdv-tabs [role="tablist"] {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .vdv-tabs [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ── Rating breakdown ── */
+  .vdv-rating-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  @media (min-width: 480px) {
+    .vdv-rating-summary {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  /* ── Similar vehicles section ── */
+  .vdv-similar {
+    margin-top: 40px;
+  }
+  @media (min-width: 768px) {
+    .vdv-similar {
+      margin-top: 60px;
+    }
+  }
+
+  /* ── Section py ── */
+  .vdv-body {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  @media (min-width: 768px) {
+    .vdv-body {
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+  }
+`;
+
 export function VehicleDetailView({
   vehicle,
   similarVehicles = [],
@@ -248,13 +363,14 @@ export function VehicleDetailView({
       transition={{ duration: 0.4 }}
       style={{ padding: containerized ? 0 : '1rem' }}
     >
-      <Box py={containerized ? 'xl' : 'lg'} px={containerized ? 0 : 'lg'}>
+      <Box className="vdv-body" px={containerized ? 0 : 'md'}>
 
         {showBreadcrumbs && (
           <AnimatedSection>
             <Breadcrumbs
               separator={<IconChevronRight size={14} style={{ opacity: 0.5 }} />}
               mb="lg"
+              style={{ flexWrap: 'wrap', rowGap: 4 }}
             >
               <Anchor component="button" size="sm" c="dimmed" onClick={() => navigate('/')}>
                 {t('nav.home')}
@@ -262,20 +378,28 @@ export function VehicleDetailView({
               <Anchor component="button" size="sm" c="dimmed" onClick={() => navigate('/fleet')}>
                 {t('nav.fleet')}
               </Anchor>
-              <Text size="sm" fw={500}>{vehicle.title}</Text>
+              <Text size="sm" fw={500} style={{ wordBreak: 'break-word' }}>{vehicle.title}</Text>
             </Breadcrumbs>
           </AnimatedSection>
         )}
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: containerized ? 'minmax(0, 1fr) 340px' : '1fr',
-            gap: containerized ? '2rem' : '1.5rem',
-            alignItems: 'start',
-            padding: containerized ? 0 : '0.5rem',
-          }}
-        >
+        {/* ── Booking card on mobile: shown ABOVE content ── */}
+        {user?.role?.name !== 'Admin' && (
+          <Box mb="xl" style={{ display: 'block' }} className="vdv-mobile-booking">
+            <style>{`
+              @media (min-width: 900px) { .vdv-mobile-booking { display: none !important; } }
+            `}</style>
+            <BookingCard
+              priceDisplay={priceDisplay}
+              specRows={specRows}
+              t={t}
+              onRent={() => setRentalOpen(true)}
+              onCopyLink={handleCopyLink}
+            />
+          </Box>
+        )}
+
+        <div className="vdv-grid">
           <AnimatedSection direction="left">
             <Stack gap="xl" style={{ minWidth: 0 }}>
 
@@ -289,11 +413,11 @@ export function VehicleDetailView({
               </Group>
 
               <div>
-                <Title order={1} fw={800}>{vehicle.title}</Title>
+                <Title order={1} fw={800} className="vdv-title">{vehicle.title}</Title>
                 <Text c="dimmed">{vehicle.year}</Text>
               </div>
 
-              <Tabs value={activeTab} onChange={setActiveTab} color="teal">
+              <Tabs value={activeTab} onChange={setActiveTab} color="teal" className="vdv-tabs">
                 <Tabs.List>
                   <Tabs.Tab value="overview">{t('vehicle.overview')}</Tabs.Tab>
                   <Tabs.Tab value="specs">{t('vehicle.specifications')}</Tabs.Tab>
@@ -324,7 +448,7 @@ export function VehicleDetailView({
                 </Tabs.Panel>
 
                 <Tabs.Panel value="specs" pt="lg">
-                  <Table.ScrollContainer minWidth={400}>
+                  <Table.ScrollContainer minWidth={300}>
                     <Table striped highlightOnHover>
                       <Table.Tbody>
                         {specRows.map(([label, value]) => (
@@ -340,15 +464,16 @@ export function VehicleDetailView({
 
                 <Tabs.Panel value="reviews" pt="lg">
                   <Stack gap="lg">
-                    <Group align="flex-start" gap="xl" wrap="wrap">
-                      <Stack align="center" gap={4}>
+                    {/* Rating summary — stacks vertically on small screens */}
+                    <Group align="flex-start" gap="xl" className="vdv-rating-summary" wrap="wrap">
+                      <Stack align="center" gap={4} style={{ minWidth: 80 }}>
                         <Text size="3rem" fw={800}>{avgRating.toFixed(1)}</Text>
                         <Rating value={avgRating} readOnly fractions={2} />
                         <Text size="sm" c="dimmed">
                           {vehicle.totalReviews ?? vehicleReviews.length} {t('vehicle.reviews')}
                         </Text>
                       </Stack>
-                      <Stack gap={4} style={{ flex: 1, minWidth: 150 }}>
+                      <Stack gap={4} style={{ flex: 1, minWidth: 140 }}>
                         {ratingBreakdown.map((rb) => (
                           <Group key={rb.star} gap="xs" wrap="nowrap">
                             <Text size="sm" w={10}>{rb.star}</Text>
@@ -378,23 +503,24 @@ export function VehicleDetailView({
                             transition={{ delay: idx * 0.05, duration: 0.3 }}
                           >
                             <Box
-                              className="glass-card"
-                              p="xl"
+                              className="glass-card vdv-review-card"
                               style={{ borderRadius: 'var(--mantine-radius-xl)' }}
                             >
-                              <Group justify="space-between" mb="xs" wrap="wrap" align="flex-start">
-                                <Group gap="sm" align="flex-start">
+                              {/* Reviewer header — stacks on very small screens */}
+                              <Group justify="space-between" mb="xs" wrap="wrap" align="flex-start" gap="xs">
+                                <Group gap="sm" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
                                   <Avatar
                                     color="teal"
                                     radius="xl"
                                     size="sm"
                                     src={review.user.image ? toImagePath(review.user.image.imageData) : undefined}
+                                    style={{ flexShrink: 0 }}
                                   >
                                     {!review.user.image?.imageData &&
                                       `${review.user.firstName?.[0] ?? ''}${review.user.lastName?.[0] ?? ''}`}
                                   </Avatar>
-                                  <div>
-                                    <Text size="sm" fw={600}>
+                                  <div style={{ minWidth: 0 }}>
+                                    <Text size="sm" fw={600} style={{ wordBreak: 'break-word' }}>
                                       {review.user.firstName} {review.user.lastName}
                                     </Text>
                                     <Text size="xs" c="dimmed">
@@ -403,39 +529,37 @@ export function VehicleDetailView({
                                   </div>
                                 </Group>
 
-                                <Stack gap={6} align="flex-end">
+                                <Stack gap={6} align="flex-end" style={{ flexShrink: 0 }}>
                                   <Rating value={review.rating} readOnly size="sm" />
-                                  <Stack gap={4} align="flex-end">
-                                    {isOwner && (
-                                      <Group gap="xs">
-                                        <Tooltip label={t('vehicle.editReview')}>
-                                          <ActionIcon
-                                            variant="subtle"
-                                            color="teal"
-                                            size="sm"
-                                            onClick={() => handleEditOpen(review)}
-                                          >
-                                            <IconEdit size={15} />
-                                          </ActionIcon>
-                                        </Tooltip>
-                                        <Tooltip label={t('vehicle.deleteReview')}>
-                                          <ActionIcon
-                                            variant="subtle"
-                                            color="red"
-                                            size="sm"
-                                            onClick={() => setDeletingReviewId(review.id)}
-                                          >
-                                            <IconTrash size={15} />
-                                          </ActionIcon>
-                                        </Tooltip>
-                                      </Group>
-                                    )}
-                                    {review.modifiedOn && review.modifiedOn !== review.createdOn && (
-                                      <Text size="xs" c="dimmed" fs="italic">
-                                        ({t('edited')} {new Date(review.modifiedOn).toLocaleDateString()})
-                                      </Text>
-                                    )}
-                                  </Stack>
+                                  {isOwner && (
+                                    <Group gap="xs">
+                                      <Tooltip label={t('vehicle.editReview')}>
+                                        <ActionIcon
+                                          variant="subtle"
+                                          color="teal"
+                                          size="sm"
+                                          onClick={() => handleEditOpen(review)}
+                                        >
+                                          <IconEdit size={15} />
+                                        </ActionIcon>
+                                      </Tooltip>
+                                      <Tooltip label={t('vehicle.deleteReview')}>
+                                        <ActionIcon
+                                          variant="subtle"
+                                          color="red"
+                                          size="sm"
+                                          onClick={() => setDeletingReviewId(review.id)}
+                                        >
+                                          <IconTrash size={15} />
+                                        </ActionIcon>
+                                      </Tooltip>
+                                    </Group>
+                                  )}
+                                  {review.modifiedOn && review.modifiedOn !== review.createdOn && (
+                                    <Text size="xs" c="dimmed" fs="italic">
+                                      ({t('edited')} {new Date(review.modifiedOn).toLocaleDateString()})
+                                    </Text>
+                                  )}
                                 </Stack>
                               </Group>
                               <Text size="sm" c="dimmed">{review.comment}</Text>
@@ -474,154 +598,29 @@ export function VehicleDetailView({
             </Stack>
           </AnimatedSection>
 
+          {/* Desktop booking card — hidden on mobile (shown above instead) */}
           {user?.role?.name !== 'Admin' && (
             <AnimatedSection direction="right" delay={0.2} scale>
-              <Box
-                style={{
-                  position: 'sticky',
-                  top: 90,
-                  borderRadius: 'var(--mantine-radius-xl)',
-                  overflow: 'hidden',
-                  background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
-                  backdropFilter: 'blur(20px)',
-                }}
-              >
-                {/* Top accent bar */}
-                <Box
-                  style={{
-                    height: 3,
-                    background: 'linear-gradient(90deg, var(--mantine-color-teal-6), var(--mantine-color-teal-4), transparent)',
-                  }}
+              <Box className="vdv-desktop-booking">
+                <style>{`
+                  .vdv-desktop-booking { display: none; }
+                  @media (min-width: 900px) { .vdv-desktop-booking { display: block; } }
+                `}</style>
+                <BookingCard
+                  priceDisplay={priceDisplay}
+                  specRows={specRows}
+                  t={t}
+                  onRent={() => setRentalOpen(true)}
+                  onCopyLink={handleCopyLink}
+                  sticky
                 />
-
-                <Stack gap={0} p="xl">
-
-                  {/* Price block */}
-                  <Box mb="lg" style={{ textAlign: 'center' }}>
-                    <Text size="xs" tt="uppercase" fw={600} c="dimmed" style={{ letterSpacing: 2 }} mb={4}>
-                      {t('vehicle.startingFrom')}
-                    </Text>
-                    <Text
-                      fw={900}
-                      c="teal"
-                      style={{
-                        fontSize: '2.6rem',
-                        lineHeight: 1,
-                        textShadow: '0 0 40px rgba(32,201,151,0.3)',
-                        letterSpacing: '-1px',
-                      }}
-                    >
-                      {priceDisplay}
-                    </Text>
-                  </Box>
-
-                  {/* Spec rows */}
-                  <Box
-                    mb="lg"
-                    style={{
-                      borderRadius: 'var(--mantine-radius-md)',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {specRows.slice(0, 4).map(([label, val], i) => (
-                      <Group
-                        key={String(label)}
-                        justify="space-between"
-                        px="md"
-                        py="sm"
-                        style={{
-                          borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                          transition: 'background 0.2s',
-                        }}
-                        className="spec-row-hover"
-                      >
-                        <Group gap="xs">
-                          <Box
-                            style={{
-                              width: 6,
-                              height: 6,
-                              borderRadius: '50%',
-                              background: 'var(--mantine-color-teal-5)',
-                              opacity: 0.7,
-                            }}
-                          />
-                          <Text size="sm" c="dimmed">{label}</Text>
-                        </Group>
-                        <Text size="sm" fw={600}>{val}</Text>
-                      </Group>
-                    ))}
-                  </Box>
-
-                  {/* CTA buttons */}
-                  <Stack gap="sm" mb="lg">
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                      <Button
-                        fullWidth
-                        size="lg"
-                        variant="filled"
-                        color="teal"
-                        onClick={() => setRentalOpen(true)}
-                        className="ripple-btn"
-                        style={{
-                          fontWeight: 700,
-                          letterSpacing: '0.5px',
-                          boxShadow: '0 4px 24px rgba(32,201,151,0.25)',
-                        }}
-                      >
-                        {t('vehicle.rentNow')}
-                      </Button>
-                    </motion.div>
-                    <Button
-                      fullWidth
-                      variant="subtle"
-                      color="gray"
-                      style={{ opacity: 0.7 }}
-                    >
-                      {t('vehicle.contact')}
-                    </Button>
-                  </Stack>
-
-                  {/* Divider + share */}
-                  <Divider style={{ borderColor: 'rgba(255,255,255,0.06)' }} mb="md" />
-
-                  <Group justify="center" gap="xs">
-                    <Tooltip label={t('vehicle.copyLink')}>
-                      <ActionIcon
-                        variant="subtle"
-                        color="gray"
-                        radius="xl"
-                        size="lg"
-                        onClick={handleCopyLink}
-                        style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-                      >
-                        <IconCopy size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-                    <Tooltip label={t('vehicle.whatsapp')}>
-                      <ActionIcon
-                        variant="subtle"
-                        color="green"
-                        radius="xl"
-                        size="lg"
-                        style={{ border: '1px solid rgba(47,158,68,0.2)' }}
-                      >
-                        <IconBrandWhatsapp size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Group>
-
-                </Stack>
               </Box>
             </AnimatedSection>
           )}
         </div>
 
         {similarVehicles.length > 0 && (
-          <Box mt={60}>
+          <Box className="vdv-similar">
             <Divider mb="xl" />
             <AnimatedSection>
               <Title order={3} fw={700} mb="lg">
@@ -652,11 +651,7 @@ export function VehicleDetailView({
         {/* Write Review Modal */}
         <Modal
           opened={writeReviewOpen}
-          onClose={() => {
-            setWriteReviewOpen(false);
-            setReviewRating(0);
-            setReviewText('');
-          }}
+          onClose={() => { setWriteReviewOpen(false); setReviewRating(0); setReviewText(''); }}
           title={
             <Group gap={10}>
               <ThemeIcon color="teal" variant="light" size={32} radius="md">
@@ -666,6 +661,7 @@ export function VehicleDetailView({
             </Group>
           }
           size="md"
+          fullScreen={typeof window !== 'undefined' && window.innerWidth < 600}
           centered
           radius="lg"
           styles={{
@@ -685,20 +681,10 @@ export function VehicleDetailView({
               onChange={(e) => setReviewText(e.currentTarget.value)}
               minRows={3}
               radius="md"
-              styles={{
-                input: { borderColor: 'var(--mantine-color-default-border)' },
-              }}
+              styles={{ input: { borderColor: 'var(--mantine-color-default-border)' } }}
             />
             <Group justify="flex-end" gap="sm" mt={4}>
-              <Button
-                variant="default"
-                radius="md"
-                onClick={() => {
-                  setWriteReviewOpen(false);
-                  setReviewRating(0);
-                  setReviewText('');
-                }}
-              >
+              <Button variant="default" radius="md" onClick={() => { setWriteReviewOpen(false); setReviewRating(0); setReviewText(''); }}>
                 {t('cancel') ?? 'Cancel'}
               </Button>
               <Button
@@ -728,6 +714,7 @@ export function VehicleDetailView({
             </Group>
           }
           size="md"
+          fullScreen={typeof window !== 'undefined' && window.innerWidth < 600}
           centered
           radius="lg"
           styles={{
@@ -747,9 +734,7 @@ export function VehicleDetailView({
               onChange={(e) => setEditText(e.currentTarget.value)}
               minRows={3}
               radius="md"
-              styles={{
-                input: { borderColor: 'var(--mantine-color-default-border)' },
-              }}
+              styles={{ input: { borderColor: 'var(--mantine-color-default-border)' } }}
             />
             <Group justify="flex-end" gap="sm" mt={4}>
               <Button variant="default" radius="md" onClick={() => setEditingReview(null)}>
@@ -810,13 +795,7 @@ export function VehicleDetailView({
             </Paper>
 
             <Group w="100%" gap="sm">
-              <Button
-                variant="default"
-                flex={1}
-                radius="md"
-                onClick={() => setDeletingReviewId(null)}
-                disabled={loading}
-              >
+              <Button variant="default" flex={1} radius="md" onClick={() => setDeletingReviewId(null)} disabled={loading}>
                 {t('cancel') ?? 'Cancel'}
               </Button>
               <Button
@@ -834,13 +813,170 @@ export function VehicleDetailView({
         </Modal>
 
       </Box>
+
+      {/* Inject styles */}
+      <style>{styles}</style>
     </motion.div>
   );
 
   return containerized ? (
     <>
       <Spinner visible={loading} />
-      <Container size="xl">{Body}</Container>
+      <Container size="xl" px="md">{Body}</Container>
     </>
   ) : Body;
+}
+
+// ── Extracted BookingCard to avoid duplication between mobile/desktop slots ──
+
+function BookingCard({
+  priceDisplay,
+  specRows,
+  t,
+  onRent,
+  onCopyLink,
+  sticky = false,
+}: {
+  priceDisplay: string;
+  specRows: (string | number | undefined)[][];
+  t: (key: string) => string;
+  onRent: () => void;
+  onCopyLink: () => void;
+  sticky?: boolean;
+}) {
+  return (
+    <Box
+      style={{
+        ...(sticky ? { position: 'sticky', top: 90 } : {}),
+        borderRadius: 'var(--mantine-radius-xl)',
+        overflow: 'hidden',
+        background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
+        backdropFilter: 'blur(20px)',
+      }}
+    >
+      {/* Top accent bar */}
+      <Box
+        style={{
+          height: 3,
+          background: 'linear-gradient(90deg, var(--mantine-color-teal-6), var(--mantine-color-teal-4), transparent)',
+        }}
+      />
+
+      <Stack gap={0} className="vdv-booking-inner">
+
+        {/* Price block */}
+        <Box mb="lg" style={{ textAlign: 'center' }}>
+          <Text size="xs" tt="uppercase" fw={600} c="dimmed" style={{ letterSpacing: 2 }} mb={4}>
+            {t('vehicle.startingFrom')}
+          </Text>
+          <Text
+            fw={900}
+            c="teal"
+            className="vdv-price"
+            style={{
+              lineHeight: 1,
+              textShadow: '0 0 40px rgba(32,201,151,0.3)',
+            }}
+          >
+            {priceDisplay}
+          </Text>
+        </Box>
+
+        {/* Spec rows */}
+        <Box
+          mb="lg"
+          style={{
+            borderRadius: 'var(--mantine-radius-md)',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            overflow: 'hidden',
+          }}
+        >
+          {specRows.slice(0, 4).map(([label, val], i) => (
+            <Group
+              key={String(label)}
+              justify="space-between"
+              px="md"
+              py="sm"
+              style={{
+                borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                transition: 'background 0.2s',
+              }}
+              className="spec-row-hover"
+            >
+              <Group gap="xs">
+                <Box
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: 'var(--mantine-color-teal-5)',
+                    opacity: 0.7,
+                  }}
+                />
+                <Text size="sm" c="dimmed">{label}</Text>
+              </Group>
+              <Text size="sm" fw={600}>{val}</Text>
+            </Group>
+          ))}
+        </Box>
+
+        {/* CTA buttons */}
+        <Stack gap="sm" mb="lg">
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Button
+              fullWidth
+              size="lg"
+              variant="filled"
+              color="teal"
+              onClick={onRent}
+              className="ripple-btn"
+              style={{
+                fontWeight: 700,
+                letterSpacing: '0.5px',
+                boxShadow: '0 4px 24px rgba(32,201,151,0.25)',
+              }}
+            >
+              {t('vehicle.rentNow')}
+            </Button>
+          </motion.div>
+          <Button fullWidth variant="subtle" color="gray" style={{ opacity: 0.7 }}>
+            {t('vehicle.contact')}
+          </Button>
+        </Stack>
+
+        {/* Divider + share */}
+        <Divider style={{ borderColor: 'rgba(255,255,255,0.06)' }} mb="md" />
+
+        <Group justify="center" gap="xs">
+          <Tooltip label={t('vehicle.copyLink')}>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              radius="xl"
+              size="lg"
+              onClick={onCopyLink}
+              style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <IconCopy size={16} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label={t('vehicle.whatsapp')}>
+            <ActionIcon
+              variant="subtle"
+              color="green"
+              radius="xl"
+              size="lg"
+              style={{ border: '1px solid rgba(47,158,68,0.2)' }}
+            >
+              <IconBrandWhatsapp size={16} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+
+      </Stack>
+    </Box>
+  );
 }

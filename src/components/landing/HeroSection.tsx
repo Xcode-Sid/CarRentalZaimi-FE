@@ -7,17 +7,57 @@ import {
   Button,
   Box,
   Stack,
-  Badge,
   SimpleGrid,
   Paper,
   useMantineColorScheme,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { IconSearch, IconShieldCheck, IconHeadset, IconCircleCheck } from '@tabler/icons-react';
+import { IconSearch } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
+import { get } from '../../utils/api.utils';
+
+interface CompanyProfileDto {
+  id?: string;
+  name?: string;
+  logoUrl?: string;
+  tagline?: string;
+  aboutText?: string;
+  missionTitle?: string;
+  missionDescription?: string;
+  whyChooseUs?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  workingHours?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twiterUrl?: string;
+  youtubeUrl?: string;
+  whatsAppNumber?: string;
+  years: number;
+  cars: number;
+  cities: number;
+  clients: number;
+}
+
+interface WhyChooseUsItem {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+function parseWhyChooseUs(raw?: string): WhyChooseUsItem[] {
+  if (!raw) return [];
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 function CountUp({ target, suffix = '' }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -49,11 +89,32 @@ export function HeroSection() {
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null]);
   const heroRef = useRef<HTMLDivElement>(null);
 
+  const [profile, setProfile] = useState<CompanyProfileDto | null>(null);
+  const whyChooseUs = parseWhyChooseUs(profile?.whyChooseUs);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await get('CompanyProfile/get');
+        if (response?.data) setProfile(response.data);
+      } catch (error) {
+        console.error('Failed to fetch company profile:', error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+
+  const stats = [
+    { target: profile?.cars ?? 0, suffix: '+', label: t('hero.stats.cars'), color: 'teal' },
+    { target: profile?.clients ?? 0, suffix: '+', label: t('hero.stats.clients'), color: 'teal' },
+    { target: profile?.cities ?? 0, suffix: '+', label: t('hero.stats.cities'), color: 'green' },
+  ];
 
   return (
     <Box
@@ -92,7 +153,7 @@ export function HeroSection() {
         }}
       />
 
-      {/* Floating orbs — hidden in light mode */}
+      {/* Floating orbs */}
       {isDark && (
         <>
           <motion.div
@@ -118,6 +179,7 @@ export function HeroSection() {
 
       <Container size="lg" style={{ position: 'relative', zIndex: 1 }}>
         <Stack align="center" gap="xl">
+
           {/* Label */}
           <AnimatedSection delay={0.1}>
             <div className="section-label">
@@ -126,10 +188,12 @@ export function HeroSection() {
                 animate={{ boxShadow: ['0 0 4px var(--az-teal)', '0 0 16px var(--az-teal)', '0 0 4px var(--az-teal)'] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
-              {t('hero.subtitle')}
+              {/* Show tagline from API, fallback to translation */}
+              {profile?.tagline ?? t('hero.subtitle')}
             </div>
           </AnimatedSection>
 
+          {/* Title — uses company name from API */}
           <AnimatedSection delay={0.2} scale>
             <Title
               ta="center"
@@ -141,16 +205,13 @@ export function HeroSection() {
                 letterSpacing: '-0.02em',
               }}
             >
-              <Text
-                component="span"
-                inherit
-                c="teal"
-              >
-                {t('hero.title')}
+              <Text component="span" inherit c="teal">
+                {profile?.name ?? t('hero.title')}
               </Text>
             </Title>
           </AnimatedSection>
 
+          {/* Subtitle — tagline or fallback */}
           <AnimatedSection delay={0.35}>
             <Text
               ta="center"
@@ -159,7 +220,7 @@ export function HeroSection() {
               c={isDark ? 'dimmed' : undefined}
               style={!isDark ? { color: '#868e96' } : undefined}
             >
-              {t('featured.subtitle')}
+              {profile?.tagline ?? t('featured.subtitle')}
             </Text>
           </AnimatedSection>
 
@@ -211,14 +272,10 @@ export function HeroSection() {
             </Box>
           </AnimatedSection>
 
-          {/* Stats counter row */}
+          {/* Stats — driven by API data */}
           <StaggerContainer stagger={0.15} delay={0.6} style={{ width: '100%', maxWidth: 650 }}>
             <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="md" mt="lg">
-              {[
-                { target: 500, suffix: '+', label: t('hero.stats.cars'), color: 'teal' },
-                { target: 10000, suffix: '+', label: t('hero.stats.clients'), color: 'teal' },
-                { target: 50, suffix: '+', label: t('hero.stats.cities'), color: 'green' },
-              ].map((stat) => (
+              {stats.map((stat) => (
                 <StaggerItem key={stat.label} scale>
                   <Paper
                     className={`${isDark ? 'glass-card' : ''} card-gradient-border`}
@@ -239,10 +296,7 @@ export function HeroSection() {
                       mt={2}
                       tt="uppercase"
                       fw={600}
-                      style={{
-                        letterSpacing: '0.05em',
-                        color: isDark ? undefined : '#868e96',
-                      }}
+                      style={{ letterSpacing: '0.05em', color: isDark ? undefined : '#868e96' }}
                       c={isDark ? 'dimmed' : undefined}
                     >
                       {stat.label}
@@ -253,39 +307,43 @@ export function HeroSection() {
             </SimpleGrid>
           </StaggerContainer>
 
-          {/* Trust badges */}
-          <StaggerContainer stagger={0.12} delay={0.9}>
-            <Group mt="md" justify="center" wrap="wrap" gap="md">
-              {[
-                { label: t('hero.trust.bestPrice'), icon: IconShieldCheck },
-                { label: t('hero.trust.support'), icon: IconHeadset },
-                { label: t('hero.trust.verified'), icon: IconCircleCheck },
-              ].map((badge) => (
-                <StaggerItem key={badge.label}>
-                  <motion.div whileHover={{ scale: 1.05, y: -2 }} transition={{ type: 'spring', stiffness: 400 }}>
-                    <Badge
-                      size="lg"
-                      variant="outline"
-                      color="gray"
-                      leftSection={<badge.icon size={16} style={{ color: '#2DD4A8' }} />}
-                      style={{
-                        padding: '0.7rem 1.4rem',
-                        cursor: 'default',
-                        borderColor: 'rgba(45, 212, 168, 0.3)',
-                        backgroundColor: 'rgba(45, 212, 168, 0.08)',
-                        color: '#fff',
-                        fontWeight: 600,
-                        letterSpacing: '0.02em',
-                        fontSize: '0.8rem',
-                      }}
-                    >
-                      {badge.label}
-                    </Badge>
-                  </motion.div>
-                </StaggerItem>
-              ))}
-            </Group>
-          </StaggerContainer>
+          {/* Trust badges — from whyChooseUs API */}
+          {whyChooseUs.length > 0 && (
+            <StaggerContainer stagger={0.12} delay={0.9}>
+              <Group mt="md" justify="center" wrap="wrap" gap="md">
+                {whyChooseUs.map((item) => (
+                  <StaggerItem key={item.title}>
+                    <motion.div whileHover={{ scale: 1.05, y: -2 }} transition={{ type: 'spring', stiffness: 400 }}>
+                      <Group
+                        gap="xs"
+                        style={{
+                          padding: '0.5rem 1.1rem',
+                          borderRadius: 999,
+                          border: '1px solid rgba(45,212,168,0.35)',
+                          background: isDark ? 'rgba(45,212,168,0.07)' : 'rgba(45,212,168,0.1)',
+                          cursor: 'default',
+                        }}
+                      >
+                        <Text size="sm" style={{ lineHeight: 1 }}>{item.icon}</Text>
+                        <Text
+                          size="sm"
+                          fw={600}
+                          style={{
+                            letterSpacing: '0.03em',
+                            color: isDark ? '#e0fdf4' : '#0d9488',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {item.title}
+                        </Text>
+                      </Group>
+                    </motion.div>
+                  </StaggerItem>
+                ))}
+              </Group>
+            </StaggerContainer>
+          )}
+
         </Stack>
       </Container>
     </Box>
