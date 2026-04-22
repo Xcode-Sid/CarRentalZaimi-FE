@@ -5,8 +5,8 @@ import {
   RangeSlider, Chip, Badge, ThemeIcon, UnstyledButton, Loader, Center,
 } from '@mantine/core';
 import {
-  IconLayoutGrid, IconList, IconFilter, IconSearch, IconDiamond,
-  IconCar, IconBolt, IconPigMoney, IconRotateClockwise,
+  IconLayoutGrid, IconList, IconFilter, IconSearch,
+  IconRotateClockwise, IconCar,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from '@mantine/hooks';
@@ -15,19 +15,13 @@ import { notifications } from '@mantine/notifications';
 import { VehicleCard } from '../components/common/VehicleCard';
 import { EmptyState } from '../components/common/EmptyState';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../components/common/AnimatedSection';
-import { get } from '../utils/api.utils';
+import { get } from '../utils/apiUtils';
 import { type Vehicle, type GeneralData, mapApiCarToVehicle } from '../data/vehicles';
 import Spinner from '../components/spinner/Spinner';
 
-const ITEMS_PER_PAGE = 6;
-const DEBOUNCE_MS = 400;
-
-const categoryIcons: Record<string, typeof IconDiamond> = {
-  Luksoze: IconDiamond, SUV: IconCar, Elektrike: IconBolt, Ekonomike: IconPigMoney,
-};
-const categoryColors: Record<string, string> = {
-  Luksoze: 'yellow', SUV: 'green', Elektrike: 'blue', Ekonomike: 'gray',
-};
+import { categoryColors } from '../constants/colors';
+import { FLEET_PAGE_SIZE as ITEMS_PER_PAGE } from '../constants/pagination';
+import { DEBOUNCE_MS, categoryIcons } from '../constants/fleet';
 
 const normalizeArray = <T,>(raw: any): T[] => {
   if (Array.isArray(raw)) return raw;
@@ -102,10 +96,10 @@ export default function FleetPage() {
         setTotalCount(res.data.totalCount);
         setTotalPages(res.data.totalPages);
       } else {
-        setError('Failed to load vehicles.');
+        setError(t('fleet.loadFailed'));
       }
     } catch {
-      setError('Failed to load vehicles. Is the API running?');
+      setError(t('fleet.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -129,7 +123,7 @@ export default function FleetPage() {
         setFuelOptions(normalizeArray<GeneralData>(fuels.data));
         setTransmissionOptions(normalizeArray<GeneralData>(trans.data));
       } catch {
-        notifications.show({ message: 'Failed to load filter options.', color: 'red' });
+        notifications.show({ message: t('fleet.filterOptionsFailed'), color: 'red' });
       }
     })();
   }, []);
@@ -369,11 +363,11 @@ export default function FleetPage() {
                       <Text size="sm" c="dimmed">
                         {totalCount > 0 ? (
                           <>
-                            {t('admin.showing') ?? 'Showing'}{' '}
+                            {t('admin.showing')}{' '}
                             <Text component="span" size="sm" fw={500} c="default">
                               {startItem}–{endItem}
                             </Text>{' '}
-                            {t('admin.of') ?? 'of'}{' '}
+                            {t('admin.of')}{' '}
                             <Text component="span" size="sm" fw={500} c="default">
                               {totalCount}
                             </Text>{' '}

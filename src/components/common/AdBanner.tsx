@@ -3,14 +3,15 @@ import { Box, Text, ActionIcon } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useAds } from '../../contexts/AdsContext';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { AUTO_PLAY_MS } from '../../constants/landing';
 
 interface Props {
   position: 'top' | 'bottom';
 }
 
-const AUTO_PLAY_MS = 5000;
-
 export function AdBanner({ position }: Props) {
+  const { t } = useTranslation();
   const { getActiveAds } = useAds();
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -131,7 +132,7 @@ export function AdBanner({ position }: Props) {
       {/* Sponsored label */}
       <Box style={{ position: 'absolute', top: 38, left: 14, zIndex: 10 }}>
         <Text size="xs" fw={500} c="white" style={{ opacity: 0.7, letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-          Sponsored
+          {t('ads.sponsored')}
         </Text>
       </Box>
 
@@ -193,7 +194,7 @@ export function AdBanner({ position }: Props) {
               navigate(ad.linkUrl);
             }}
           >
-            <Text size="sm" fw={500} c="white">Learn more</Text>
+            <Text size="sm" fw={500} c="white">{t('ads.learnMore')}</Text>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

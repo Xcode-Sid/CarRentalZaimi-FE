@@ -6,21 +6,15 @@ import {
 import { IconPhone, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import { useNavigate } from 'react-router-dom';
+import type { PhonePrefix } from '../../types/company';
 
 interface PhoneNumberModalProps {
     opened: boolean;
     userId: string;
     onSuccess: () => void;
     onClose: () => void;
-}
-
-interface PhonePrefix {
-    countryName: string | null;
-    phonePrefix: string | null;
-    flag: string | null;
-    phoneRegex: string | null;
 }
 
 const PhoneNumberModal: React.FC<PhoneNumberModalProps> = ({ opened, userId, onSuccess, onClose }) => {

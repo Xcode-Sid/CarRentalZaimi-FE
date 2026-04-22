@@ -603,6 +603,86 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   }
 
+  /* ===== DASHBOARD CHART CARD ===== */
+  .chart-card {
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .chart-card:hover {
+    border-color: rgba(45, 212, 168, 0.2);
+  }
+  [data-mantine-color-scheme='dark'] .chart-card:hover {
+    box-shadow: 0 8px 32px rgba(45, 212, 168, 0.08);
+  }
+  [data-mantine-color-scheme='light'] .chart-card:hover {
+    box-shadow: 0 8px 24px rgba(45, 212, 168, 0.06);
+  }
+
+  /* ===== LIST ROW HOVER ===== */
+  .list-row-animated {
+    transition: background 0.25s ease, transform 0.25s ease;
+    border-radius: 10px;
+  }
+  .list-row-animated:hover {
+    transform: translateX(4px);
+  }
+  [data-mantine-color-scheme='dark'] .list-row-animated:hover {
+    background: rgba(45, 212, 168, 0.06) !important;
+  }
+  [data-mantine-color-scheme='light'] .list-row-animated:hover {
+    background: rgba(45, 212, 168, 0.04) !important;
+  }
+
+  /* ===== ANIMATED GRADIENT BORDER ===== */
+  .animated-border-glow {
+    position: relative;
+  }
+  .animated-border-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--border-angle, 0deg), transparent 40%, rgba(45,212,168,0.4) 50%, transparent 60%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .animated-border-glow:hover::before {
+    opacity: 1;
+    animation: border-spin 3s linear infinite;
+  }
+  @keyframes border-spin {
+    to { --border-angle: 360deg; }
+  }
+  @property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  /* ===== LOADING SHIMMER SKELETON ===== */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(45,212,168,0.03) 25%,
+      rgba(45,212,168,0.08) 50%,
+      rgba(45,212,168,0.03) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-wave 1.5s ease-in-out infinite;
+    border-radius: var(--mantine-radius-lg);
+  }
+  @keyframes skeleton-wave {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
   /* ===== ACCOUNT RENTALS (BOOKINGS) TABLE ===== */
   [data-mantine-color-scheme='dark'] .account-rentals-table thead tr {
     background: rgba(45, 212, 168, 0.07);

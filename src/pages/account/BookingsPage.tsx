@@ -32,10 +32,10 @@ import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { formatBookingPeriod } from '../../utils/bookingDisplay';
 import {
   BookingDetailContent,
-  bookingStatusColors,
   bookingStatusKeys,
 } from '../../components/booking/BookingDetailContent';
-import { get, put } from '../../utils/api.utils';
+import { bookingStatusColors } from '../../constants/colors';
+import { get, put } from '../../utils/apiUtils';
 import Spinner from '../../components/spinner/Spinner';
 
 
@@ -132,7 +132,7 @@ function CancelModal({ booking, onClose, onConfirm }: CancelModalProps) {
         )}
 
         <Textarea
-          label={t('account.cancelReason') ?? 'Reason (optional)'}
+          label={t('account.cancelReason')}
           placeholder={t('account.cancelReasonPlaceholder')}
           value={reason}
           onChange={(e) => setReason(e.currentTarget.value)}
@@ -214,7 +214,7 @@ export default function BookingsPage() {
       setTotalPages(res.data.totalPages ?? 1);
       setTotalCount(res.data.totalCount ?? 0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : t('common.unknownError'));
       setBookings([]);
     } finally {
       setLoading(false);
@@ -236,7 +236,7 @@ export default function BookingsPage() {
         bookingId: cancelTarget.id,
         reason: reason.trim() || null,
       });
-      if (!res.success) throw new Error(res.message || 'Failed to cancel booking');
+      if (!res.success) throw new Error(res.message || t('account.cancelBookingFailed'));
       setCancelTarget(null);
       setSelected(null);
       await fetchBookings();
@@ -463,7 +463,7 @@ export default function BookingsPage() {
                               </Table.Td>
                               <Table.Td>
                                 <Group gap={4} wrap="nowrap">
-                                  <Tooltip label={t('account.viewDetails') ?? 'View details'} withArrow position="top">
+                                  <Tooltip label={t('account.viewDetails')} withArrow position="top">
                                     <ActionIcon
                                       variant="subtle"
                                       color="teal"
@@ -474,7 +474,7 @@ export default function BookingsPage() {
                                     </ActionIcon>
                                   </Tooltip>
                                   {isAccepted && (
-                                    <Tooltip label={t('account.cancel') ?? 'Cancel'} withArrow position="top">
+                                    <Tooltip label={t('account.cancel')} withArrow position="top">
                                       <ActionIcon
                                         variant="subtle"
                                         color="red"
@@ -499,15 +499,15 @@ export default function BookingsPage() {
                 {totalPages > 1 && (
                   <Group justify="space-between" align="center" px={4}>
                     <Text size="xs" c="dimmed">
-                      {t('admin.showing') ?? 'Showing'}{' '}
+                      {t('admin.showing')}{' '}
                       <Text component="span" size="xs" fw={500} c="default">
                         {startItem}–{endItem}
                       </Text>{' '}
-                      {t('admin.of') ?? 'of'}{' '}
+                      {t('admin.of')}{' '}
                       <Text component="span" size="xs" fw={500} c="default">
                         {totalCount}
                       </Text>{' '}
-                      {t('account.myBookings') ?? 'bookings'}
+                      {t('account.myBookings')}
                     </Text>
                     <Pagination
                       value={page}

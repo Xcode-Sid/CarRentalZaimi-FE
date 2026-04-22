@@ -1,18 +1,11 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppShell, Box, Container, NavLink, Stack, Group, Tabs, ScrollArea } from '@mantine/core';
-import { IconUser, IconDeviceFloppy, IconCalendar, IconSettings } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/common/Navbar';
 import { Footer } from '../components/common/Footer';
 import { AdBanner } from '../components/common/AdBanner';
-
-const navItems = [
-  { path: '/account/profile', icon: IconUser, labelKey: 'account.profile' },
-  { path: '/account/saved', icon: IconDeviceFloppy, labelKey: 'account.savedCars' },
-  { path: '/account/bookings', icon: IconCalendar, labelKey: 'account.myBookings' },
-  { path: '/account/settings', icon: IconSettings, labelKey: 'account.settings' },
-];
+import { accountNavItems as navItems } from '../constants/navigation';
 
 export function AccountLayout() {
   const { t } = useTranslation();

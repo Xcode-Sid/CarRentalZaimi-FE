@@ -17,7 +17,7 @@ import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { Logo } from '../components/common/Logo';
 import { AnimatedSection } from '../components/common/AnimatedSection';
-import { post } from '../utils/api.utils';
+import { post } from '../utils/apiUtils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function ResetPasswordPage() {

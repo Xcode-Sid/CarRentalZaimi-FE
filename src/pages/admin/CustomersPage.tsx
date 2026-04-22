@@ -29,15 +29,11 @@ import { BookingDetailContent, bookingStatusKeys } from '../../components/bookin
 import { type User } from '../../data/users';
 import { mapApiBooking, type Booking } from '../../data/bookings';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get } from '../../utils/api.utils';
+import { get } from '../../utils/apiUtils';
 import { toImagePath } from '../../utils/general';
 
 
-const statusColors: Record<string, string> = {
-  accepted: 'green',
-  refused: 'red',
-  finished: 'gray',
-};
+import { customerStatusColors as statusColors } from '../../constants/colors';
 
 export default function CustomersPage() {
   const { t } = useTranslation();
@@ -81,7 +77,7 @@ export default function CustomersPage() {
       setTotalPages(res.data.totalPages);
       setTotalCount(res.data.totalCount);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : t('common.unknownError'));
       setCustomers([]);
     } finally {
       setLoading(false);
@@ -112,7 +108,7 @@ export default function CustomersPage() {
       const mapped: Booking[] = (res.data ?? []).map(mapApiBooking);
       setUserBookings(mapped);
     } catch (err) {
-      setBookingsError(err instanceof Error ? err.message : 'Unknown error');
+      setBookingsError(err instanceof Error ? err.message : t('common.unknownError'));
     } finally {
       setBookingsLoading(false);
     }
@@ -368,11 +364,11 @@ export default function CustomersPage() {
           {totalPages > 1 && (
             <Group justify="space-between" align="center" px={4}>
               <Text size="xs" c="dimmed">
-                {t('admin.showing') ?? 'Showing'}{' '}
+                {t('admin.showing')}{' '}
                 <Text component="span" size="xs" fw={500}>{startItem}–{endItem}</Text>{' '}
-                {t('admin.of') ?? 'of'}{' '}
+                {t('admin.of')}{' '}
                 <Text component="span" size="xs" fw={500}>{totalCount}</Text>{' '}
-                {t('admin.customers') ?? 'customers'}
+                {t('admin.customers')}
               </Text>
               <Pagination
                 value={page}

@@ -9,6 +9,10 @@ function getWarningTitle() {
   return i18next.t("common.warningTitle");
 }
 
+function getSuccessTitle() {
+  return i18next.t("common.successTitle");
+}
+
 function getInfoTitle() {
   return i18next.t("common.infoTitle");
 }
@@ -26,6 +30,15 @@ export function showApiWarning(message: string) {
     color: "orange",
     title: getWarningTitle(),
     message,
+  });
+}
+
+export function showApiSuccess(message: string) {
+  notifications.show({
+    color: "teal",
+    title: getSuccessTitle(),
+    message,
+    autoClose: 4000,
   });
 }
 

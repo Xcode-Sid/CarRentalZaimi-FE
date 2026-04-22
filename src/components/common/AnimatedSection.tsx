@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { motion, type Variant } from 'framer-motion';
+import { ANIMATION_DIRECTION_OFFSET } from '../../constants/landing';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'none';
 
@@ -16,13 +17,7 @@ interface AnimatedSectionProps {
   scale?: boolean;
 }
 
-const directionOffset: Record<Direction, { x: number; y: number }> = {
-  up: { x: 0, y: 40 },
-  down: { x: 0, y: -40 },
-  left: { x: 40, y: 0 },
-  right: { x: -40, y: 0 },
-  none: { x: 0, y: 0 },
-};
+const directionOffset = ANIMATION_DIRECTION_OFFSET as Record<Direction, { x: number; y: number }>;
 
 export function AnimatedSection({
   children,

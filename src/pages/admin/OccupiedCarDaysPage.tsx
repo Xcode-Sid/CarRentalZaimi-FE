@@ -8,75 +8,24 @@ import {
 import { useForm } from '@mantine/form';
 import { IconPlus, IconEdit, IconTrash, IconRefresh, IconCar } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get, post, put, del } from '../../utils/api.utils';
+import { get, post, put, del } from '../../utils/apiUtils';
 import { DatePickerInput } from '@mantine/dates';
 import Spinner from '../../components/spinner/Spinner';
-
-interface OccupiedCarDays {
-    id: string;
-    car: {
-        id: string;
-        title: string;
-    }
-    startDate: string;
-    endDate: string;
-    type: string;
-}
-
-interface FilterValues {
-    carId: string;
-    startDate: Date | null;
-    endDate: Date | null;
-}
-
-interface FormValues {
-    carId: string;
-    startDate: Date | null;
-    endDate: Date | null;
-    type: string;
-}
-
-interface Car {
-    id: string;
-    title: string;
-}
-
-interface OccupiedDateEntry {
-    date: Date;
-    type: string;
-}
-
-const inputStyles = {
-    input: {
-        transition: "border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.18s",
-        "&:focus": {
-            transform: "translateY(-1px)",
-            boxShadow: "0 0 0 3px rgba(29, 158, 117, 0.12)",
-        },
-    },
-    label: {
-        transition: "color 0.15s",
-        "&:has(+ * :focus)": { color: "var(--mantine-color-teal-7)" },
-    },
-};
-
-const typeColor: Record<string, string> = {
-    Booking: '#ef4444',
-    Maintenance: '#f59e0b',
-    PrivateUse: '#3b82f6',
-    Other: '#8b5cf6',
-};
-
-const typeLabel: Record<string, string> = {
-    Booking: 'Booking',
-    Maintenance: 'Maintenance',
-    PrivateUse: 'Private Use',
-    Other: 'Other',
-};
+import type {
+    OccupiedCarDays,
+    OccupiedCarDaysFilterValues as FilterValues,
+    OccupiedCarDaysFormValues as FormValues,
+    CarOption as Car,
+    OccupiedDateEntry,
+} from '../../types/admin';
+import { inputStyles } from '../../constants/styles';
+import { occupiedDayTypeColors as typeColor, occupiedDayTypeLabels as typeLabel } from '../../constants/colors';
 
 export default function OccupiedCarDaysPage() {
+    const { t } = useTranslation();
 
     const [items, setItems] = useState<OccupiedCarDays[]>([]);
     const [loading, setLoading] = useState(false);
@@ -265,9 +214,9 @@ export default function OccupiedCarDaysPage() {
                                 }}
                             />
                             <div>
-                                <Title order={2} fw={800}>Car Busy Days</Title>
+                                <Title order={2} fw={800}>{t('occupiedDays.title')}</Title>
                                 <Text c="dimmed" size="sm" mt={4}>
-                                    Manage blocked date ranges per vehicle
+                                    {t('occupiedDays.subtitle')}
                                 </Text>
                             </div>
                         </Group>
@@ -277,14 +226,14 @@ export default function OccupiedCarDaysPage() {
                             radius="md"
                             onClick={openCreate}
                         >
-                            Add Block
+                            {t('occupiedDays.addBlock')}
                         </Button>
                     </Group>
 
                     {/* FILTERS */}
                     <Group wrap="wrap" align="end" gap="sm" mb="sm">
                         <Select
-                            placeholder="Filter by Car"
+                            placeholder={t('occupiedDays.filterByCar')}
                             radius="md"
                             data={carOptions}
                             clearable
@@ -298,7 +247,7 @@ export default function OccupiedCarDaysPage() {
                         />
                         <DatePickerInput
                             type="range"
-                            placeholder="Date Range"
+                            placeholder={t('occupiedDays.dateRange')}
                             radius="md"
                             value={[filterForm.values.startDate, filterForm.values.endDate]}
                             onChange={([start, end]) => {
@@ -307,7 +256,7 @@ export default function OccupiedCarDaysPage() {
                                 setPage(1);
                             }}
                         />
-                        <Tooltip label="Refresh" withArrow>
+                        <Tooltip label={t('common.refresh')} withArrow>
                             <ActionIcon
                                 variant="light"
                                 color="teal"
@@ -355,11 +304,11 @@ export default function OccupiedCarDaysPage() {
                                         <Table.Thead>
                                             <Table.Tr>
                                                 <Table.Th w={60}>#</Table.Th>
-                                                <Table.Th>Car</Table.Th>
-                                                <Table.Th>Start Date</Table.Th>
-                                                <Table.Th>End Date</Table.Th>
-                                                <Table.Th>Type</Table.Th>
-                                                <Table.Th w={90}>Actions</Table.Th>
+                                                <Table.Th>{t('occupiedDays.table.car')}</Table.Th>
+                                                <Table.Th>{t('occupiedDays.table.startDate')}</Table.Th>
+                                                <Table.Th>{t('occupiedDays.table.endDate')}</Table.Th>
+                                                <Table.Th>{t('occupiedDays.table.type')}</Table.Th>
+                                                <Table.Th w={90}>{t('occupiedDays.table.actions')}</Table.Th>
                                             </Table.Tr>
                                         </Table.Thead>
 
@@ -394,7 +343,7 @@ export default function OccupiedCarDaysPage() {
                                                                     <IconCar size={18} />
                                                                 </ThemeIcon>
                                                                 <Text size="sm" c="dimmed">
-                                                                    No blocked days found
+                                                                    {t('occupiedDays.empty')}
                                                                 </Text>
                                                                 <Button
                                                                     leftSection={<IconPlus size={15} />}
@@ -405,7 +354,7 @@ export default function OccupiedCarDaysPage() {
                                                                     mt={4}
                                                                     onClick={openCreate}
                                                                 >
-                                                                    Add Block
+                                                                    {t('occupiedDays.addBlock')}
                                                                 </Button>
                                                             </Stack>
                                                         </Center>
@@ -478,14 +427,14 @@ export default function OccupiedCarDaysPage() {
                                                                 border: `1px solid ${typeColor[x.type] ?? '#888'}44`,
                                                             }}
                                                         >
-                                                            {typeLabel[x.type] ?? x.type}
+                                                            {t(typeLabel[x.type]) ?? x.type}
                                                         </Badge>
                                                     </Table.Td>
 
                                                     {/* Actions */}
                                                     <Table.Td>
                                                         <Group gap={4}>
-                                                            <Tooltip label="Edit" withArrow fz="xs">
+                                                            <Tooltip label={t('common.edit')} withArrow fz="xs">
                                                                 <ActionIcon
                                                                     variant="subtle"
                                                                     color="yellow"
@@ -496,7 +445,7 @@ export default function OccupiedCarDaysPage() {
                                                                     <IconEdit size={15} />
                                                                 </ActionIcon>
                                                             </Tooltip>
-                                                            <Tooltip label="Delete" withArrow fz="xs">
+                                                            <Tooltip label={t('common.delete')} withArrow fz="xs">
                                                                 <ActionIcon
                                                                     variant="subtle"
                                                                     color="red"
@@ -520,11 +469,11 @@ export default function OccupiedCarDaysPage() {
                             {totalPages > 1 && (
                                 <Group justify="space-between" align="center" px={4}>
                                     <Text size="xs" c="dimmed">
-                                        Showing{' '}
+                                        {t('common.showing')}{' '}
                                         <Text component="span" size="xs" fw={500}>{startItem}–{endItem}</Text>
-                                        {' '}of{' '}
+                                        {' '}{t('common.of')}{' '}
                                         <Text component="span" size="xs" fw={500}>{totalCount}</Text>
-                                        {' '}records
+                                        {' '}{t('occupiedDays.records')}
                                     </Text>
                                     <Pagination
                                         value={page}
@@ -557,7 +506,7 @@ export default function OccupiedCarDaysPage() {
                                 {editTarget ? <IconEdit size={16} /> : <IconPlus size={16} />}
                             </ThemeIcon>
                             <Text fw={500} size="md">
-                                {editTarget ? 'Edit Blocked Days' : 'Add Blocked Days'}
+                                {editTarget ? t('occupiedDays.editTitle') : t('occupiedDays.addTitle')}
                             </Text>
                         </Group>
                     }
@@ -571,7 +520,7 @@ export default function OccupiedCarDaysPage() {
                 >
                     <Stack gap="md">
                         <Select
-                            label="Car"
+                            label={t('occupiedDays.form.car')}
                             radius="md"
                             data={carOptions}
                             value={modalForm.values.carId || null}
@@ -585,7 +534,7 @@ export default function OccupiedCarDaysPage() {
 
                         <DatePickerInput
                             type="range"
-                            label="Date Range"
+                            label={t('occupiedDays.form.dateRange')}
                             minDate={new Date()}
                             value={[modalForm.values.startDate, modalForm.values.endDate]}
                             onChange={([start, end]) => {
@@ -621,19 +570,19 @@ export default function OccupiedCarDaysPage() {
                             {Object.entries(typeLabel).map(([type, label]) => (
                                 <Group key={type} gap={4}>
                                     <Box w={12} h={12} style={{ borderRadius: 3, backgroundColor: typeColor[type] }} />
-                                    <Text size="xs" c="dimmed">{label}</Text>
+                                    <Text size="xs" c="dimmed">{t(label)}</Text>
                                 </Group>
                             ))}
                         </Group>
 
                         <Select
-                            label="Type"
+                            label={t('occupiedDays.form.type')}
                             radius="md"
                             data={[
-                                { value: 'Booking', label: 'Booking' },
-                                { value: 'Maintenance', label: 'Maintenance' },
-                                { value: 'PrivateUse', label: 'Private Use' },
-                                { value: 'Other', label: 'Other' },
+                                { value: 'Booking', label: t('occupiedDays.type.booking') },
+                                { value: 'Maintenance', label: t('occupiedDays.type.maintenance') },
+                                { value: 'PrivateUse', label: t('occupiedDays.type.privateUse') },
+                                { value: 'Other', label: t('occupiedDays.type.other') },
                             ]}
                             styles={inputStyles}
                             {...modalForm.getInputProps('type')}
@@ -649,7 +598,7 @@ export default function OccupiedCarDaysPage() {
                             leftSection={editTarget ? <IconEdit size={16} /> : <IconPlus size={16} />}
                             onClick={handleSave}
                         >
-                            {editTarget ? 'Update' : 'Save'}
+                            {editTarget ? t('common.update') : t('common.save')}
                         </Button>
                     </Stack>
                 </Modal>
@@ -663,7 +612,7 @@ export default function OccupiedCarDaysPage() {
                             <ThemeIcon color="red" variant="light" size={32} radius="md">
                                 <IconTrash size={16} />
                             </ThemeIcon>
-                            <Text fw={500} size="md">Delete Blocked Days</Text>
+                            <Text fw={500} size="md">{t('occupiedDays.deleteTitle')}</Text>
                         </Group>
                     }
                     size="sm"
@@ -711,20 +660,20 @@ export default function OccupiedCarDaysPage() {
                         >
                             <Stack gap={4} align="center">
                                 <Text size="sm" ta="center" fw={500} c="red.8">
-                                    Are you sure you want to delete this record?
+                                    {t('occupiedDays.deleteConfirm')}
                                 </Text>
                                 <Text size="xs" ta="center" c="dimmed">
-                                    This action cannot be undone.
+                                    {t('common.cannotBeUndone')}
                                 </Text>
                             </Stack>
                         </Paper>
 
                         <Group w="100%" gap="sm">
                             <Button variant="default" flex={1} radius="md" onClick={() => setDeleteTarget(null)}>
-                                Cancel
+                                {t('cancel')}
                             </Button>
                             <Button color="red" flex={1} radius="md" leftSection={<IconTrash size={15} />} onClick={handleDelete}>
-                                Delete
+                                {t('delete')}
                             </Button>
                         </Group>
                     </Stack>

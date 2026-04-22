@@ -14,7 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get, post, put, del } from '../../utils/api.utils';
+import { get, post, put, del } from '../../utils/apiUtils';
+import type { PhonePrefix, PhonePrefixFormValues as FormValues } from '../../types/company';
 
 // ── Flag emoji helper ─────────────────────────────────────────────────────────
 function countryCodeToFlag(code: string | null): string {
@@ -26,86 +27,9 @@ function countryCodeToFlag(code: string | null): string {
     );
 }
 
-// ── Country list ──────────────────────────────────────────────────────────────
-// value = 2-letter ISO code (stored as flag emoji via countryCodeToFlag)
-const COUNTRIES: { code: string; name: string; flag: string }[] = [
-    { code: 'AL', name: 'Albania', flag: '🇦🇱' },
-    { code: 'AD', name: 'Andorra', flag: '🇦🇩' },
-    { code: 'AT', name: 'Austria', flag: '🇦🇹' },
-    { code: 'BY', name: 'Belarus', flag: '🇧🇾' },
-    { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
-    { code: 'BA', name: 'Bosnia and Herzegovina', flag: '🇧🇦' },
-    { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
-    { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
-    { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
-    { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
-    { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
-    { code: 'EE', name: 'Estonia', flag: '🇪🇪' },
-    { code: 'FI', name: 'Finland', flag: '🇫🇮' },
-    { code: 'FR', name: 'France', flag: '🇫🇷' },
-    { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-    { code: 'GR', name: 'Greece', flag: '🇬🇷' },
-    { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
-    { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
-    { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
-    { code: 'IT', name: 'Italy', flag: '🇮🇹' },
-    { code: 'XK', name: 'Kosovo', flag: '🇽🇰' },
-    { code: 'LV', name: 'Latvia', flag: '🇱🇻' },
-    { code: 'LI', name: 'Liechtenstein', flag: '🇱🇮' },
-    { code: 'LT', name: 'Lithuania', flag: '🇱🇹' },
-    { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
-    { code: 'MT', name: 'Malta', flag: '🇲🇹' },
-    { code: 'MD', name: 'Moldova', flag: '🇲🇩' },
-    { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
-    { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
-    { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
-    { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
-    { code: 'NO', name: 'Norway', flag: '🇳🇴' },
-    { code: 'PL', name: 'Poland', flag: '🇵🇱' },
-    { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
-    { code: 'RO', name: 'Romania', flag: '🇷🇴' },
-    { code: 'RU', name: 'Russia', flag: '🇷🇺' },
-    { code: 'SM', name: 'San Marino', flag: '🇸🇲' },
-    { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
-    { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
-    { code: 'SI', name: 'Slovenia', flag: '🇸🇮' },
-    { code: 'ES', name: 'Spain', flag: '🇪🇸' },
-    { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
-    { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
-    { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
-    { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
-    { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-    { code: 'VA', name: 'Vatican City', flag: '🇻🇦' },
-    // Beyond Europe
-    { code: 'US', name: 'United States', flag: '🇺🇸' },
-    { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-    { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-    { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
-    { code: 'CN', name: 'China', flag: '🇨🇳' },
-    { code: 'IN', name: 'India', flag: '🇮🇳' },
-    { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-    { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
-    { code: 'NG', name: 'Nigeria', flag: '🇳🇬' },
-    { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
-    { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
-    { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
-];
+import { COUNTRIES, FLAG_SELECT_DATA } from '../../data/countries';
+import { glassInputStyles as inputStyles } from '../../constants/styles';
 
-// Select data: value = ISO code, label = name only (used for search matching)
-const FLAG_SELECT_DATA = COUNTRIES.map(({ code, name }) => ({
-    value: code,
-    label: name,
-}));
-
-interface PhonePrefix {
-    id: string;
-    countryName: string | null;
-    phonePrefix: string | null;
-    flag: string | null;       // stored as flag emoji e.g. "🇦🇱"
-    phoneRegex: string | null;
-}
-
-// Convert stored emoji back to ISO code for the Select value
 function flagEmojiToCode(emoji: string | null): string {
     if (!emoji) return '';
     try {
@@ -115,21 +39,6 @@ function flagEmojiToCode(emoji: string | null): string {
     } catch { /* ignore */ }
     return '';
 }
-
-interface FormValues {
-    countryName: string;
-    phonePrefix: string;
-    flag: string;
-    phoneRegex: string;
-}
-
-const inputStyles = {
-    input: {
-        background: 'rgba(255,255,255,0.04)',
-        border: '0.5px solid var(--mantine-color-default-border)',
-        '&:focus': { borderColor: 'var(--az-teal)' },
-    },
-};
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function PhonePrefixPage() {

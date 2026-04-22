@@ -19,7 +19,7 @@ import AdminDashboardPage from './pages/admin/DashboardPage';
 import AdminCarsPage from './pages/admin/cars/CarsPage';
 import AdminBookingsPage from './pages/admin/AdminBookingsPage';
 import AdminCustomersPage from './pages/admin/CustomersPage';
-import AdminSettingsPage from './pages/admin/SettingsPage';
+import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminAnalyticsPage from './pages/admin/AnalyticsPage';
 import AdminReportsPage from './pages/admin/ReportsPage';
 import AdminAdsPage from './pages/admin/AdsPage';
@@ -27,18 +27,22 @@ import { LanguageSwitcher } from './components/common/LanguageSwitcher';
 import { ThemeToggle } from './components/common/ThemeToggle';
 import { AdsVerticalLayout } from './layouts/AdPageShell';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import VerifyPhonePage from './pages/register/VerifyPhonePage ';
-import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage ';
+import VerifyPhonePage from './pages/register/VerifyPhonePage';
+import AdminCarDataPage from './pages/admin/cars/AdminCarDataPage';
 import PromotionsPage from './pages/account/PromotionsPage';
-import AdminAdditionalServicesPage from './pages/account/AdditionalServicesPage ';
-import RecomandedCarsPage from './pages/admin/cars/RecomendedCarPage';
+import AdminAdditionalServicesPage from './pages/account/AdditionalServicesPage';
+import RecommendedCarsPage from './pages/admin/cars/RecommendedCarPage';
 import PartnersPage from './pages/admin/PartnersPage';
 import TermsPage from './pages/admin/TermsPage';
-import PrivacyPolicyPage from './pages/admin/PrivacyPage';
+import PrivacyPolicyPage from './pages/admin/PrivacyPolicyPage';
 import SubscriptionsPage from './pages/admin/SubscriptionsPage';
-import { UnsubscribePage } from './pages/account/UnsubscribePage';
+import UnsubscribePage from './pages/account/UnsubscribePage';
 import OccupiedCarDaysPage from './pages/admin/OccupiedCarDaysPage';
-import PhonePrefixPage from './pages/admin/Phoneprefixpage';
+import PhonePrefixPage from './pages/admin/PhonePrefixPage';
+import NotificationsPage from './pages/account/NotificationsPage';
+import UserDashboardPage from './pages/account/DashboardPage';
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
+import AdminLogsPage from './pages/admin/AdminLogsPage';
 
 export default function App() {
   return (
@@ -75,11 +79,13 @@ export default function App() {
 
         <Route element={<UserAccountRoute />}>
           <Route element={<AccountLayout />}>
-            <Route path="/account" element={<Navigate to="/account/profile" replace />} />
+            <Route path="/account" element={<Navigate to="/account/dashboard" replace />} />
+            <Route path="/account/dashboard" element={<UserDashboardPage />} />
             <Route path="/account/profile" element={<ProfilePage />} />
             <Route path="/account/saved" element={<SavedCarsPage />} />
             <Route path="/account/bookings" element={<BookingsPage />} />
             <Route path="/account/settings" element={<SettingsPage />} />
+            <Route path="/account/notifications" element={<NotificationsPage />} />
           </Route>
         </Route>
 
@@ -96,13 +102,15 @@ export default function App() {
             <Route path="/admin/car-data" element={<AdminCarDataPage />} />
             <Route path="/admin/promotion" element={<PromotionsPage />} />
             <Route path="/admin/additional-services" element={<AdminAdditionalServicesPage />} />
-            <Route path="/admin/featured_cars" element={<RecomandedCarsPage />} />
+            <Route path="/admin/featured_cars" element={<RecommendedCarsPage />} />
             <Route path="/admin/partners" element={<PartnersPage />} />
             <Route path="/admin/terms" element={<TermsPage />} />
             <Route path="/admin/privacies" element={<PrivacyPolicyPage />} />
             <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
             <Route path="/admin/occupiedDays" element={<OccupiedCarDaysPage />} />
             <Route path="/admin/statePrefixes" element={<PhonePrefixPage />} />
+            <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
+            <Route path="/admin/logs" element={<AdminLogsPage />} />
           </Route>
         </Route>
 

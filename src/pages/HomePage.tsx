@@ -6,7 +6,7 @@ import { HowItWorks } from '../components/landing/HowItWorks';
 import { TestimonialsCarousel } from '../components/landing/TestimonialsCarousel';
 import { AnimatedDivider } from '../components/common/AnimatedDivider';
 import { useEffect, useState } from 'react';
-import { get } from '../utils/api.utils';
+import { get } from '../utils/apiUtils';
 
 
 function PartnersLogos() {

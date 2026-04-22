@@ -7,10 +7,7 @@ import {
 import { useForm } from '@mantine/form';
 import {
     IconSearch, IconPlus, IconEdit, IconTrash, IconDeviceFloppy,
-    IconFileText, IconRefresh, IconShieldCheck, IconLock, IconKey,
-    IconScale, IconBuildingBank, IconUserCheck, IconAlertCircle,
-    IconCookie, IconMail, IconPhone, IconGlobe, IconInfoCircle,
-    IconClipboardList, IconNotes, IconStarFilled, IconBell,
+    IconRefresh, IconLock,
     IconCheck,
     IconBan,
 } from '@tabler/icons-react';
@@ -18,61 +15,15 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get, post, put, del } from '../../utils/api.utils';
-
-
-// ── Icon registry ─────────────────────────────────────────────────────────────
-const ICON_MAP: Record<string, React.FC<{ size?: number; color?: string }>> = {
-    'file-text': IconFileText,
-    'shield-check': IconShieldCheck,
-    'lock': IconLock,
-    'key': IconKey,
-    'scale': IconScale,
-    'building-bank': IconBuildingBank,
-    'user-check': IconUserCheck,
-    'alert-circle': IconAlertCircle,
-    'cookie': IconCookie,
-    'mail': IconMail,
-    'phone': IconPhone,
-    'globe': IconGlobe,
-    'info-circle': IconInfoCircle,
-    'clipboard-list': IconClipboardList,
-    'notes': IconNotes,
-    'star': IconStarFilled,
-    'bell': IconBell,
-};
-
-const ICON_OPTIONS = Object.keys(ICON_MAP).map((value) => ({ value, label: value }));
+import { get, post, put, del } from '../../utils/apiUtils';
+import type { PrivacyPolicy, PrivacyPolicyFormValues as FormValues } from '../../types/admin';
+import { POLICY_ICON_MAP, POLICY_ICON_OPTIONS } from '../../constants/iconRegistry';
+import { glassInputStyles as inputStyles } from '../../constants/styles';
 
 function PolicyIcon({ icon, size = 14, color = 'white' }: { icon: string | null; size?: number; color?: string }) {
-    const Comp = icon ? ICON_MAP[icon] : null;
+    const Comp = icon ? POLICY_ICON_MAP[icon] : null;
     return Comp ? <Comp size={size} color={color} /> : <IconLock size={size} color={color} />;
 }
-
-interface PrivacyPolicy {
-    id: string;
-    title: string;
-    description: string;
-    icon: string | null;
-    color: string;
-    isActive: boolean;
-}
-
-interface FormValues {
-    title: string;
-    description: string;
-    icon: string;
-    color: string;
-    isActive: boolean;
-}
-
-const inputStyles = {
-    input: {
-        background: 'rgba(255,255,255,0.04)',
-        border: '0.5px solid var(--mantine-color-default-border)',
-        '&:focus': { borderColor: 'var(--az-teal)' },
-    },
-};
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function PrivacyPolicyPage() {
@@ -131,7 +82,7 @@ export default function PrivacyPolicyPage() {
             setTotalPages(res.data.totalPages ?? 1);
             setTotalCount(res.data.totalCount ?? 0);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
+            setError(err instanceof Error ? err.message : t('common.unknownError'));
             setPolicies([]);
         } finally {
             setLoading(false);
@@ -599,7 +550,7 @@ export default function PrivacyPolicyPage() {
                         placeholder={t('privacyPolicy.form.iconPlaceholder')}
                         radius="md"
                         clearable
-                        data={ICON_OPTIONS}
+                        data={POLICY_ICON_OPTIONS}
                         renderOption={({ option }) => (
                             <Group gap={8}>
                                 <PolicyIcon icon={option.value} size={14} color="currentColor" />

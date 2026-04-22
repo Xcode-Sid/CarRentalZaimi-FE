@@ -4,8 +4,9 @@ import { Center, Loader, Text, Button, Container, Stack } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { VehicleDetailView } from '../components/vehicle/VehicleDetailView';
-import { get } from '../utils/api.utils';
+import { get } from '../utils/apiUtils';
 import { mapApiCarToVehicle, type Vehicle } from '../data/vehicles';
+import { SIMILAR_CARS_PAGE_SIZE } from '../constants/pagination';
 
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -22,7 +23,7 @@ export default function VehicleDetailPage() {
 
   useEffect(() => {
     if (!id) {
-      setError('No vehicle ID provided.');
+      setError(t('vehicle.notFound'));
       setLoading(false);
       return;
     }
@@ -40,7 +41,7 @@ export default function VehicleDetailPage() {
           if (mapped.categoryId) {
             try {
               const similarRes = await get(
-                `Cars?pageNr=1&pageSize=5&categoryId=${mapped.categoryId}`,
+                `Cars?pageNr=1&pageSize=${SIMILAR_CARS_PAGE_SIZE}&categoryId=${mapped.categoryId}`,
               );
               if (similarRes.success) {
                 const items: any[] = similarRes.data?.items ?? [];
@@ -56,10 +57,10 @@ export default function VehicleDetailPage() {
             }
           }
         } else {
-          setError('Vehicle not found.');
+          setError(t('vehicle.notFound'));
         }
       } catch {
-        setError('Failed to load vehicle. Is the API running?');
+        setError(t('vehicle.failedToLoad'));
       } finally {
         setLoading(false);
       }
@@ -81,7 +82,7 @@ export default function VehicleDetailPage() {
       <Container size="sm" py={80}>
         <Stack align="center" gap="md">
           <Text c="red" ta="center" size="lg">
-            {error ?? 'Vehicle not found.'}
+            {error ?? t('vehicle.notFound')}
           </Text>
           <Button
             variant="light"

@@ -15,12 +15,12 @@ import { IconMailOff, IconCircleCheck, IconAlertCircle } from '@tabler/icons-rea
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
-import { post } from '../../utils/api.utils';
+import { post } from '../../utils/apiUtils';
 import { useTranslation } from 'react-i18next';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
-export function UnsubscribePage() {
+export default function UnsubscribePage() {
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';
   const [searchParams] = useSearchParams();

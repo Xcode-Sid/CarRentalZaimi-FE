@@ -9,33 +9,13 @@ import { UAParser } from 'ua-parser-js';
 import { useAuth } from '../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import Spinner from '../../components/spinner/Spinner';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import PhoneNumberModal from '../../components/registration/PhoneNumberModal';
-
-
-enum DeviceType {
-  Mobile = 1,
-  Tablet = 2,
-  Desktop = 3
-}
-
-interface DeviceInfo {
-  deviceType: DeviceType;
-  userAgent: string;
-  operatingSystem: string;
-  browser: string;
-  lastIPAddress: string;
-}
+import { DeviceType, type DeviceInfo, type PendingAuthData } from '../../types/oauth';
 
 interface SimpleGoogleOAuthProps {
   isMobile?: boolean;
   clientId?: string;
-}
-
-interface PendingAuthData {
-  token: string;
-  user: Record<string, unknown>;
-  role: { name: string } | string;
 }
 
 const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
@@ -101,14 +81,14 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
     if (!state?.startsWith('google_')) return;
     const err = urlParams.get('error');
     if (err) {
-      setError(`Authentication failed: ${err}`);
+      setError(`${t('oauth.authFailed')}: ${err}`);
       window.history.replaceState({}, document.title, window.location.pathname);
       return;
     }
     if (code && state) {
       const storedState = sessionStorage.getItem('google_oauth_state');
       if (storedState !== state) {
-        setError('Invalid state parameter. Please try again.');
+        setError(t('oauth.invalidState'));
         sessionStorage.removeItem('google_oauth_state');
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
@@ -152,7 +132,7 @@ const GoogleOAuth: React.FC<SimpleGoogleOAuthProps> = ({
       }
 
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Authentication failed';
+      const msg = err instanceof Error ? err.message : t('oauth.authFailed');
       setError(msg);
       notifications.show({ color: 'red', title: t('error'), message: msg });
     } finally {

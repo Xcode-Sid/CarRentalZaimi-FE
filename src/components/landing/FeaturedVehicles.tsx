@@ -19,11 +19,10 @@ import { motion } from 'framer-motion';
 import { notifications } from '@mantine/notifications';
 import { VehicleCard } from '../common/VehicleCard';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
-import { get } from '../../utils/api.utils';
+import { get } from '../../utils/apiUtils';
 import { type Vehicle, mapApiCarToVehicle } from '../../data/vehicles';
 import { AnimatedDivider } from '../common/AnimatedDivider';
-
-const FEATURED_LIMIT = 4;
+import { FEATURED_LIMIT } from '../../constants/landing';
 
 export function FeaturedVehicles() {
   const { t } = useTranslation();
@@ -50,11 +49,11 @@ export function FeaturedVehicles() {
               : res.data?.items ?? [];
           setFeatured(raw.map(mapApiCarToVehicle));
         } else {
-          setError('Failed to load featured vehicles.');
+          setError(t('featured.loadError'));
           notifications.show({ message: t('failedToLoadCars'), color: 'red' });
         }
       } catch {
-        setError('Failed to load featured vehicles. Is the API running?');
+        setError(t('featured.loadError'));
         notifications.show({ message:  t('failedToLoadCars'), color: 'red' });
       } finally {
         setLoading(false);

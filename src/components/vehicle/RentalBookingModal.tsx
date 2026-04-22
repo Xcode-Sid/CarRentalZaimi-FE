@@ -38,7 +38,7 @@ import { notifications } from '@mantine/notifications';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Vehicle } from '../../data/vehicles';
 import { getDayDiscount } from '../../utils/rentalPricing';
-import { get, post } from '../../utils/api.utils';
+import { get, post } from '../../utils/apiUtils';
 import type { AdditionalService } from '../../data/bookings';
 import Spinner from '../spinner/Spinner';
 
@@ -112,11 +112,11 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
     },
     validate: {
       startDate: (value) =>
-        !value ? (t('rental.validation.startDateRequired') ?? 'Start date is required') : null,
+        !value ? t('rental.validation.startDateRequired') : null,
       endDate: (value) =>
-        !value ? (t('rental.validation.endDateRequired') ?? 'End date is required') : null,
+        !value ? t('rental.validation.endDateRequired') : null,
       paymentMethod: (value) =>
-        !value ? (t('rental.validation.paymentRequired') ?? 'Payment method is required') : null,
+        !value ? t('rental.validation.paymentRequired') : null,
     },
   });
 
@@ -451,7 +451,7 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
                       </Stack>
                     ) : additionalServices.length === 0 ? (
                       <Text size="sm" c="dimmed" ta="center">
-                        {t('rental.noAddons') ?? 'No additional services available.'}
+                        {t('rental.noAddons')}
                       </Text>
                     ) : (
                       additionalServices.map((service) => {
@@ -519,7 +519,7 @@ export function RentalBookingModal({ opened, onClose, vehicle, bookedDates = [] 
                         <Group gap="xs" mt={6}>
                           <IconInfoCircle size={14} color="var(--mantine-color-blue-5)" style={{ flexShrink: 0 }} />
                           <Text size="xs" c="dimmed">
-                            {t('rental.phoneFromProfile') ?? 'This number was taken from your profile. You can enter a different one above.'}
+                            {t('rental.phoneFromProfile')}
                           </Text>
                         </Group>
                       )}

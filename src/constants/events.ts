@@ -19,3 +19,10 @@ export const CHAT_FRIEND_STATUS_CHANGED = "FriendStatusChanged";
 export const CHAT_MESSAGE_MARKED_READ = "MessageMarkedAsRead";
 export const CHAT_MESSAGE_MARKED_UNREAD = "MessageMarkedAsUnRead";
 export const CHAT_ERROR = "Error";
+
+/** Notification SignalR event names */
+export const NOTIF_RECEIVE = "ReceiveNotification";
+export const NOTIF_READ = "NotificationRead";
+export const NOTIF_UNREAD = "NotificationUnread";
+export const NOTIF_DELETED = "NotificationDeleted";
+export const NOTIF_ALL_READ = "AllNotificationsRead";

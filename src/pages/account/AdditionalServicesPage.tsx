@@ -12,7 +12,6 @@ import {
     Stack,
     Modal,
     Text,
-    Box,
     Paper,
     ThemeIcon,
     Tooltip,
@@ -39,52 +38,11 @@ import { useTranslation } from "react-i18next";
 
 import { useForm } from "@mantine/form";
 import { PAGE_SIZE } from "../../constants/pagination";
-import { del, get, post, put } from "../../utils/api.utils";
+import { del, get, post, put } from "../../utils/apiUtils";
 import Spinner from "../../components/spinner/Spinner";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface AdditionalService {
-    id: string;
-    name: string;
-    icon: string | null;
-    pricePerDay: number;
-    isActive: boolean;
-}
-
-// ─── Input styles ─────────────────────────────────────────────────────────────
-
-const inputStyles = {
-    input: {
-        transition: "border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.18s",
-        "&:focus": {
-            transform: "translateY(-1px)",
-            boxShadow: "0 0 0 3px rgba(29, 158, 117, 0.12)",
-        },
-    },
-    label: {
-        transition: "color 0.15s",
-        "&:has(+ * :focus)": { color: "var(--mantine-color-teal-7)" },
-    },
-};
-
-const SERVICE_ICONS: { value: string; label: string }[] = [
-    { value: "🛰️", label: "GPS / Satellite" },
-    { value: "🪑", label: "Baby Seat" },
-    { value: "🐾", label: "Pet Friendly" },
-    { value: "🛡️", label: "Insurance" },
-    { value: "⛽", label: "Fuel Package" },
-    { value: "🅿️", label: "Parking" },
-    { value: "🚗", label: "Delivery" },
-    { value: "🧹", label: "Cleaning" },
-    { value: "📱", label: "Mobile Wi-Fi" },
-    { value: "🔑", label: "Extra Key" },
-    { value: "❄️", label: "AC / Climate" },
-    { value: "🎿", label: "Ski Rack" },
-    { value: "🔧", label: "Roadside Assist" },
-    { value: "📷", label: "Dashcam" },
-    { value: "🎵", label: "Sound System" },
-];
+import type { AdditionalService } from "../../types/admin";
+import { inputStyles } from "../../constants/styles";
+import { SERVICE_ICONS } from "../../constants/iconRegistry";
 
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -321,7 +279,7 @@ export default function AdminAdditionalServicesPage() {
                                     color="gray"
                                     radius="md"
                                     onClick={() => setSearch("")}
-                                    title="Clear search"
+                                    title={t("common.clearSearch")}
                                 >
                                     <IconX size={15} />
                                 </ActionIcon>

@@ -12,24 +12,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
-import { get, post, put, del } from '../../utils/api.utils';
-
-const PAGE_SIZE = 6;
-
-interface Partner {
-    id: string;
-    name: string;
-    initials: string;
-    color: string;
-    isActive: boolean;
-}
-
-interface FormValues {
-    name: string;
-    initials: string;
-    color: string;
-    isActive: boolean;
-}
+import { get, post, put, del } from '../../utils/apiUtils';
+import type { Partner, PartnerFormValues as FormValues } from '../../types/admin';
+import { glassInputStyles as inputStyles } from '../../constants/styles';
+import { PARTNERS_PAGE_SIZE as PAGE_SIZE } from '../../constants/pagination';
 
 // ── Partner Avatar ────────────────────────────────────────────────────────────
 function PartnerAvatar({ partner }: { partner: Partner }) {
@@ -65,6 +51,7 @@ function PartnerCard({
     onEdit: (p: Partner) => void;
     onDelete: (p: Partner) => void;
 }) {
+    const { t } = useTranslation();
     return (
         <motion.div
             layout
@@ -101,12 +88,12 @@ function PartnerCard({
                         color={partner.isActive ? 'teal' : 'gray'}
                         style={{ flexShrink: 0, marginTop: 2 }}
                     >
-                        {partner.isActive ? 'Active' : 'Inactive'}
+                        {partner.isActive ? t('common.active') : t('common.inactive')}
                     </Badge>
                 </Group>
 
                 <Group gap="xs" mt="auto" justify="flex-end">
-                    <Tooltip label="Edit partner" withArrow>
+                    <Tooltip label={t('partners.edit')} withArrow>
                         <ActionIcon
                             variant="light"
                             color="teal"
@@ -117,7 +104,7 @@ function PartnerCard({
                             <IconEdit size={15} />
                         </ActionIcon>
                     </Tooltip>
-                    <Tooltip label="Delete partner" withArrow>
+                    <Tooltip label={t('partners.delete')} withArrow>
                         <ActionIcon
                             variant="light"
                             color="red"
@@ -134,14 +121,6 @@ function PartnerCard({
     );
 }
 
-// ── Input styles ──────────────────────────────────────────────────────────────
-const inputStyles = {
-    input: {
-        background: 'rgba(255,255,255,0.04)',
-        border: '0.5px solid var(--mantine-color-default-border)',
-        '&:focus': { borderColor: 'var(--az-teal)' },
-    },
-};
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function PartnersPage() {
@@ -165,9 +144,9 @@ export default function PartnersPage() {
     const form = useForm<FormValues>({
         initialValues: { name: '', initials: '', color: '#2dd4a8', isActive: true },
         validate: {
-            name: (v) => (!v.trim() ? 'Name is required' : null),
-            initials: (v) => (!v.trim() ? 'Initials are required' : v.length > 4 ? 'Max 4 chars' : null),
-            color: (v) => (!v ? 'Color is required' : null),
+            name: (v) => (!v.trim() ? t('partners.validation.nameRequired') : null),
+            initials: (v) => (!v.trim() ? t('partners.validation.initialsRequired') : v.length > 4 ? t('partners.validation.maxChars') : null),
+            color: (v) => (!v ? t('partners.validation.colorRequired') : null),
         },
     });
 
@@ -194,13 +173,13 @@ export default function PartnersPage() {
             if (debouncedSearch.trim()) params.set('Search', debouncedSearch.trim());
 
             const res = await get(`Partner/getPaged?${params.toString()}`);
-            if (!res.success) throw new Error(res.message || 'Failed to load partners');
+            if (!res.success) throw new Error(res.message || t('partners.loadFailed'));
 
             setPartners(res.data.items ?? []);
             setTotalPages(res.data.totalPages ?? 1);
             setTotalCount(res.data.totalCount ?? 0);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
+            setError(err instanceof Error ? err.message : t('common.unknownError'));
             setPartners([]);
         } finally {
             setLoading(false);
@@ -246,10 +225,10 @@ export default function PartnersPage() {
                     id: editTarget.id,
                     ...form.values,
                 });
-                if (!res.success) throw new Error(res.message || 'Failed to update partner');
+                if (!res.success) throw new Error(res.message || t('partners.updateFailed'));
             } else {
                 const res = await post('Partner', form.values);
-                if (!res.success) throw new Error(res.message || 'Failed to create partner');
+                if (!res.success) throw new Error(res.message || t('partners.createFailed'));
             }
             closeModal();
             fetchPartners();
@@ -267,7 +246,7 @@ export default function PartnersPage() {
         setActionLoading(true);
         try {
             const res = await del(`Partner/${deleteTarget.id}`);
-            if (!res.success) throw new Error(res.message || 'Failed to delete partner');
+            if (!res.success) throw new Error(res.message || t('partners.deleteFailed'));
             setDeleteTarget(null);
             fetchPartners();
         } catch (err) {
@@ -302,9 +281,9 @@ export default function PartnersPage() {
                                 }}
                             />
                             <div>
-                                <Title order={2} fw={800}>Partners</Title>
+                                <Title order={2} fw={800}>{t('partners.pageTitle')}</Title>
                                 <Text c="dimmed" size="sm" mt={4}>
-                                    Manage partner organisations and their branding
+                                    {t('partners.pageSubtitle')}
                                 </Text>
                             </div>
                         </Group>
@@ -314,7 +293,7 @@ export default function PartnersPage() {
                             radius="md"
                             onClick={openCreate}
                         >
-                            Add Partner
+                            {t('partners.add')}
                         </Button>
                     </Group>
                 </AnimatedSection>
@@ -323,13 +302,13 @@ export default function PartnersPage() {
                 <AnimatedSection delay={0.08}>
                     <Group wrap="wrap" align="end" gap="sm" mb="sm">
                         <TextInput
-                            placeholder="Search partners…"
+                            placeholder={t('partners.searchPlaceholder')}
                             leftSection={<IconSearch size={16} />}
                             value={search}
                             onChange={(e) => setSearch(e.currentTarget.value)}
                             style={{ flex: 1, minWidth: 240, maxWidth: 420 }}
                         />
-                        <Tooltip label="Refresh" withArrow>
+                        <Tooltip label={t('common.refresh')} withArrow>
                             <ActionIcon
                                 variant="light"
                                 color="teal"
@@ -389,11 +368,11 @@ export default function PartnersPage() {
                             {totalPages > 1 && (
                                 <Group justify="space-between" align="center" px={4}>
                                     <Text size="xs" c="dimmed">
-                                        Showing{' '}
+                                        {t('common.showing')}{' '}
                                         <Text component="span" size="xs" fw={500}>{startItem}–{endItem}</Text>
-                                        {' '}of{' '}
+                                        {' '}{t('common.of')}{' '}
                                         <Text component="span" size="xs" fw={500}>{totalCount}</Text>
-                                        {' '}partners
+                                        {' '}{t('partners.partners')}
                                     </Text>
                                     <Pagination
                                         value={page}
@@ -415,9 +394,9 @@ export default function PartnersPage() {
                                 <ThemeIcon size={56} radius="xl" color="teal" variant="light">
                                     <IconUsers size={28} />
                                 </ThemeIcon>
-                                <Text fw={600} size="md" mt="xs">No partners found</Text>
+                                <Text fw={600} size="md" mt="xs">{t('partners.empty')}</Text>
                                 <Text c="dimmed" size="sm">
-                                    {search ? 'Try a different search term' : 'Add your first partner to get started'}
+                                    {search ? t('partners.emptySearch') : t('partners.emptyHint')}
                                 </Text>
                                 {!search && (
                                     <Button
@@ -428,7 +407,7 @@ export default function PartnersPage() {
                                         mt="xs"
                                         onClick={openCreate}
                                     >
-                                        Add Partner
+                                        {t('partners.add')}
                                     </Button>
                                 )}
                             </Stack>
@@ -447,7 +426,7 @@ export default function PartnersPage() {
                             {editTarget ? <IconEdit size={16} /> : <IconPlus size={16} />}
                         </ThemeIcon>
                         <Text fw={500} size="md">
-                            {editTarget ? 'Edit Partner' : 'Add Partner'}
+                            {editTarget ? t('partners.editTitle') : t('partners.addTitle')}
                         </Text>
                     </Group>
                 }
@@ -461,8 +440,8 @@ export default function PartnersPage() {
             >
                 <Stack gap="md">
                     <TextInput
-                        label="Name"
-                        placeholder="e.g. Acme Corporation"
+                        label={t('partners.form.name')}
+                        placeholder={t('partners.form.namePlaceholder')}
                         required
                         radius="md"
                         {...form.getInputProps('name')}
@@ -470,9 +449,9 @@ export default function PartnersPage() {
                     />
 
                     <TextInput
-                        label="Initials"
-                        placeholder="e.g. AC"
-                        description="2–4 characters shown in the avatar"
+                        label={t('partners.form.initials')}
+                        placeholder={t('partners.form.initialsPlaceholder')}
+                        description={t('partners.form.initialsDescription')}
                         required
                         maxLength={4}
                         radius="md"
@@ -486,7 +465,7 @@ export default function PartnersPage() {
                     />
 
                     <ColorInput
-                        label="Brand Color"
+                        label={t('partners.form.color')}
                         placeholder="#2dd4a8"
                         required
                         radius="md"
@@ -506,7 +485,7 @@ export default function PartnersPage() {
                             radius="md"
                             style={{ background: 'rgba(255,255,255,0.03)', border: '0.5px solid var(--mantine-color-default-border)' }}
                         >
-                            <Text size="xs" c="dimmed" mb={10}>Preview</Text>
+                            <Text size="xs" c="dimmed" mb={10}>{t('partners.form.preview')}</Text>
                             <Group gap={12}>
                                 <Box
                                     style={{
@@ -525,9 +504,9 @@ export default function PartnersPage() {
                                     </Text>
                                 </Box>
                                 <div>
-                                    <Text fw={600} size="sm">{form.values.name || 'Partner name'}</Text>
+                                    <Text fw={600} size="sm">{form.values.name || t('partners.form.partnerName')}</Text>
                                     <Badge size="xs" color={form.values.isActive ? 'teal' : 'gray'} variant="dot" mt={2}>
-                                        {form.values.isActive ? 'Active' : 'Inactive'}
+                                        {form.values.isActive ? t('common.active') : t('common.inactive')}
                                     </Badge>
                                 </div>
                             </Group>
@@ -535,8 +514,8 @@ export default function PartnersPage() {
                     )}
 
                     <Switch
-                        label="Active"
-                        description="Inactive partners are hidden from public-facing areas"
+                        label={t('common.active')}
+                        description={t('partners.form.inactiveDescription')}
                         color="teal"
                         radius="md"
                         {...form.getInputProps('isActive', { type: 'checkbox' })}
@@ -552,7 +531,7 @@ export default function PartnersPage() {
                         leftSection={editTarget ? <IconDeviceFloppy size={16} /> : <IconPlus size={16} />}
                         onClick={handleSave}
                     >
-                        {editTarget ? 'Save Changes' : 'Create Partner'}
+                        {editTarget ? t('common.saveChanges') : t('partners.create')}
                     </Button>
                 </Stack>
             </Modal>

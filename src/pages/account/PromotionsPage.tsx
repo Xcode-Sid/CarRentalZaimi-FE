@@ -44,50 +44,10 @@ import { useTranslation } from "react-i18next";
 
 import { useForm } from "@mantine/form";
 import { PAGE_SIZE } from "../../constants/pagination";
-import { del, get, post, put } from "../../utils/api.utils";
+import { del, get, post, put } from "../../utils/apiUtils";
 import Spinner from "../../components/spinner/Spinner";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Promotion {
-    id: string;
-    title: string | null;
-    description: string | null;
-    code: string | null;
-    discountPercentage: number;
-    numberOfDays: number;
-    isActive: boolean;
-    carId: string | null;
-    carCategoryId: string | null;
-    carName?: string | null;
-    carCategoryName?: string | null;
-}
-
-interface CarCategory {
-    id: string;
-    name: string;
-}
-
-interface Car {
-    id: string;
-    title: string | null;
-    licensePlate: string;
-}
-// ─── Input styles ─────────────────────────────────────────────────────────────
-
-const inputStyles = {
-    input: {
-        transition: "border-color 0.18s, background 0.18s, box-shadow 0.18s, transform 0.18s",
-        "&:focus": {
-            transform: "translateY(-1px)",
-            boxShadow: "0 0 0 3px rgba(29, 158, 117, 0.12)",
-        },
-    },
-    label: {
-        transition: "color 0.15s",
-        "&:has(+ * :focus)": { color: "var(--mantine-color-teal-7)" },
-    },
-};
+import type { Promotion, PromotionCarCategory as CarCategory, PromotionCar as Car } from "../../types/admin";
+import { inputStyles } from "../../constants/styles";
 
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -421,7 +381,7 @@ const carOptions = cars.map((c) => ({
                                     color="gray"
                                     radius="md"
                                     onClick={() => setSearch("")}
-                                    title="Clear search"
+                                    title={t("common.clearSearch")}
                                 >
                                     <IconX size={15} />
                                 </ActionIcon>

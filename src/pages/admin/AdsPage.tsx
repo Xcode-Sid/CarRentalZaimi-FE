@@ -14,22 +14,11 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../../components/common/AnimatedSection';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get, post, put, del } from '../../utils/api.utils';
+import { get, post, put, del } from '../../utils/apiUtils';
 import { toImagePath } from '../../utils/general';
 import { notifications } from '@mantine/notifications';
 import { mapToAd, type Ad } from '../../data/ads';
-
-
-interface FormValues {
-  title: string;
-  imageName: string;
-  videoName: string;
-  imageData: string;
-  videoData: string;
-  linkUrl: string;
-  position: 'top' | 'bottom' | '';
-  isActive: boolean;
-}
+import type { AdsFormValues as FormValues } from '../../types/admin';
 
 // ── File Upload Field ─────────────────────────────────────────────────────────
 function FileUploadField({
@@ -178,15 +167,7 @@ function FileUploadField({
 }
 
 
-const inputStyles = {
-  input: {
-    background: 'rgba(255,255,255,0.04)',
-    border: '0.5px solid var(--mantine-color-default-border)',
-  },
-  wrapper: {
-    '--input-bd-focus': 'var(--az-teal)',
-  },
-} as const;
+import { adsInputStyles as inputStyles } from '../../constants/styles';
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function AdsPage() {
@@ -801,7 +782,7 @@ export default function AdsPage() {
 
               <Group gap={8} align="center">
                 <Box style={{ flex: 1, height: 1, background: 'var(--mantine-color-default-border)' }} />
-                <Text size="xs" c="dimmed" fw={500}>OR</Text>
+                <Text size="xs" c="dimmed" fw={500}>{t('common.or')}</Text>
                 <Box style={{ flex: 1, height: 1, background: 'var(--mantine-color-default-border)' }} />
               </Group>
 

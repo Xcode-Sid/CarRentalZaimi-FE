@@ -29,7 +29,7 @@ import GoogleOAuth from './oauth/GoogleOAuth';
 import FacebookOAuth from './oauth/FacebookOAuth';
 import MicrosoftOAuth from './oauth/MicrosoftOAuth';
 import YahooOAuth from './oauth/YahooOAuth';
-import { get, post } from '../utils/api.utils';
+import { get, post } from '../utils/apiUtils';
 import { Loader } from 'lucide-react';
 import { useForm } from '@mantine/form';
 import Spinner from '../components/spinner/Spinner';

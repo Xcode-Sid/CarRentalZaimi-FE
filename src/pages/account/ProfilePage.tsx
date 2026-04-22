@@ -25,7 +25,7 @@ import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../../components/common/AnimatedSection';
-import { post } from '../../utils/api.utils';
+import { post } from '../../utils/apiUtils';
 import type { User } from '../../data/users';
 import Spinner from '../../components/spinner/Spinner';
 import { toImagePath } from '../../utils/general';
@@ -83,14 +83,13 @@ export default function ProfilePage() {
   };
 
   const mapApiResponseToUser = (raw: any): User => ({
-    id: raw.id,
+    id: raw.id ?? raw.userId ?? raw.Id ?? null,
     firstName: raw.firstName,
     lastName: raw.lastName,
     email: raw.email,
     phoneNumber: raw.phoneNumber ?? '',
     username: raw.username ?? null,
     dateOfBirth: raw.dateOfBirth ? new Date(raw.dateOfBirth) : null,
-    // ✅ role is now a UserRole object, not a string
     role: raw.role
       ? {
         id: raw.role.id,
@@ -99,7 +98,6 @@ export default function ProfilePage() {
         concurrencyStamp: raw.role.concurrencyStamp ?? null,
       }
       : null,
-    // ✅ image is now a UserImage object
     image: raw.image
       ? {
         id: raw.image.id,
@@ -224,7 +222,7 @@ export default function ProfilePage() {
 
                     <StaggerItem>
                       <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                        <DateInput label={t('register.dateOfBirth')} placeholder="DD/MM/YYYY" leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
+                        <DateInput label={t('register.dateOfBirth')} placeholder={t('common.datePlaceholder')} leftSection={<IconCalendar size={16} />} maxDate={new Date()} valueFormat="DD/MM/YYYY" clearable {...form.getInputProps('dateOfBirth')} />
                         <TextInput label={t('username')} leftSection={<IconUser size={16} />} disabled {...form.getInputProps('username')} />
                       </SimpleGrid>
                     </StaggerItem>

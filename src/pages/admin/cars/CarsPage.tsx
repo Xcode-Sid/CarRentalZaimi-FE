@@ -13,10 +13,11 @@ import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { motion } from 'framer-motion';
 import { type CarImage as UploadedCarImage } from '../../../components/car-image/CarImageUploadPanel';
-import { CarFormModal, type Lookups } from './CarFormModal';
+import { CarFormModal } from './CarFormModal';
+import type { Lookups } from '../../../constants/carForm';
 import { type Vehicle, type GeneralData, type FormValues, mapApiCarToVehicle } from '../../../data/vehicles';
 import { PAGE_SIZE } from '../../../constants/pagination';
-import { del, get, post, put } from '../../../utils/api.utils';
+import { del, get, post, put } from '../../../utils/apiUtils';
 import { AnimatedSection } from '../../../components/common/AnimatedSection';
 import { toImagePath } from '../../../utils/general';
 import { VehicleDetailView } from '../../../components/vehicle/VehicleDetailView';
@@ -86,7 +87,7 @@ export default function CarsPage() {
         fuels: normalizeArray(fuels.data),
       });
     } catch {
-      notifications.show({ message: 'Failed to load lookup data.', color: 'red' });
+      notifications.show({ message: t('admin.carsLookupFailed'), color: 'red' });
     } finally {
       setLookupsLoading(false);
     }
@@ -109,10 +110,10 @@ export default function CarsPage() {
         setTotalPages(res.data.totalPages);
         setTotalCount(res.data.totalCount);
       } else {
-        setError('Failed to load cars.');
+        setError(t('admin.carsLoadFailed'));
       }
     } catch {
-      setError('Failed to load cars. Is the API running?');
+      setError(t('admin.carsLoadFailed'));
     } finally {
       setLoading(false);
     }
@@ -166,10 +167,10 @@ export default function CarsPage() {
         notifications.show({ title: t('success'), message: t('admin.carSaved'), color: 'teal' });
         await fetchCars();
       } else {
-        notifications.show({ title: t('error'), message: 'Save failed. Check API.', color: 'red' });
+        notifications.show({ title: t('error'), message: t('admin.carsSaveFailed'), color: 'red' });
       }
     } catch (err) {
-      notifications.show({ title: t('error'), message: 'Save failed. Check API.', color: 'red' });
+      notifications.show({ title: t('error'), message: t('admin.carsSaveFailed'), color: 'red' });
     } finally {
       setSaving(false);
     }
@@ -184,10 +185,10 @@ export default function CarsPage() {
         notifications.show({ message: t('admin.carDeleted'), color: 'red' });
         setDeleteTarget(null);
       } else {
-        notifications.show({ message: 'Delete failed.', color: 'red' });
+        notifications.show({ message: t('admin.carsDeleteFailed'), color: 'red' });
       }
     } catch {
-      notifications.show({ message: 'Delete failed.', color: 'red' });
+      notifications.show({ message: t('admin.carsDeleteFailed'), color: 'red' });
     }
   };
 
@@ -212,7 +213,7 @@ export default function CarsPage() {
                   {t('admin.manageCars')}
                 </Title>
                 <Text size="sm" c="dimmed">
-                  {totalCount} {t('admin.carsTotal') ?? 'vehicles listed'}
+                  {totalCount} {t('admin.carsTotal')}
                 </Text>
               </Stack>
 
@@ -287,7 +288,7 @@ export default function CarsPage() {
                       color="gray"
                       radius="md"
                       onClick={() => { setSearch(''); setCategoryFilter(null); }}
-                      title="Clear filters"
+                      title={t('common.clearFilters')}
                     >
                       <IconX size={15} />
                     </ActionIcon>
@@ -347,7 +348,7 @@ export default function CarsPage() {
                                     <IconCar size={20} />
                                   </ThemeIcon>
                                   <Text size="sm" c="dimmed">
-                                    {t('admin.noCarsFound') ?? 'No cars found'}
+                                    {t('admin.noCarsFound')}
                                   </Text>
                                 </Stack>
                               </Center>
@@ -453,15 +454,15 @@ export default function CarsPage() {
                 {totalPages > 1 && (
                   <Group justify="space-between" align="center" px={4}>
                     <Text size="xs" c="dimmed">
-                      {t('admin.showing') ?? 'Showing'}{' '}
+                      {t('admin.showing')}{' '}
                       <Text component="span" size="xs" fw={500} c="default">
                         {startItem}–{endItem}
                       </Text>{' '}
-                      {t('admin.of') ?? 'of'}{' '}
+                      {t('admin.of')}{' '}
                       <Text component="span" size="xs" fw={500} c="default">
                         {totalCount}
                       </Text>{' '}
-                      {t('admin.cars') ?? 'cars'}
+                      {t('admin.cars')}
                     </Text>
 
                     <Pagination

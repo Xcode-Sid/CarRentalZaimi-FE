@@ -2,7 +2,7 @@ import { ActionIcon, useMantineColorScheme } from "@mantine/core";
 import { Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-import { STORAGE_KEYS } from "../data/storageKeys";
+import { STORAGE_KEYS } from "../../data/storageKeys";
 
 export default function ThemeSwitcher() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();

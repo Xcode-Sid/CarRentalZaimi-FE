@@ -43,28 +43,10 @@ import { ImageGallery } from './ImageGallery';
 import { RentalBookingModal } from './RentalBookingModal';
 import { AnimatedSection, StaggerContainer, StaggerItem } from '../common/AnimatedSection';
 import { useAuth } from '../../contexts/AuthContext';
-import { get, post, put, del } from '../../utils/api.utils';
+import { get, post, put, del } from '../../utils/apiUtils';
 import Spinner from '../spinner/Spinner';
 import { toImagePath } from '../../utils/general';
-
-type CarReview = {
-  id: string;
-  createdOn: string;
-  modifiedOn: string;
-  rating: number;
-  comment: string;
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    username: string;
-    email: string;
-    image: {
-      imageName: string;
-      imageData: string;
-    } | null;
-  };
-};
+import type { CarReview } from '../../types/reviews';
 
 export function VehicleDetailView({
   vehicle,
@@ -137,24 +119,24 @@ export function VehicleDetailView({
   const priceDisplay = `€${vehicle.pricePerDay}/${t('vehicle.perDay')}`;
 
   const features = [
-    vehicle.abs && 'ABS',
-    vehicle.bluetooth && 'Bluetooth',
-    vehicle.airConditioner && 'A/C',
-    vehicle.gps && 'GPS',
-    vehicle.camera && 'Camera',
-    vehicle.heatedSeats && 'Heated Seats',
-    vehicle.panoramicRoof && 'Panoramic Roof',
-    vehicle.parkingSensors && 'Parking Sensors',
-    vehicle.cruiseControl && 'Cruise Control',
-    vehicle.climateControl && 'Climate Control',
-    vehicle.ledHeadlights && 'LED Headlights',
-    vehicle.appleCarPlay && 'Apple CarPlay',
-    vehicle.androidAuto && 'Android Auto',
-    vehicle.laneDepartureAlert && 'Lane Departure Alert',
-    vehicle.adaptiveCruiseControl && 'Adaptive Cruise Control',
-    vehicle.wirelessCharging && 'Wireless Charging',
-    vehicle.electricWindows && 'Electric Windows',
-    vehicle.thirdRowSeats && 'Third Row Seats',
+    vehicle.abs && t('vehicle.features.abs'),
+    vehicle.bluetooth && t('vehicle.features.bluetooth'),
+    vehicle.airConditioner && t('vehicle.features.ac'),
+    vehicle.gps && t('vehicle.features.gps'),
+    vehicle.camera && t('vehicle.features.camera'),
+    vehicle.heatedSeats && t('vehicle.features.heatedSeats'),
+    vehicle.panoramicRoof && t('vehicle.features.panoramicRoof'),
+    vehicle.parkingSensors && t('vehicle.features.parkingSensors'),
+    vehicle.cruiseControl && t('vehicle.features.cruiseControl'),
+    vehicle.climateControl && t('vehicle.features.climateControl'),
+    vehicle.ledHeadlights && t('vehicle.features.ledHeadlights'),
+    vehicle.appleCarPlay && t('vehicle.features.appleCarPlay'),
+    vehicle.androidAuto && t('vehicle.features.androidAuto'),
+    vehicle.laneDepartureAlert && t('vehicle.features.laneDepartureAlert'),
+    vehicle.adaptiveCruiseControl && t('vehicle.features.adaptiveCruiseControl'),
+    vehicle.wirelessCharging && t('vehicle.features.wirelessCharging'),
+    vehicle.electricWindows && t('vehicle.features.electricWindows'),
+    vehicle.thirdRowSeats && t('vehicle.features.thirdRowSeats'),
   ].filter(Boolean) as string[];
 
   const specRows = [
@@ -162,7 +144,7 @@ export function VehicleDetailView({
     [t('vehicle.model'), vehicle.modelName ?? '—'],
     [t('vehicle.year'), vehicle.year],
     [t('vehicle.mileage'), vehicle.mileage ?? '—'],
-    [t('vehicle.engine'), vehicle.horsePower ? `${vehicle.horsePower} HP` : '—'],
+    [t('vehicle.engine'), vehicle.horsePower ? `${vehicle.horsePower} ${t('vehicle.hp')}` : '—'],
     [t('vehicle.transmission'), vehicle.transmissionType ?? '—'],
     [t('vehicle.fuel'), vehicle.fuelType ?? '—'],
     [t('vehicle.color'), vehicle.exteriorColor ?? '—'],
@@ -181,7 +163,7 @@ export function VehicleDetailView({
         comment: reviewText,
       });
 
-      if (!response.success) throw new Error('Failed to submit review');
+      if (!response.success) return;
 
       notifications.show({ title: t('success'), message: t('vehicle.reviewSuccess'), color: 'teal' });
       setReviewRating(0);
@@ -205,12 +187,14 @@ export function VehicleDetailView({
     if (!editingReview || !editRating || !editText) return;
     setLoading(true);
     try {
-      await put(`CarReview/update/${editingReview.id}`, {
+      const res = await put(`CarReview/update/${editingReview.id}`, {
         rating: editRating,
         comment: editText,
       });
 
-      notifications.show({ title: t('success'), message: t('vehicle.reviewUpdated') ?? 'Review updated!', color: 'teal' });
+      if (!res.success) return;
+
+      notifications.show({ title: t('success'), message: t('vehicle.reviewUpdated'), color: 'teal' });
       setEditingReview(null);
       await refreshReviews();
     } catch {
@@ -224,9 +208,11 @@ export function VehicleDetailView({
     if (!deletingReviewId) return;
     setLoading(true);
     try {
-      await del(`CarReview/${deletingReviewId}`);
+      const res = await del(`CarReview/${deletingReviewId}`);
 
-      notifications.show({ title: t('success'), message: t('vehicle.reviewDeleted') ?? 'Review deleted!', color: 'teal' });
+      if (!res.success) return;
+
+      notifications.show({ title: t('success'), message: t('vehicle.reviewDeleted'), color: 'teal' });
       setDeletingReviewId(null);
       setVehicleReviews((prev) => prev.filter((r) => r.id !== deletingReviewId));
     } catch {
@@ -362,7 +348,7 @@ export function VehicleDetailView({
                     <Divider />
 
                     {loading ? (
-                      <Text c="dimmed" ta="center">{t('loading') ?? 'Loading...'}</Text>
+                      <Text c="dimmed" ta="center">{t('loading')}</Text>
                     ) : vehicleReviews.length === 0 ? (
                       <Text c="dimmed" ta="center">{t('vehicle.noReviews')}</Text>
                     ) : (
@@ -699,7 +685,7 @@ export function VehicleDetailView({
                   setReviewText('');
                 }}
               >
-                {t('cancel') ?? 'Cancel'}
+                {t('cancel')}
               </Button>
               <Button
                 color="teal"
@@ -753,7 +739,7 @@ export function VehicleDetailView({
             />
             <Group justify="flex-end" gap="sm" mt={4}>
               <Button variant="default" radius="md" onClick={() => setEditingReview(null)}>
-                {t('cancel') ?? 'Cancel'}
+                {t('cancel')}
               </Button>
               <Button
                 color="teal"
@@ -801,10 +787,10 @@ export function VehicleDetailView({
             >
               <Stack gap={4} align="center">
                 <Text size="sm" ta="center" fw={500} c="red.8">
-                  {t('vehicle.deleteReviewConfirm') ?? 'Are you sure you want to delete this review?'}
+                  {t('vehicle.deleteReviewConfirm')}
                 </Text>
                 <Text size="xs" ta="center" c="dimmed">
-                  {t('carData.deleteUndone') ?? 'This action cannot be undone.'}
+                  {t('carData.deleteUndone')}
                 </Text>
               </Stack>
             </Paper>
@@ -817,7 +803,7 @@ export function VehicleDetailView({
                 onClick={() => setDeletingReviewId(null)}
                 disabled={loading}
               >
-                {t('cancel') ?? 'Cancel'}
+                {t('cancel')}
               </Button>
               <Button
                 color="red"

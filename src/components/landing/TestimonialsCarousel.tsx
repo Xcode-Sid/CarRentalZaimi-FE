@@ -6,23 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AnimatedSection } from '../common/AnimatedSection';
 import { PAGE_SIZE } from '../../constants/pagination';
-import { get } from '../../utils/api.utils';
-
-type CarReview = {
-  id: string;
-  createdOn: string;
-  rating: number;
-  comment: string;
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    image: {
-      imageName: string;
-      imageData: string;
-    } | null;
-  };
-};
+import { get } from '../../utils/apiUtils';
+import type { CarReview } from '../../types/reviews';
 
 export function TestimonialsCarousel() {
   const { t } = useTranslation();
